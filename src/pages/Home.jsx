@@ -4,12 +4,12 @@ import { useNews } from '../context/NewsContext';
 import { formatDate, timeAgo } from '../utils/helpers';
 
 const INITIAL_WEATHER = [
+    { city: 'रतनगढ़', temp: '34°C', icon: '☀️', desc: 'धूप' },
     { city: 'जयपुर', temp: '34°C', icon: '☀️', desc: 'धूप' },
     { city: 'जोधपुर', temp: '36°C', icon: '🌤️', desc: 'आंशिक बादल' },
     { city: 'उदयपुर', temp: '30°C', icon: '⛅', desc: 'बादल' },
     { city: 'कोटा', temp: '33°C', icon: '☀️', desc: 'गर्म' },
     { city: 'बीकानेर', temp: '38°C', icon: '🌵', desc: 'शुष्क' },
-    { city: 'अजमेर', temp: '32°C', icon: '⛅', desc: 'हल्के बादल' },
 ];
 
 function NewsCard({ article, large = false }) {
@@ -81,8 +81,8 @@ export default function Home() {
     useEffect(() => {
         const fetchWeather = async () => {
             try {
-                // Open-Meteo URL for Jaipur, Jodhpur, Udaipur, Kota, Bikaner, Ajmer
-                const res = await fetch("https://api.open-meteo.com/v1/forecast?latitude=26.9124,26.2389,24.5854,25.2138,28.0229,26.4499&longitude=75.7873,73.0243,73.7125,75.8648,73.3119,74.6399&current_weather=true");
+                // Open-Meteo URL for Ratangarh, Jaipur, Jodhpur, Udaipur, Kota, Bikaner
+                const res = await fetch("https://api.open-meteo.com/v1/forecast?latitude=28.0775,26.9124,26.2389,24.5854,25.2138,28.0229&longitude=74.6200,75.7873,73.0243,73.7125,75.8648,73.3119&current_weather=true");
                 const data = await res.json();
 
                 const getWeatherIcon = (code) => {
