@@ -16,7 +16,7 @@ export default function LiveTV() {
                             src={(() => {
                                 let url = settings.liveUrl;
                                 if (url.includes('youtube.com/embed/')) {
-                                    url += url.includes('?') ? '&autoplay=1&mute=1' : '?autoplay=1&mute=1';
+                                    url += url.includes('?') ? '&autoplay=1&mute=0' : '?autoplay=1&mute=0';
                                 }
                                 return url;
                             })()}
