@@ -13,7 +13,13 @@ export default function LiveTV() {
                 <div className="video-embed" style={{ borderRadius: 'var(--radius-lg)', overflow: 'hidden', boxShadow: 'var(--card-shadow-hover)' }}>
                     {settings.liveUrl ? (
                         <iframe
-                            src={settings.liveUrl}
+                            src={(() => {
+                                let url = settings.liveUrl;
+                                if (url.includes('youtube.com/embed/')) {
+                                    url += url.includes('?') ? '&autoplay=1&mute=1' : '?autoplay=1&mute=1';
+                                }
+                                return url;
+                            })()}
                             title="JG News Plus Live TV"
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                             allowFullScreen
