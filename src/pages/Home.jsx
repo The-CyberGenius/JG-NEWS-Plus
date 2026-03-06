@@ -10,6 +10,16 @@ const INITIAL_WEATHER = [
     { city: 'उदयपुर', temp: '30°C', icon: '⛅', desc: 'बादल' },
     { city: 'कोटा', temp: '33°C', icon: '☀️', desc: 'गर्म' },
     { city: 'बीकानेर', temp: '38°C', icon: '🌵', desc: 'शुष्क' },
+    { city: 'अजमेर', temp: '32°C', icon: '⛅', desc: 'बादल' },
+    { city: 'अलवर', temp: '33°C', icon: '☀️', desc: 'धूप' },
+    { city: 'भीलवाड़ा', temp: '31°C', icon: '🌤️', desc: 'आंशिक बादल' },
+    { city: 'सीकर', temp: '34°C', icon: '☀️', desc: 'धूप' },
+    { city: 'पाली', temp: '35°C', icon: '☀️', desc: 'धूप' },
+    { city: 'माउंट आबू', temp: '22°C', icon: '⛅', desc: 'ठंडा' },
+    { city: 'जैसलमेर', temp: '39°C', icon: '🌵', desc: 'शुष्क' },
+    { city: 'चित्तौड़गढ़', temp: '31°C', icon: '⛅', desc: 'बादल' },
+    { city: 'भरतपुर', temp: '33°C', icon: '☀️', desc: 'धूप' },
+    { city: 'गंगानगर', temp: '37°C', icon: '☀️', desc: 'धूप' },
 ];
 
 function NewsCard({ article, large = false }) {
@@ -81,8 +91,8 @@ export default function Home() {
     useEffect(() => {
         const fetchWeather = async () => {
             try {
-                // Open-Meteo URL for Ratangarh, Jaipur, Jodhpur, Udaipur, Kota, Bikaner
-                const res = await fetch("https://api.open-meteo.com/v1/forecast?latitude=28.0775,26.9124,26.2389,24.5854,25.2138,28.0229&longitude=74.6200,75.7873,73.0243,73.7125,75.8648,73.3119&current_weather=true");
+                // Open-Meteo URL for 16 Rajasthan Cities
+                const res = await fetch("https://api.open-meteo.com/v1/forecast?latitude=28.0775,26.9124,26.2389,24.5854,25.2138,28.0229,26.4499,27.5530,25.3407,27.6094,25.7711,24.5926,26.9157,24.8829,27.2152,29.9038&longitude=74.6200,75.7873,73.0243,73.7125,75.8648,73.3119,74.6399,76.6346,74.6313,75.1398,73.3234,72.7156,70.9083,74.6230,77.4895,73.8772&current_weather=true");
                 const data = await res.json();
 
                 const getWeatherIcon = (code) => {
