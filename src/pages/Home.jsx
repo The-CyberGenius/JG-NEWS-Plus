@@ -1,9 +1,9 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useNews } from '../context/NewsContext';
 import { formatDate, timeAgo } from '../utils/helpers';
 
-const WEATHER_DATA = [
+const INITIAL_WEATHER = [
     { city: 'जयपुर', temp: '34°C', icon: '☀️', desc: 'धूप' },
     { city: 'जोधपुर', temp: '36°C', icon: '🌤️', desc: 'आंशिक बादल' },
     { city: 'उदयपुर', temp: '30°C', icon: '⛅', desc: 'बादल' },
@@ -76,6 +76,38 @@ function SectionHeader({ title, linkTo, linkLabel = 'और देखें' }) 
 
 export default function Home() {
     const { articles, settings } = useNews();
+    const [weatherData, setWeatherData] = useState(INITIAL_WEATHER);
+
+    useEffect(() => {
+        const fetchWeather = async () => {
+            try {
+                // Open-Meteo URL for Jaipur, Jodhpur, Udaipur, Kota, Bikaner, Ajmer
+                const res = await fetch("https://api.open-meteo.com/v1/forecast?latitude=26.9124,26.2389,24.5854,25.2138,28.0229,26.4499&longitude=75.7873,73.0243,73.7125,75.8648,73.3119,74.6399&current_weather=true");
+                const data = await res.json();
+
+                const getWeatherIcon = (code) => {
+                    if (code === 0) return '☀️';
+                    if (code === 1 || code === 2 || code === 3) return '⛅';
+                    if (code >= 45 && code <= 48) return '🌫️';
+                    if (code >= 51 && code <= 67) return '🌧️';
+                    if (code >= 71 && code <= 77) return '❄️';
+                    if (code >= 95) return '⛈️';
+                    return '🌤️';
+                };
+
+                const updatedWeather = data.map((location, i) => ({
+                    ...INITIAL_WEATHER[i],
+                    temp: `${Math.round(location.current_weather.temperature)}°C`,
+                    icon: getWeatherIcon(location.current_weather.weathercode)
+                }));
+
+                setWeatherData(updatedWeather);
+            } catch (err) {
+                console.error("Open-Meteo weather update failed", err);
+            }
+        };
+        fetchWeather();
+    }, []);
 
     const featured = useMemo(() => articles.find(a => a.isFeatured) || articles[0], [articles]);
     const breaking = useMemo(() => articles.filter(a => a.isBreaking).slice(0, 3), [articles]);
@@ -152,7 +184,7 @@ export default function Home() {
                             🌡️ मौसम
                         </div>
                         <div className="weather-grid" style={{ display: 'flex', gap: '12px', flexShrink: 0 }}>
-                            {WEATHER_DATA.map(w => (
+                            {weatherData.map(w => (
                                 <div key={w.city} style={{ background: 'rgba(255,255,255,0.08)', borderRadius: '10px', padding: '8px 14px', textAlign: 'center', color: 'white', minWidth: '90px' }}>
                                     <div style={{ fontSize: '1.1rem' }}>{w.icon}</div>
                                     <div style={{ fontWeight: 700, fontSize: '0.82rem', color: 'var(--teal)' }}>{w.temp}</div>

@@ -57,24 +57,7 @@ export default function ArticlePage() {
     return (
         <>
             <article>
-                {/* Hero Image — Click to open lightbox */}
-                <div className="article-hero" style={{ cursor: 'zoom-in' }} onClick={() => setLightbox(true)} title="क्लिक करके बड़ा देखें">
-                    <img src={heroImg} alt={article.title} />
-                    <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(10,22,40,0.6) 0%, transparent 60%)' }} />
-                    {/* Zoom hint */}
-                    <div style={{
-                        position: 'absolute', bottom: '16px', right: '16px',
-                        background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(6px)',
-                        color: 'white', padding: '6px 12px', borderRadius: '8px',
-                        fontSize: '0.75rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px',
-                        pointerEvents: 'none',
-                    }}>
-                        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                            <circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" /><path d="M11 8v6M8 11h6" />
-                        </svg>
-                        बड़ा देखें
-                    </div>
-                </div>
+
 
                 <div className="article-body">
                     {/* Breadcrumb */}
