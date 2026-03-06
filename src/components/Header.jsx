@@ -47,7 +47,7 @@ export default function Header() {
                     <div style={{ display: 'flex', gap: '14px', alignItems: 'center' }}>
                         <a href="https://facebook.com" target="_blank" rel="noreferrer" style={{ color: '#4267B2', fontWeight: 700 }}>Facebook</a>
                         <a href="https://youtube.com" target="_blank" rel="noreferrer" style={{ color: '#FF0000', fontWeight: 700 }}>YouTube</a>
-                        <a href="https://twitter.com" target="_blank" rel="noreferrer" style={{ color: '#1DA1F2', fontWeight: 700 }}>Twitter</a>
+                        <a href="https://twitter.com" target="_blank" rel="noreferrer" style={{ color: '#1DA1F2', fontWeight: 700 }}>X</a>
                     </div>
                 </div>
             </div>
