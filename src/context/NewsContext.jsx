@@ -9,49 +9,60 @@ import {
 const NewsContext = createContext(null);
 
 export const NewsProvider = ({ children }) => {
-    const [articles, setArticles] = useState(() => getArticles());
-    const [categories, setCategories] = useState(() => getCategories());
-    const [settings, setSettings] = useState(() => getSettings());
+    const [articles, setArticles] = useState([]);
+    const [categories, setCategories] = useState([]);
+    const [settings, setSettings] = useState({});
     const [adminAuth, setAdminAuth] = useState(() => isAdminLoggedIn());
 
-    const refresh = useCallback(() => {
-        setArticles(getArticles());
-        setCategories(getCategories());
-        setSettings(getSettings());
+    const refresh = useCallback(async () => {
+        try {
+            const fetchedArticles = await getArticles();
+            const fetchedCategories = await getCategories();
+            const fetchedSettings = await getSettings();
+            setArticles(fetchedArticles);
+            setCategories(fetchedCategories);
+            setSettings(fetchedSettings);
+        } catch (error) {
+            console.error(error);
+        }
     }, []);
 
-    const handleAdd = useCallback((article) => {
-        addArticle(article);
-        setArticles(getArticles());
+    React.useEffect(() => {
+        refresh();
+    }, [refresh]);
+
+    const handleAdd = useCallback(async (article) => {
+        await addArticle(article);
+        await refresh();
+    }, [refresh]);
+
+    const handleUpdate = useCallback(async (id, updates) => {
+        await updateArticle(id, updates);
+        await refresh();
+    }, [refresh]);
+
+    const handleDelete = useCallback(async (id) => {
+        await deleteArticle(id);
+        await refresh();
+    }, [refresh]);
+
+    const handleAddCategory = useCallback(async (name) => {
+        await addCategory(name);
+        await refresh();
+    }, [refresh]);
+
+    const handleDeleteCategory = useCallback(async (name) => {
+        await deleteCategory(name);
+        await refresh();
+    }, [refresh]);
+
+    const handleUpdateSettings = useCallback(async (updates) => {
+        const s = await updateSettings(updates);
+        if (s) setSettings(s);
     }, []);
 
-    const handleUpdate = useCallback((id, updates) => {
-        updateArticle(id, updates);
-        setArticles(getArticles());
-    }, []);
-
-    const handleDelete = useCallback((id) => {
-        deleteArticle(id);
-        setArticles(getArticles());
-    }, []);
-
-    const handleAddCategory = useCallback((name) => {
-        addCategory(name);
-        setCategories(getCategories());
-    }, []);
-
-    const handleDeleteCategory = useCallback((name) => {
-        deleteCategory(name);
-        setCategories(getCategories());
-    }, []);
-
-    const handleUpdateSettings = useCallback((updates) => {
-        const s = updateSettings(updates);
-        setSettings(s);
-    }, []);
-
-    const handleLogin = useCallback((password) => {
-        const ok = adminLogin(password);
+    const handleLogin = useCallback(async (password) => {
+        const ok = await adminLogin(password);
         if (ok) setAdminAuth(true);
         return ok;
     }, []);
