@@ -491,7 +491,7 @@ ol {
 
 .ticker-inner {
   display: flex;
-  animation: ticker-scroll 40s linear infinite;
+  animation: ticker-scroll 15s linear infinite;
   white-space: nowrap;
 }
 
