@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="hi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JG News Plus – User Guide | संचालन गाइड</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600;700;800&family=Inter:wght@400;600;700;800&display=swap');
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --navy: #0a1628;
+            --teal: #00bcd4;
+            --saffron: #ff6f00;
+            --red: #e53935;
+            --white: #ffffff;
+        }
+
+        body {
+            font-family: 'Noto Sans Devanagari', 'Inter', sans-serif;
+            color: #1e293b;
+            line-height: 1.7;
+            font-size: 14px;
+            background: #f8fafc;
+        }
+
+        /* Print Styles */
+        @media print {
+            body {
+                background: white;
+                font-size: 12px;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            .page-break {
+                page-break-before: always;
+            }
+
+            .card {
+                box-shadow: none !important;
+                border: 1px solid #e2e8f0 !important;
+            }
+
+            header {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .step-num {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .badge {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .header-grad {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .warning-box,
+            .tip-box,
+            .info-box {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
+
+        /* Print Button */
+        .print-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+            background: var(--navy);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+            font-family: inherit;
+        }
+
+        .print-btn:hover {
+            background: #152035;
+        }
+
+        /* Layout */
+        .container {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* Header */
+        .header-grad {
+            background: linear-gradient(135deg, var(--navy) 0%, #1e3a5f 100%);
+            padding: 48px 0 40px;
+            color: white;
+            text-align: center;
+        }
+
+        .header-logo {
+            font-size: 2.4rem;
+            font-weight: 900;
+            margin-bottom: 8px;
+        }
+
+        .header-logo .teal {
+            color: var(--teal);
+        }
+
+        .header-logo .saffron {
+            color: var(--saffron);
+        }
+
+        .header-tagline {
+            color: var(--teal);
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 4px;
+        }
+
+        .header-title {
+            font-size: 1.4rem;
+            font-weight: 800;
+            margin: 20px 0 8px;
+        }
+
+        .header-sub {
+            opacity: 0.8;
+            font-size: 0.95rem;
+        }
+
+        .doc-meta {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .doc-meta-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 6px 16px;
+            border-radius: 100px;
+            font-size: 0.82rem;
+        }
+
+        /* Content */
+        .content {
+            padding: 40px 0;
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 20px rgba(10, 22, 40, 0.10);
+        }
+
+        /* Section Title */
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--navy);
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 3px solid var(--teal);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Steps */
+        .steps {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .step {
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+        }
+
+        .step-num {
+            width: 32px;
+            height: 32px;
+            background: var(--navy);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .step-content {
+            flex: 1;
+            padding-top: 4px;
+        }
+
+        .step-title {
+            font-weight: 700;
+            color: var(--navy);
+            margin-bottom: 4px;
+        }
+
+        .step-desc {
+            color: #475569;
+            font-size: 0.9rem;
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+        }
+
+        .badge-red {
+            background: var(--red);
+            color: white;
+        }
+
+        .badge-teal {
+            background: var(--teal);
+            color: white;
+        }
+
+        .badge-navy {
+            background: var(--navy);
+            color: white;
+        }
+
+        .badge-saffron {
+            background: var(--saffron);
+            color: white;
+        }
+
+        .badge-green {
+            background: #16a34a;
+            color: white;
+        }
+
+        /* Credential Box */
+        .cred-box {
+            background: var(--navy);
+            border-radius: 12px;
+            padding: 20px 24px;
+            color: white;
+            margin: 16px 0;
+        }
+
+        .cred-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .cred-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .cred-label {
+            opacity: 0.7;
+            font-size: 0.82rem;
+            width: 100px;
+            flex-shrink: 0;
+        }
+
+        .cred-value {
+            font-weight: 800;
+            color: var(--teal);
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.08);
+            padding: 4px 14px;
+            border-radius: 6px;
+        }
+
+        /* Warning / Tip Boxes */
+        .warning-box {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 14px 18px;
+            border-radius: 0 10px 10px 0;
+            margin: 14px 0;
+        }
+
+        .tip-box {
+            background: #d1fae5;
+            border-left: 4px solid #10b981;
+            padding: 14px 18px;
+            border-radius: 0 10px 10px 0;
+            margin: 14px 0;
+        }
+
+        .info-box {
+            background: #dbeafe;
+            border-left: 4px solid #3b82f6;
+            padding: 14px 18px;
+            border-radius: 0 10px 10px 0;
+            margin: 14px 0;
+        }
+
+        .warning-box strong,
+        .tip-box strong,
+        .info-box strong {
+            display: block;
+            margin-bottom: 4px;
+            font-size: 0.85rem;
+        }
+
+        /* Table */
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 12px 0;
+        }
+
+        .info-table th {
+            background: var(--navy);
+            color: white;
+            padding: 10px 14px;
+            text-align: left;
+            font-size: 0.82rem;
+        }
+
+        .info-table td {
+            padding: 10px 14px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 0.88rem;
+        }
+
+        .info-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .info-table tr:nth-child(even) td {
+            background: #f8fafc;
+        }
+
+        /* URL highlight */
+        .url-box {
+            background: #1e293b;
+            color: var(--teal);
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-family: monospace;
+            font-size: 0.95rem;
+            margin: 10px 0;
+            display: block;
+        }
+
+        /* Two col layout for fields */
+        .fields-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 14px;
+            margin: 14px 0;
+        }
+
+        .field-item {
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 14px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .field-name {
+            font-weight: 800;
+            color: var(--navy);
+            font-size: 0.88rem;
+            margin-bottom: 4px;
+        }
+
+        .field-desc {
+            color: #64748b;
+            font-size: 0.82rem;
+        }
+
+        .field-req {
+            color: var(--red);
+            font-size: 0.72rem;
+            font-weight: 700;
+        }
+
+        /* TOC */
+        .toc {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .toc-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            background: #f8fafc;
+            border-radius: 8px;
+        }
+
+        .toc-num {
+            background: var(--teal);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 800;
+            flex-shrink: 0;
+        }
+
+        .toc-text {
+            font-weight: 600;
+            color: var(--navy);
+            font-size: 0.9rem;
+        }
+
+        /* Footer */
+        .doc-footer {
+            background: var(--navy);
+            color: rgba(255, 255, 255, 0.6);
+            text-align: center;
+            padding: 20px;
+            font-size: 0.78rem;
+            margin-top: 40px;
+        }
+
+        .doc-footer strong {
+            color: var(--teal);
+        }
+    </style>
+</head>
+
+<body>
+
+    <button class="print-btn no-print" onclick="window.print()">🖨️ PDF Save करें (Print)</button>
+
+    <!-- HEADER -->
+    <div class="header-grad">
+        <div class="container">
+            <div class="header-logo">JG <span class="teal">NEWS</span> <span class="saffron">Plus</span></div>
+            <div class="header-tagline">Rajasthan | 24x7 NEWS</div>
+            <div style="font-size:1.1rem; color:#ff8f00; font-weight:800; margin-top:8px;">निडर • निष्पक्ष • निर्भीक
+            </div>
+            <div class="header-title">📘 Website संचालन गाइड</div>
+            <div class="header-sub">Non-Technical Users के लिए आसान हिंदी गाइड</div>
+            <div class="doc-meta">
+                <div class="doc-meta-item">📅 मार्च 2026</div>
+                <div class="doc-meta-item">🔐 Confidential</div>
+                <div class="doc-meta-item">📄 Version 1.0</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="content">
+        <div class="container">
+
+            <!-- TABLE OF CONTENTS -->
+            <div class="card">
+                <div class="section-title">📋 विषय सूची</div>
+                <div class="toc">
+                    <div class="toc-item">
+                        <div class="toc-num">1</div>
+                        <div class="toc-text">Website और Admin Panel क्या है?</div>
+                    </div>
+                    <div class="toc-item">
+                        <div class="toc-num">2</div>
+                        <div class="toc-text">Admin Panel में Login कैसे करें</div>
+                    </div>
+                    <div class="toc-item">
+                        <div class="toc-num">3</div>
+                        <div class="toc-text">नई खबर कैसे जोड़ें (Step by Step)</div>
+                    </div>
+                    <div class="toc-item">
+                        <div class="toc-num">4</div>
+                        <div class="toc-text">खबर Edit/Delete कैसे करें</div>
+                    </div>
+                    <div class="toc-item">
+                        <div class="toc-num">5</div>
+                        <div class="toc-text">Breaking News कैसे Set करें</div>
+                    </div>
+                    <div class="toc-item">
+                        <div class="toc-num">6</div>
+                        <div class="toc-text">Live TV URL कैसे बदलें</div>
+                    </div>
+                    <div class="toc-item">
+                        <div class="toc-num">7</div>
+                        <div class="toc-text">श्रेणियाँ (Categories) Manage करना</div>
+                    </div>
+                    <div class="toc-item">
+                        <div class="toc-num">8</div>
+                        <div class="toc-text">हिंदी/English Language Switch</div>
+                    </div>
+                    <div class="toc-item">
+                        <div class="toc-num">9</div>
+                        <div class="toc-text">Important Login Details</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 1 -->
+            <div class="card">
+                <div class="section-title">🌐 Section 1: Website और Admin Panel क्या है?</div>
+                <p style="color:#475569; margin-bottom:16px;">आपकी <strong>JG News Plus Rajasthan</strong> website के दो
+                    हिस्से हैं:</p>
+                <table class="info-table">
+                    <thead>
+                        <tr>
+                            <th>हिस्सा</th>
+                            <th>क्या है?</th>
+                            <th>URL</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="badge badge-teal">🌐 Public Website</span></td>
+                            <td>जो आम लोग देखते हैं — खबरें, Live TV, Gallery</td>
+                            <td><strong>localhost:5173</strong></td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-navy">🔐 Admin Panel</span></td>
+                            <td>सिर्फ आप देख सकते हैं — खबरें add/edit/delete करना</td>
+                            <td><strong>localhost:5173/admin</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="tip-box"><strong>✅ याद रखें:</strong> Public website पर कोई Admin link नहीं है। Admin Panel
+                    सिर्फ URL से खुलता है।</div>
+            </div>
+
+            <!-- SECTION 2 -->
+            <div class="card">
+                <div class="section-title">🔐 Section 2: Admin Panel में Login</div>
+                <ol class="steps">
+                    <li class="step">
+                        <div class="step-num">1</div>
+                        <div class="step-content">
+                            <div class="step-title">Browser खोलें</div>
+                            <div class="step-desc">Chrome, Firefox, या Safari — कोई भी browser खोलें।</div>
+                        </div>
+                    </li>
+                    <li class="step">
+                        <div class="step-num">2</div>
+                        <div class="step-content">
+                            <div class="step-title">Admin URL Type करें</div>
+                            <div class="step-desc">Address bar में यह URL type करें:</div>
+                            <span class="url-box">http://localhost:5173/admin</span>
+                        </div>
+                    </li>
+                    <li class="step">
+                        <div class="step-num">3</div>
+                        <div class="step-content">
+                            <div class="step-title">Password Enter करें</div>
+                            <div class="step-desc">Login page पर आपको यह credentials चाहिए:</div>
+                            <div class="cred-box">
+                                <div class="cred-row"><span class="cred-label">Username:</span><span
+                                        class="cred-value">admin</span></div>
+                                <div class="cred-row"><span class="cred-label">Password:</span><span
+                                        class="cred-value">jgnews@2024</span></div>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="step">
+                        <div class="step-num">4</div>
+                        <div class="step-content">
+                            <div class="step-title">"Login करें" बटन दबाएं</div>
+                            <div class="step-desc">Dashboard खुल जाएगा — आप अंदर हैं! 🎉</div>
+                        </div>
+                    </li>
+                </ol>
+                <div class="warning-box"><strong>⚠️ ध्यान दें:</strong> Password गलत होने पर "गलत पासवर्ड" message आएगा।
+                    ऊपर दिया password ध्यान से type करें।</div>
+            </div>
+
+            <!-- SECTION 3 -->
+            <div class="card">
+                <div class="section-title">➕ Section 3: नई खबर कैसे जोड़ें</div>
+                <p style="color:#475569; margin-bottom:18px;">Login होने के बाद Dashboard में जाएं। फिर इन steps follow
+                    करें:</p>
+                <ol class="steps">
+                    <li class="step">
+                        <div class="step-num">1</div>
+                        <div class="step-content">
+                            <div class="step-title">Left Sidebar में "➕ खबर जोड़ें" पर Click करें</div>
+                            <div class="step-desc">या Dashboard में Quick Action button से भी जा सकते हैं।</div>
+                        </div>
+                    </li>
+                    <li class="step">
+                        <div class="step-num">2</div>
+                        <div class="step-content">
+                            <div class="step-title">Form में सारी जानकारी भरें</div>
+                            <div class="step-desc">नीचे सभी fields की जानकारी दी गई है:</div>
+                        </div>
+                    </li>
+                </ol>
+
+                <div class="fields-grid">
+                    <div class="field-item">
+                        <div class="field-name">📝 शीर्षक (Title) <span class="field-req">*जरूरी</span></div>
+                        <div class="field-desc">खबर का मुख्य शीर्षक हिंदी या अंग्रेजी में।<br>उदाहरण: "जयपुर में भारी
+                            बारिश"</div>
+                    </div>
+                    <div class="field-item">
+                        <div class="field-name">📄 सारांश (Excerpt)</div>
+                        <div class="field-desc">खबर का 2-3 लाइन का संक्षिप्त सारांश। होमपेज पर यही दिखेगा।</div>
+                    </div>
+                    <div class="field-item">
+                        <div class="field-name">📰 पूर्ण खबर (Content) <span class="field-req">*जरूरी</span></div>
+                        <div class="field-desc">पूरी खबर यहाँ लिखें। &lt;p&gt; टैग से paragraph बना सकते हैं।</div>
+                    </div>
+                    <div class="field-item">
+                        <div class="field-name">🏷️ श्रेणी (Category) <span class="field-req">*जरूरी</span></div>
+                        <div class="field-desc">Dropdown से चुनें: राजनीति, खेल, अपराध, मनोरंजन आदि।</div>
+                    </div>
+                    <div class="field-item">
+                        <div class="field-name">📍 स्थान (Location) <span class="field-req">*जरूरी</span></div>
+                        <div class="field-desc">राजस्थान के 33 जिलों में से चुनें। Dropdown में सभी हैं।</div>
+                    </div>
+                    <div class="field-item">
+                        <div class="field-name">✍️ लेखक (Author)</div>
+                        <div class="field-desc">खबर किसने लिखी — जैसे "JG News Desk" या रिपोर्टर का नाम।</div>
+                    </div>
+                    <div class="field-item">
+                        <div class="field-name">🏷️ टैग (Tags)</div>
+                        <div class="field-desc">खबर से जुड़े शब्द, comma से अलग करें।<br>उदाहरण: जयपुर, बारिश, मानसून
+                        </div>
+                    </div>
+                    <div class="field-item">
+                        <div class="field-name">📷 फोटो (Image)</div>
+                        <div class="field-desc">Image URL paste करें या "फाइल अपलोड" से अपने computer से photo चुनें।
+                        </div>
+                    </div>
+                    <div class="field-item">
+                        <div class="field-name">🎬 Video URL</div>
+                        <div class="field-desc">YouTube video embed link paste करें।<br>Format:
+                            youtube.com/embed/VIDEO_ID</div>
+                    </div>
+                </div>
+
+                <ol class="steps" style="margin-top:16px;">
+                    <li class="step">
+                        <div class="step-num">3</div>
+                        <div class="step-content">
+                            <div class="step-title">Breaking News और Featured Toggle Set करें</div>
+                            <div class="step-desc">
+                                <span class="badge badge-red">🔴 Breaking News</span> — ON करने से खबर ऊपर के red ticker
+                                में चलेगी।<br>
+                                <span class="badge badge-saffron">⭐ Featured</span> — ON करने से खबर होमपेज पर बड़ी
+                                दिखेगी।
+                            </div>
+                        </div>
+                    </li>
+                    <li class="step">
+                        <div class="step-num">4</div>
+                        <div class="step-content">
+                            <div class="step-title">"✅ खबर प्रकाशित करें" बटन दबाएं</div>
+                            <div class="step-desc">खबर तुरंत website पर live हो जाएगी! 🎉</div>
+                        </div>
+                    </li>
+                </ol>
+                <div class="tip-box"><strong>💡 Tip:</strong> खबर publish होने के बाद Homepage खोलकर देखें — आपकी नई खबर
+                    तुरंत दिखेगी।</div>
+            </div>
+
+            <!-- SECTION 4 -->
+            <div class="card">
+                <div class="section-title">✏️ Section 4: खबर Edit/Delete करना</div>
+                <ol class="steps">
+                    <li class="step">
+                        <div class="step-num">1</div>
+                        <div class="step-content">
+                            <div class="step-title">Sidebar में "📰 खबरें प्रबंधन" पर Click करें</div>
+                            <div class="step-desc">सभी खबरों की list दिखेगी।</div>
+                        </div>
+                    </li>
+                    <li class="step">
+                        <div class="step-num">2</div>
+                        <div class="step-content">
+                            <div class="step-title">खबर खोजें</div>
+                            <div class="step-desc">Category filter से filter करें या ऊपर-नीचे scroll करके खबर ढूंढें।
+                            </div>
+                        </div>
+                    </li>
+                    <li class="step">
+                        <div class="step-num">3</div>
+                        <div class="step-content">
+                            <div class="step-title">Edit या Delete करें</div>
+                            <div class="step-desc">
+                                <span class="badge badge-teal">✏️ Edit</span> — बटन से खबर खोलें और बदलाव करें, फिर
+                                "Update" दबाएं।<br><br>
+                                <span class="badge badge-red">🗑️ Delete</span> — बटन से खबर हटाएं। Confirm popup आएगा —
+                                "हटाएं" दबाएं।
+                            </div>
+                        </div>
+                    </li>
+                </ol>
+                <div class="warning-box"><strong>⚠️ सावधान:</strong> Delete की गई खबर वापस नहीं आती। Delete से पहले दो
+                    बार सोचें।</div>
+            </div>
+
+            <!-- SECTION 5 -->
+            <div class="card">
+                <div class="section-title">🔴 Section 5: Breaking News Set करना</div>
+                <p style="color:#475569; margin-bottom:16px;">Breaking News वो होती है जो website के ऊपर red ticker में
+                    चलती है।</p>
+                <ol class="steps">
+                    <li class="step">
+                        <div class="step-num">1</div>
+                        <div class="step-content">
+                            <div class="step-title">"📰 खबरें प्रबंधन" में जाएं</div>
+                        </div>
+                    </li>
+                    <li class="step">
+                        <div class="step-num">2</div>
+                        <div class="step-content">
+                            <div class="step-title">खबर के सामने "Breaking" बटन देखें</div>
+                            <div class="step-desc">अगर <span class="badge badge-red">🔴 हाँ</span> है — Breaking ON
+                                है।<br>अगर "नहीं" है — Breaking OFF है।</div>
+                        </div>
+                    </li>
+                    <li class="step">
+                        <div class="step-num">3</div>
+                        <div class="step-content">
+                            <div class="step-title">बटन Click करके Toggle करें</div>
+                            <div class="step-desc">तुरंत website के ticker में बदलाव दिखेगा।</div>
+                        </div>
+                    </li>
+                </ol>
+                <div class="tip-box"><strong>💡 Best Practice:</strong> एक समय में 3-5 से ज़्यादा Breaking News न रखें।
+                    Ticker बहुत लंबा हो जाता है।</div>
+            </div>
+
+            <!-- SECTION 6 -->
+            <div class="card">
+                <div class="section-title">📺 Section 6: Live TV URL बदलना</div>
+                <ol class="steps">
+                    <li class="step">
+                        <div class="step-num">1</div>
+                        <div class="step-content">
+                            <div class="step-title">Sidebar में "📺 Live TV" पर Click करें</div>
+                        </div>
+                    </li>
+                    <li class="step">
+                        <div class="step-num">2</div>
+                        <div class="step-content">
+                            <div class="step-title">YouTube Live URL Paste करें</div>
+                            <div class="step-desc">
+                                YouTube पर अपना Live video खोलें। URL कॉपी करें।<br>
+                                जैसे: <span
+                                    style="color:var(--teal); font-weight:700;">https://youtube.com/watch?v=ABC123XYZ</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="step">
+                        <div class="step-num">3</div>
+                        <div class="step-content">
+                            <div class="step-title">"💾 Save करें" दबाएं</div>
+                            <div class="step-desc">System auto convert करेगा। Preview भी दिखेगा। ✅</div>
+                        </div>
+                    </li>
+                </ol>
+                <div class="info-box"><strong>ℹ️ जानकारी:</strong> Regular YouTube URL paste भी काम करता है — system खुद
+                    Embed format में convert कर देता है।</div>
+            </div>
+
+            <!-- SECTION 7 -->
+            <div class="card">
+                <div class="section-title">🏷️ Section 7: Categories Manage करना</div>
+                <ol class="steps">
+                    <li class="step">
+                        <div class="step-num">1</div>
+                        <div class="step-content">
+                            <div class="step-title">Sidebar में "🏷️ श्रेणियाँ" पर Click करें</div>
+                        </div>
+                    </li>
+                    <li class="step">
+                        <div class="step-num">2</div>
+                        <div class="step-content">
+                            <div class="step-title">नई Category जोड़ने के लिए</div>
+                            <div class="step-desc">Input box में category का नाम हिंदी में लिखें → "➕ जोड़ें" दबाएं।
+                            </div>
+                        </div>
+                    </li>
+                    <li class="step">
+                        <div class="step-num">3</div>
+                        <div class="step-content">
+                            <div class="step-title">Category हटाने के लिए</div>
+                            <div class="step-desc">Category के सामने "🗑️ हटाएं" → Confirm popup → "हटाएं" दबाएं।</div>
+                        </div>
+                    </li>
+                </ol>
+            </div>
+
+            <!-- SECTION 8 -->
+            <div class="card">
+                <div class="section-title">🌐 Section 8: Hindi/English Language Switch</div>
+                <p style="color:#475569; margin-bottom:12px;">Website पर Visitors भाषा बदल सकते हैं:</p>
+                <ol class="steps">
+                    <li class="step">
+                        <div class="step-num">1</div>
+                        <div class="step-content">
+                            <div class="step-title">Website के Header (ऊपर) में देखें</div>
+                            <div class="step-desc">एक <strong>"🌐 EN"</strong> या <strong>"🌐 हि"</strong> बटन दिखेगा।
+                            </div>
+                        </div>
+                    </li>
+                    <li class="step">
+                        <div class="step-num">2</div>
+                        <div class="step-content">
+                            <div class="step-title">Click करें</div>
+                            <div class="step-desc">Website की भाषा तुरंत बदल जाएगी — Hindi ↔ English। Browser remember
+                                रखेगा।</div>
+                        </div>
+                    </li>
+                </ol>
+                <div class="tip-box"><strong>💡 Note:</strong> News articles का content वही दिखेगा जो आपने लिखा है। केवल
+                    Navigation, Buttons, और Labels बदलते हैं।</div>
+            </div>
+
+            <!-- SECTION 9 - Credentials -->
+            <div class="card" style="background: var(--navy); color: white;">
+                <div class="section-title" style="color: var(--teal); border-color: var(--teal);">🔑 Section 9:
+                    Important Login Details (Save करें)</div>
+                <table class="info-table" style="color: white;">
+                    <thead>
+                        <tr>
+                            <th style="background: rgba(255,255,255,0.15);">Detail</th>
+                            <th style="background: rgba(255,255,255,0.15);">Information</th>
+                        </tr>
+                    </thead>
+                    <tbody style="background: rgba(255,255,255,0.05);">
+                        <tr>
+                            <td style="border-color: rgba(255,255,255,0.1);">🌐 Website URL</td>
+                            <td style="border-color: rgba(255,255,255,0.1); color: var(--teal); font-weight: 700;">
+                                http://localhost:5173</td>
+                        </tr>
+                        <tr>
+                            <td style="border-color: rgba(255,255,255,0.1);">🔐 Admin Panel URL</td>
+                            <td style="border-color: rgba(255,255,255,0.1); color: var(--teal); font-weight: 700;">
+                                http://localhost:5173/admin</td>
+                        </tr>
+                        <tr>
+                            <td style="border-color: rgba(255,255,255,0.1);">👤 Username</td>
+                            <td style="border-color: rgba(255,255,255,0.1); color: var(--saffron); font-weight: 700;">
+                                admin</td>
+                        </tr>
+                        <tr>
+                            <td style="border-color: rgba(255,255,255,0.1);">🔑 Password</td>
+                            <td style="border-color: rgba(255,255,255,0.1); color: var(--saffron); font-weight: 700;">
+                                jgnews@2024</td>
+                        </tr>
+                        <tr>
+                            <td style="border-color: rgba(255,255,255,0.1);">📧 Support Email</td>
+                            <td style="border-color: rgba(255,255,255,0.1);">news@jgnewsplus.in</td>
+                        </tr>
+                        <tr>
+                            <td style="border-color: rgba(255,255,255,0.1); border-bottom: none;">💾 Data Storage</td>
+                            <td style="border-color: rgba(255,255,255,0.1); border-bottom: none;">Browser localStorage
+                                (automatically saved)</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div
+                    style="background: rgba(255,111,0,0.2); border-left: 4px solid var(--saffron); padding: 14px 18px; border-radius: 0 10px 10px 0; margin-top: 16px;">
+                    <strong style="color: var(--saffron); display: block; margin-bottom: 4px;">⚠️ IMPORTANT: यह document
+                        safe जगह रखें।</strong>
+                    <span style="font-size: 0.85rem; opacity: 0.9;">Password किसी अनजान व्यक्ति को न दें। Admin Panel का
+                        link public न करें।</span>
+                </div>
+            </div>
+
+            <!-- Quick Reference Card -->
+            <div class="card" style="border: 3px solid var(--teal);">
+                <div class="section-title">⚡ Quick Reference — एक नजर में</div>
+                <table class="info-table">
+                    <thead>
+                        <tr>
+                            <th>काम</th>
+                            <th>कहाँ जाएं</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>नई खबर Post करना</td>
+                            <td>Admin → Sidebar → ➕ खबर जोड़ें</td>
+                        </tr>
+                        <tr>
+                            <td>खबर Edit करना</td>
+                            <td>Admin → 📰 खबरें प्रबंधन → ✏️ Edit</td>
+                        </tr>
+                        <tr>
+                            <td>खबर Delete करना</td>
+                            <td>Admin → 📰 खबरें प्रबंधन → 🗑️ Delete</td>
+                        </tr>
+                        <tr>
+                            <td>Breaking News चालू करना</td>
+                            <td>Admin → 📰 खबरें प्रबंधन → Breaking बटन</td>
+                        </tr>
+                        <tr>
+                            <td>Featured खबर बनाना</td>
+                            <td>Article Form → ⭐ Featured Toggle ON</td>
+                        </tr>
+                        <tr>
+                            <td>Live TV URL बदलना</td>
+                            <td>Admin → 📺 Live TV → URL Paste → Save</td>
+                        </tr>
+                        <tr>
+                            <td>नई Category जोड़ना</td>
+                            <td>Admin → 🏷️ श्रेणियाँ → नाम Type → जोड़ें</td>
+                        </tr>
+                        <tr>
+                            <td>Language बदलना</td>
+                            <td>Website Header → 🌐 EN / हि बटन</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="doc-footer">
+        <p>यह document <strong>JG News Plus Rajasthan</strong> के लिए बनाई गई है।</p>
+        <p style="margin-top:6px;">Developed by <strong>Genius Developers</strong> | <strong>Confidential
+                Document</strong></p>
+    </div>
+
+</body>
+
+</html>
