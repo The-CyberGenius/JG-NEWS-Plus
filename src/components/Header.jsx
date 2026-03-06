@@ -126,7 +126,11 @@ export default function Header() {
                 )}
 
                 {/* Desktop Nav */}
-                <nav className="hide-mobile" style={{ background: 'var(--navy)' }}>
+                <style>{`
+                    .desktop-nav-bar { display: none; background: var(--navy); }
+                    @media (min-width: 768px) { .desktop-nav-bar { display: block; } }
+                `}</style>
+                <nav className="desktop-nav-bar">
                     <div className="container" style={{ display: 'flex' }}>
                         {NAV_LINKS.map(link => (
                             <Link key={link.path} to={link.path} style={{ padding: '10px 14px', color: 'rgba(255,255,255,0.85)', fontSize: '0.85rem', fontWeight: 600, transition: 'var(--transition)', borderBottom: '3px solid transparent', display: 'block' }}
