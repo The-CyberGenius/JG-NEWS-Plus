@@ -159,28 +159,63 @@ export const deleteNewspaper = async (id) => {
     }
 };
 
-// Upload PDF/Image to Cloudinary via backend
+// ─── Direct Cloudinary Upload (Frontend → Cloudinary) ─────────────────────────
+// File seedha browser se Cloudinary pe jaati hai — no backend file handling
+// Works on Vercel (no 4.5MB limit issue)
+
+const CLOUDINARY_CLOUD = 'dsczo1zim';
+
+const getUploadSignature = async (folder, resourceType = 'raw') => {
+    const response = await api.get(`/upload/signature?folder=${folder}&resource_type=${resourceType}`);
+    return response.data;
+};
+
 export const uploadPDF = async (file, onProgress) => {
+    // Step 1: Get signature from backend (API secret never sent to frontend)
+    const sig = await getUploadSignature('jgnews_epaper', 'raw');
+
+    // Step 2: Upload directly from browser to Cloudinary
     const formData = new FormData();
-    formData.append('pdf', file);
-    const response = await api.post('/upload/pdf', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-        onUploadProgress: (evt) => {
-            if (onProgress && evt.total) {
-                onProgress(Math.round((evt.loaded * 100) / evt.total));
-            }
-        },
-    });
-    return response.data;
+    formData.append('file', file);
+    formData.append('api_key', sig.apiKey);
+    formData.append('timestamp', sig.timestamp);
+    formData.append('signature', sig.signature);
+    formData.append('folder', sig.folder);
+
+    const response = await axios.post(
+        `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/raw/upload`,
+        formData,
+        {
+            onUploadProgress: (evt) => {
+                if (onProgress && evt.total) {
+                    onProgress(Math.round((evt.loaded * 100) / evt.total));
+                }
+            },
+        }
+    );
+    return { url: response.data.secure_url, publicId: response.data.public_id, bytes: response.data.bytes };
 };
 
-export const uploadImage = async (file) => {
+export const uploadImage = async (file, onProgress) => {
+    const sig = await getUploadSignature('jgnews_thumbnails', 'image');
+
     const formData = new FormData();
-    formData.append('image', file);
-    const response = await api.post('/upload/image', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-    });
-    return response.data;
+    formData.append('file', file);
+    formData.append('api_key', sig.apiKey);
+    formData.append('timestamp', sig.timestamp);
+    formData.append('signature', sig.signature);
+    formData.append('folder', 'jgnews_thumbnails');
+
+    const response = await axios.post(
+        `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`,
+        formData,
+        {
+            onUploadProgress: (evt) => {
+                if (onProgress && evt.total) {
+                    onProgress(Math.round((evt.loaded * 100) / evt.total));
+                }
+            },
+        }
+    );
+    return { url: response.data.secure_url, publicId: response.data.public_id };
 };
-
-
