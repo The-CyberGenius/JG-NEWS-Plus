@@ -22,7 +22,7 @@ const INITIAL_WEATHER = [
     { city: 'गंगानगर', temp: '37°C', icon: '☀️', desc: 'धूप' },
 ];
 
-function NewsCard({ article, large = false }) {
+function NewsCard({ article }) {
     return (
         <Link to={`/article/${article.id}`} className="news-card" style={{ textDecoration: 'none' }}>
             <div className="news-card__img">
@@ -91,29 +91,25 @@ export default function Home() {
     useEffect(() => {
         const fetchWeather = async () => {
             try {
-                // Open-Meteo URL for 16 Rajasthan Cities
                 const res = await fetch("https://api.open-meteo.com/v1/forecast?latitude=28.0775,26.9124,26.2389,24.5854,25.2138,28.0229,26.4499,27.5530,25.3407,27.6094,25.7711,24.5926,26.9157,24.8829,27.2152,29.9038&longitude=74.6200,75.7873,73.0243,73.7125,75.8648,73.3119,74.6399,76.6346,74.6313,75.1398,73.3234,72.7156,70.9083,74.6230,77.4895,73.8772&current_weather=true");
                 const data = await res.json();
-
                 const getWeatherIcon = (code) => {
                     if (code === 0) return '☀️';
-                    if (code === 1 || code === 2 || code === 3) return '⛅';
+                    if (code <= 3) return '⛅';
                     if (code >= 45 && code <= 48) return '🌫️';
                     if (code >= 51 && code <= 67) return '🌧️';
                     if (code >= 71 && code <= 77) return '❄️';
                     if (code >= 95) return '⛈️';
                     return '🌤️';
                 };
-
                 const updatedWeather = data.map((location, i) => ({
                     ...INITIAL_WEATHER[i],
                     temp: `${Math.round(location.current_weather.temperature)}°C`,
-                    icon: getWeatherIcon(location.current_weather.weathercode)
+                    icon: getWeatherIcon(location.current_weather.weathercode),
                 }));
-
                 setWeatherData(updatedWeather);
             } catch (err) {
-                console.error("Open-Meteo weather update failed", err);
+                console.error('Open-Meteo weather update failed', err);
             }
         };
         fetchWeather();
@@ -136,51 +132,41 @@ export default function Home() {
             <div className="container section-gap">
                 <div style={{ display: 'grid', gap: '20px', gridTemplateColumns: '1fr' }}>
                     <div style={{ display: 'grid', gap: '20px' }}>
-                        {/* Featured + Breaking side by side on desktop */}
-                        <div style={{
-                            display: 'grid', gap: '20px',
-                            gridTemplateColumns: breaking.length > 0 ? '1fr' : '1fr',
-                        }}>
-                            <style>{`
-                @media (min-width: 1024px) {
-                  .hero-grid { grid-template-columns: 2fr 1fr !important; }
-                }
-              `}</style>
-                            <div className="hero-grid" style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '20px' }}>
-                                <FeaturedCard article={featured} />
-                                {breaking.length > 0 && (
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                                        <h2 className="section-title" style={{ marginBottom: '4px' }}>ताज़ी खबरें</h2>
-                                        {breaking.map(a => (
-                                            <Link key={a.id} to={`/article/${a.id}`} style={{ textDecoration: 'none' }}>
-                                                <div style={{
-                                                    background: 'white', borderRadius: '12px', padding: '14px',
-                                                    boxShadow: 'var(--card-shadow)', display: 'flex', gap: '12px',
-                                                    transition: 'var(--transition)', alignItems: 'flex-start',
-                                                }}
-                                                    onMouseEnter={e => e.currentTarget.style.boxShadow = 'var(--card-shadow-hover)'}
-                                                    onMouseLeave={e => e.currentTarget.style.boxShadow = 'var(--card-shadow)'}
-                                                >
-                                                    <img
-                                                        src={a.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=200&q=70'}
-                                                        alt={a.title}
-                                                        style={{ width: '80px', height: '60px', objectFit: 'cover', borderRadius: '8px', flexShrink: 0 }}
-                                                    />
-                                                    <div style={{ flex: 1, minWidth: 0 }}>
-                                                        <span className="badge badge-red" style={{ marginBottom: '6px' }}>ब्रेकिंग</span>
-                                                        <div style={{ fontWeight: 700, fontSize: '0.88rem', lineHeight: 1.4, color: 'var(--text-primary)', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
-                                                            {a.title}
-                                                        </div>
-                                                        <div style={{ fontSize: '0.72rem', color: 'var(--gray-600)', marginTop: '4px' }}>
-                                                            📍 {a.location} • {timeAgo(a.date)}
-                                                        </div>
+                        <style>{`@media (min-width: 1024px) { .hero-grid { grid-template-columns: 2fr 1fr !important; } }`}</style>
+                        <div className="hero-grid" style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '20px' }}>
+                            <FeaturedCard article={featured} />
+                            {breaking.length > 0 && (
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                                    <h2 className="section-title" style={{ marginBottom: '4px' }}>ताज़ी खबरें</h2>
+                                    {breaking.map(a => (
+                                        <Link key={a.id} to={`/article/${a.id}`} style={{ textDecoration: 'none' }}>
+                                            <div style={{
+                                                background: 'white', borderRadius: '12px', padding: '14px',
+                                                boxShadow: 'var(--card-shadow)', display: 'flex', gap: '12px',
+                                                transition: 'var(--transition)', alignItems: 'flex-start',
+                                            }}
+                                                onMouseEnter={e => e.currentTarget.style.boxShadow = 'var(--card-shadow-hover)'}
+                                                onMouseLeave={e => e.currentTarget.style.boxShadow = 'var(--card-shadow)'}
+                                            >
+                                                <img
+                                                    src={a.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=200&q=70'}
+                                                    alt={a.title}
+                                                    style={{ width: '80px', height: '60px', objectFit: 'cover', borderRadius: '8px', flexShrink: 0 }}
+                                                />
+                                                <div style={{ flex: 1, minWidth: 0 }}>
+                                                    <span className="badge badge-red" style={{ marginBottom: '6px' }}>ब्रेकिंग</span>
+                                                    <div style={{ fontWeight: 700, fontSize: '0.88rem', lineHeight: 1.4, color: 'var(--text-primary)', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+                                                        {a.title}
+                                                    </div>
+                                                    <div style={{ fontSize: '0.72rem', color: 'var(--gray-600)', marginTop: '4px' }}>
+                                                        📍 {a.location} • {timeAgo(a.date)}
                                                     </div>
                                                 </div>
-                                            </Link>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
+                                            </div>
+                                        </Link>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -193,7 +179,7 @@ export default function Home() {
                         <div style={{ color: 'var(--teal)', fontWeight: 800, fontSize: '0.82rem', whiteSpace: 'nowrap', flexShrink: 0 }}>
                             🌡️ मौसम
                         </div>
-                        <div className="weather-grid" style={{ display: 'flex', gap: '12px', flexShrink: 0 }}>
+                        <div style={{ display: 'flex', gap: '12px', flexShrink: 0 }}>
                             {weatherData.map(w => (
                                 <div key={w.city} style={{ background: 'rgba(255,255,255,0.08)', borderRadius: '10px', padding: '8px 14px', textAlign: 'center', color: 'white', minWidth: '90px' }}>
                                     <div style={{ fontSize: '1.1rem' }}>{w.icon}</div>
@@ -218,33 +204,30 @@ export default function Home() {
             {settings.liveUrl && (
                 <div style={{ background: 'linear-gradient(135deg, var(--navy), var(--navy-mid))', padding: '40px 0', margin: '8px 0' }}>
                     <div className="container">
-                        <div style={{ display: 'grid', gap: '24px', alignItems: 'center' }}>
-                            <style>{`@media(min-width:768px){.live-banner-grid{grid-template-columns:1fr 1fr !important;}}`}</style>
-                            <div className="live-banner-grid" style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '24px', alignItems: 'center' }}>
-                                <div style={{ color: 'white' }}>
-                                    <span className="live-badge" style={{ marginBottom: '12px' }}>
-                                        <span className="live-dot" />
-                                        LIVE ON AIR
-                                    </span>
-                                    <h2 style={{ fontSize: '1.8rem', fontWeight: 900, margin: '12px 0 8px', lineHeight: 1.2 }}>
-                                        JG NEWS Plus<br />
-                                        <span style={{ color: 'var(--teal)' }}>LIVE देखें</span>
-                                    </h2>
-                                    <p style={{ opacity: 0.8, fontSize: '0.9rem', marginBottom: '20px' }}>
-                                        24x7 राजस्थान की सबसे तेज़ और सच्ची खबरें। निडर, निष्पक्ष और निर्भीक।
-                                    </p>
-                                    <Link to="/live" className="btn btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
-                                        ▶ अभी देखें
-                                    </Link>
-                                </div>
-                                <div className="video-embed">
-                                    <iframe
-                                        src={settings.liveUrl}
-                                        title="JG News Plus Live"
-                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                        allowFullScreen
-                                    />
-                                </div>
+                        <style>{`@media(min-width:768px){.live-banner-grid{grid-template-columns:1fr 1fr !important;}}`}</style>
+                        <div className="live-banner-grid" style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '24px', alignItems: 'center' }}>
+                            <div style={{ color: 'white' }}>
+                                <span className="live-badge" style={{ marginBottom: '12px' }}>
+                                    <span className="live-dot" />LIVE ON AIR
+                                </span>
+                                <h2 style={{ fontSize: '1.8rem', fontWeight: 900, margin: '12px 0 8px', lineHeight: 1.2 }}>
+                                    JG NEWS Plus<br />
+                                    <span style={{ color: 'var(--teal)' }}>LIVE देखें</span>
+                                </h2>
+                                <p style={{ opacity: 0.8, fontSize: '0.9rem', marginBottom: '20px' }}>
+                                    24x7 राजस्थान की सबसे तेज़ और सच्ची खबरें। निडर, निष्पक्ष और निर्भीक।
+                                </p>
+                                <Link to="/live" className="btn btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                                    ▶ अभी देखें
+                                </Link>
+                            </div>
+                            <div className="video-embed">
+                                <iframe
+                                    src={settings.liveUrl}
+                                    title="JG News Plus Live"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                    allowFullScreen
+                                />
                             </div>
                         </div>
                     </div>
@@ -265,15 +248,12 @@ export default function Home() {
             <div style={{ background: 'var(--gray-100)', padding: '40px 0' }}>
                 <div className="container">
                     <SectionHeader title="वीडियो न्यूज़" linkTo="/videos" />
-                    <div className="news-grid-3" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '20px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '20px' }}>
                         {articles.filter(a => a.videoUrl).slice(0, 3).map(a => (
                             <Link key={a.id} to={`/article/${a.id}`} style={{ textDecoration: 'none' }} className="news-card">
                                 <div style={{ position: 'relative', paddingTop: '56.25%', background: 'var(--navy)', borderRadius: '12px 12px 0 0', overflow: 'hidden' }}>
-                                    <img
-                                        src={a.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600&q=80'}
-                                        alt={a.title}
-                                        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.8 }}
-                                    />
+                                    <img src={a.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600&q=80'} alt={a.title}
+                                        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.8 }} />
                                     <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                         <div style={{ width: '52px', height: '52px', background: 'rgba(255,255,255,0.9)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                             <span style={{ fontSize: '1.2rem', marginLeft: '4px' }}>▶</span>
@@ -301,6 +281,44 @@ export default function Home() {
                             <h3>अभी कोई वीडियो उपलब्ध नहीं है</h3>
                         </div>
                     )}
+                </div>
+            </div>
+
+            {/* E-Newspaper Banner */}
+            <div style={{ background: 'linear-gradient(135deg, #120820 0%, var(--navy) 60%, #0d2137 100%)', padding: '48px 0', margin: '8px 0' }}>
+                <div className="container">
+                    <style>{`@media(min-width:768px){.epaper-banner-grid{grid-template-columns:1fr 1fr !important;}}`}</style>
+                    <div className="epaper-banner-grid" style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '32px', alignItems: 'center' }}>
+                        <div style={{ color: 'white' }}>
+                            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'var(--saffron)', color: 'white', padding: '5px 14px', borderRadius: '100px', fontSize: '0.78rem', fontWeight: 800, marginBottom: '16px', letterSpacing: '0.5px' }}>
+                                📰 E-NEWSPAPER
+                            </div>
+                            <h2 style={{ fontSize: '1.8rem', fontWeight: 900, margin: '0 0 10px', lineHeight: 1.2 }}>
+                                JG News Plus<br />
+                                <span style={{ color: 'var(--teal)' }}>ई-अखबार पढ़ें</span>
+                            </h2>
+                            <p style={{ opacity: 0.8, fontSize: '0.9rem', marginBottom: '20px', lineHeight: 1.7 }}>
+                                राजस्थान का सबसे भरोसेमंद डिजिटल समाचार पत्र।<br />
+                                घर बैठे पढ़ें, मुफ्त में डाउनलोड करें।
+                            </p>
+                            <Link to="/epaper" className="btn btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                                📖 अभी पढ़ें
+                            </Link>
+                        </div>
+                        <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                            {[
+                                { icon: '📰', label: 'दैनिक संस्करण', desc: 'हर दिन ताज़ा अखबार' },
+                                { icon: '📥', label: 'Free Download', desc: 'PDF डाउनलोड करें' },
+                                { icon: '🔍', label: 'Easy Reading', desc: 'Zoom करके पढ़ें' },
+                            ].map(f => (
+                                <div key={f.label} style={{ textAlign: 'center', background: 'rgba(255,255,255,0.08)', borderRadius: '12px', padding: '18px 20px', minWidth: '110px' }}>
+                                    <div style={{ fontSize: '2rem', marginBottom: '6px' }}>{f.icon}</div>
+                                    <div style={{ fontWeight: 700, color: 'var(--teal)', fontSize: '0.82rem' }}>{f.label}</div>
+                                    <div style={{ fontSize: '0.72rem', opacity: 0.7, marginTop: '3px' }}>{f.desc}</div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

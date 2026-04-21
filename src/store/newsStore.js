@@ -128,3 +128,34 @@ export const adminLogout = () => {
 
 export const isAdminLoggedIn = () =>
     sessionStorage.getItem(KEYS.ADMIN) === 'true';
+
+// ─── E-Newspaper ──────────────────────────────────────────────────────────────
+export const getNewspapers = async () => {
+    try {
+        const response = await api.get('/newspapers');
+        return response.data.map(n => ({ ...n, id: n._id }));
+    } catch (error) {
+        console.error('Error fetching newspapers', error);
+        return [];
+    }
+};
+
+export const addNewspaper = async (data) => {
+    try {
+        const response = await api.post('/newspapers', data);
+        return { ...response.data, id: response.data._id };
+    } catch (error) {
+        console.error('Error adding newspaper', error);
+        throw error;
+    }
+};
+
+export const deleteNewspaper = async (id) => {
+    try {
+        await api.delete(`/newspapers/${id}`);
+    } catch (error) {
+        console.error('Error deleting newspaper', error);
+        throw error;
+    }
+};
+

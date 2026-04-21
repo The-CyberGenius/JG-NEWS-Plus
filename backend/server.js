@@ -8,6 +8,7 @@ import articleRoutes from './routes/articles.js';
 import categoryRoutes from './routes/categories.js';
 import settingRoutes from './routes/settings.js';
 import adminRoutes from './routes/admin.js';
+import newspaperRoutes from './routes/newspapers.js';
 
 dotenv.config();
 
@@ -25,6 +26,7 @@ app.use('/api/articles', articleRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/settings', settingRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/newspapers', newspaperRoutes);
 
 app.get('/api', (req, res) => {
     res.send('JG NEWS PLUS API is running...');

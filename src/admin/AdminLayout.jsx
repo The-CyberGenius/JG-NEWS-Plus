@@ -8,6 +8,7 @@ const NAV_ITEMS = [
     { path: '/admin/news/add', icon: '➕', label: 'खबर जोड़ें' },
     { path: '/admin/live', icon: '📺', label: 'Live TV' },
     { path: '/admin/categories', icon: '🏷️', label: 'श्रेणियाँ' },
+    { path: '/admin/epaper', icon: '🗞️', label: 'ई-अखबार (PDF)' },
 ];
 
 export default function AdminLayout({ children }) {

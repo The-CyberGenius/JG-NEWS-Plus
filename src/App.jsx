@@ -13,6 +13,7 @@ import LiveTV from './pages/LiveTV';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import SearchResults from './pages/SearchResults';
+import EPaper from './pages/EPaper';
 import AdminLayout from './admin/AdminLayout';
 import AdminLogin from './admin/AdminLogin';
 import Dashboard from './admin/Dashboard';
@@ -20,6 +21,7 @@ import NewsManager from './admin/NewsManager';
 import ArticleForm from './admin/ArticleForm';
 import LiveTVManager from './admin/LiveTVManager';
 import CategoryManager from './admin/CategoryManager';
+import NewspaperManager from './admin/NewspaperManager';
 import AdminGuard from './admin/AdminGuard';
 
 function PublicLayout({ children }) {
@@ -48,6 +50,7 @@ export default function App() {
                         <Route path="/about" element={<PublicLayout><About /></PublicLayout>} />
                         <Route path="/contact" element={<PublicLayout><Contact /></PublicLayout>} />
                         <Route path="/search" element={<PublicLayout><SearchResults /></PublicLayout>} />
+                        <Route path="/epaper" element={<PublicLayout><EPaper /></PublicLayout>} />
 
                         {/* Admin */}
                         <Route path="/admin" element={<AdminLogin />} />
@@ -61,6 +64,7 @@ export default function App() {
                                         <Route path="news/edit/:id" element={<ArticleForm />} />
                                         <Route path="live" element={<LiveTVManager />} />
                                         <Route path="categories" element={<CategoryManager />} />
+                                        <Route path="epaper" element={<NewspaperManager />} />
                                     </Routes>
                                 </AdminLayout>
                             </AdminGuard>
