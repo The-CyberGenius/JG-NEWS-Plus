@@ -16,6 +16,60 @@ function formatDate(d) {
     } catch { return d; }
 }
 
+function CloudinaryGuide() {
+    const [open, setOpen] = useState(false);
+    return (
+        <div style={{ marginBottom: '16px', border: '2px solid var(--teal)', borderRadius: '12px', overflow: 'hidden' }}>
+            <button
+                onClick={() => setOpen(!open)}
+                style={{
+                    width: '100%', background: 'rgba(0,188,212,0.08)', border: 'none',
+                    padding: '14px 18px', textAlign: 'left', cursor: 'pointer',
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    fontWeight: 700, color: 'var(--navy)', fontSize: '0.92rem',
+                }}
+            >
+                <span>📖 Cloudinary से PDF कैसे अपलोड करें? (Step by Step)</span>
+                <span style={{ color: 'var(--teal)', fontSize: '1.1rem' }}>{open ? '▲' : '▼'}</span>
+            </button>
+            {open && (
+                <div style={{ padding: '18px', background: 'white', fontSize: '0.85rem', lineHeight: 1.8 }}>
+                    <div style={{ display: 'grid', gap: '10px' }}>
+                        {[
+                            { step: '1', text: 'cloudinary.com पर जाएं → Free account बनाएं (Sign Up)' },
+                            { step: '2', text: 'Dashboard → Media Library → Upload → अपना PDF चुनें' },
+                            { step: '3', text: 'Upload होने के बाद PDF पर क्लिक करें' },
+                            { step: '4', text: '"Copy URL" बटन दबाएं → URL आपके clipboard में आ जाएगा' },
+                            { step: '5', text: 'वह URL नीचे "PDF URL" field में paste करें' },
+                        ].map(({ step, text }) => (
+                            <div key={step} style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+                                <div style={{
+                                    width: '26px', height: '26px', background: 'var(--teal)', color: 'white',
+                                    borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    fontWeight: 800, fontSize: '0.78rem', flexShrink: 0,
+                                }}>
+                                    {step}
+                                </div>
+                                <span style={{ color: 'var(--text-secondary)', paddingTop: '3px' }}>{text}</span>
+                            </div>
+                        ))}
+                        <div style={{ background: 'var(--gray-100)', borderRadius: '8px', padding: '10px 14px', marginTop: '6px' }}>
+                            <div style={{ fontWeight: 700, color: 'var(--navy)', marginBottom: '4px' }}>📌 Example URL:</div>
+                            <code style={{ fontSize: '0.75rem', color: 'var(--teal)', wordBreak: 'break-all' }}>
+                                https://res.cloudinary.com/YOUR_CLOUD/image/upload/sample.pdf
+                            </code>
+                        </div>
+                        <a href="https://cloudinary.com" target="_blank" rel="noreferrer"
+                            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'var(--teal)', color: 'white', padding: '8px 16px', borderRadius: '8px', fontWeight: 700, fontSize: '0.82rem', textDecoration: 'none', width: 'fit-content' }}>
+                            🌐 Cloudinary खोलें →
+                        </a>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+}
+
 export default function NewspaperManager() {
     const [newspapers, setNewspapers] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -79,18 +133,24 @@ export default function NewspaperManager() {
             {/* Header */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '28px', flexWrap: 'wrap', gap: '12px' }}>
                 <div>
-                    <h1 style={{ fontSize: '1.5rem', fontWeight: 900, color: 'var(--navy)' }}>📰 ई-अखबार प्रबंधन</h1>
+                    <h1 style={{ fontSize: '1.5rem', fontWeight: 900, color: 'var(--navy)' }}>🗞️ ई-अखबार प्रबंधन</h1>
                     <p style={{ color: 'var(--gray-600)', fontSize: '0.85rem', marginTop: '4px' }}>
-                        PDF संस्करण अपलोड करें और प्रबंधित करें
+                        PDF अपलोड करें — यूज़र वेबसाइट पर ही पढ़ सकेंगे
                     </p>
                 </div>
-                <button
-                    className="btn btn-primary"
-                    onClick={() => setShowForm(!showForm)}
-                    style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
-                >
+                <button className="btn btn-primary" onClick={() => setShowForm(!showForm)} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     {showForm ? '✕ बंद करें' : '+ नया संस्करण जोड़ें'}
                 </button>
+            </div>
+
+            {/* Info Banner */}
+            <div style={{ background: 'linear-gradient(135deg, rgba(0,188,212,0.1), rgba(0,188,212,0.05))', border: '1px solid rgba(0,188,212,0.3)', borderRadius: '12px', padding: '14px 18px', marginBottom: '20px', display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+                <span style={{ fontSize: '1.4rem', flexShrink: 0 }}>✅</span>
+                <div style={{ fontSize: '0.85rem', lineHeight: 1.7, color: 'var(--text-secondary)' }}>
+                    <strong style={{ color: 'var(--navy)' }}>PDF वेबसाइट पर ही खुलेगा</strong> — यूज़र को Google Drive नहीं जाना पड़ेगा।
+                    PDF को <strong>Cloudinary</strong> पर अपलोड करें और URL यहाँ paste करें।
+                    यूज़र को zoom, page navigation, और download — सब website पर मिलेगा।
+                </div>
             </div>
 
             {/* Add Form */}
@@ -99,64 +159,56 @@ export default function NewspaperManager() {
                     <h3 style={{ fontWeight: 800, color: 'var(--navy)', marginBottom: '20px', paddingBottom: '12px', borderBottom: '2px solid var(--gray-200)' }}>
                         📋 नया ई-अखबार संस्करण
                     </h3>
+
+                    {/* Cloudinary Guide */}
+                    <CloudinaryGuide />
+
                     <form onSubmit={handleSubmit}>
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '16px', marginBottom: '16px' }}>
                             <div className="form-group" style={{ marginBottom: 0 }}>
                                 <label className="form-label">शीर्षक (Title) *</label>
-                                <input
-                                    className="form-control"
-                                    value={form.title}
-                                    onChange={e => set('title', e.target.value)}
-                                    placeholder="जैसे: JG News Plus - दैनिक संस्करण"
-                                    required
-                                />
+                                <input className="form-control" value={form.title} onChange={e => set('title', e.target.value)}
+                                    placeholder="जैसे: JG News Plus - दैनिक संस्करण" required />
                             </div>
                             <div className="form-group" style={{ marginBottom: 0 }}>
                                 <label className="form-label">संस्करण (Edition)</label>
-                                <input
-                                    className="form-control"
-                                    value={form.edition}
-                                    onChange={e => set('edition', e.target.value)}
-                                    placeholder="जैसे: अंक 042 | अप्रैल 2025"
-                                />
+                                <input className="form-control" value={form.edition} onChange={e => set('edition', e.target.value)}
+                                    placeholder="जैसे: अंक 042 | अप्रैल 2025" />
                             </div>
                             <div className="form-group" style={{ marginBottom: 0 }}>
                                 <label className="form-label">प्रकाशन दिनांक</label>
-                                <input
-                                    type="date"
-                                    className="form-control"
-                                    value={form.publishDate}
-                                    onChange={e => set('publishDate', e.target.value)}
-                                />
+                                <input type="date" className="form-control" value={form.publishDate} onChange={e => set('publishDate', e.target.value)} />
                             </div>
                         </div>
 
                         <div className="form-group">
-                            <label className="form-label">📄 PDF URL * <span style={{ color: 'var(--gray-600)', fontWeight: 400, fontSize: '0.78rem' }}>(Google Drive, Cloudinary, या अन्य CDN से लिंक)</span></label>
+                            <label className="form-label">
+                                📄 PDF URL *
+                                <span style={{ color: 'var(--teal)', fontWeight: 600, marginLeft: '8px', fontSize: '0.78rem' }}>
+                                    (Cloudinary URL — यूज़र वेबसाइट पर पढ़ सकेंगे)
+                                </span>
+                            </label>
                             <input
                                 className="form-control"
                                 value={form.pdfUrl}
                                 onChange={e => set('pdfUrl', e.target.value)}
-                                placeholder="https://drive.google.com/file/d/FILE_ID/preview"
+                                placeholder="https://res.cloudinary.com/YOUR_CLOUD/image/upload/newspaper.pdf"
                                 required
+                                style={{ fontFamily: 'monospace', fontSize: '0.85rem' }}
                             />
-                            <div style={{ fontSize: '0.72rem', color: 'var(--gray-600)', marginTop: '6px', background: 'var(--gray-100)', padding: '8px 12px', borderRadius: '6px' }}>
-                                💡 <strong>Google Drive:</strong> File को "Anyone with link can view" करें → Share → Copy link<br />
-                                फिर link को इस format में बदलें:<br />
-                                <code style={{ fontSize: '0.68rem', background: 'var(--gray-200)', padding: '2px 6px', borderRadius: '4px' }}>
-                                    https://drive.google.com/file/d/FILE_ID/preview
-                                </code>
-                            </div>
                         </div>
 
                         <div className="form-group">
-                            <label className="form-label">🖼️ थंबनेल Image URL <span style={{ color: 'var(--gray-600)', fontWeight: 400, fontSize: '0.78rem' }}>(वैकल्पिक — न हो तो default icon दिखेगा)</span></label>
-                            <input
-                                className="form-control"
-                                value={form.thumbnail}
-                                onChange={e => set('thumbnail', e.target.value)}
-                                placeholder="https://example.com/newspaper-thumbnail.jpg"
-                            />
+                            <label className="form-label">
+                                🖼️ थंबनेल (Cover Image URL)
+                                <span style={{ color: 'var(--gray-600)', fontWeight: 400, fontSize: '0.78rem', marginLeft: '6px' }}>(वैकल्पिक)</span>
+                            </label>
+                            <input className="form-control" value={form.thumbnail} onChange={e => set('thumbnail', e.target.value)}
+                                placeholder="https://res.cloudinary.com/YOUR_CLOUD/image/upload/cover.jpg" />
+                            {form.thumbnail && (
+                                <img src={form.thumbnail} alt="Preview" className="img-preview" style={{ maxHeight: '120px' }}
+                                    onError={e => e.target.style.display = 'none'} />
+                            )}
                         </div>
 
                         <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
@@ -173,21 +225,20 @@ export default function NewspaperManager() {
 
             {/* Newspapers List */}
             <div style={{ background: 'white', borderRadius: 'var(--radius-md)', boxShadow: 'var(--card-shadow)', overflow: 'hidden' }}>
-                <div style={{ padding: '18px 20px', borderBottom: '1px solid var(--gray-200)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ padding: '18px 20px', borderBottom: '1px solid var(--gray-200)' }}>
                     <h3 style={{ fontWeight: 800, color: 'var(--navy)', fontSize: '1rem' }}>
-                        📋 सभी संस्करण ({newspapers.length})
+                        📋 प्रकाशित संस्करण ({newspapers.length})
                     </h3>
                 </div>
-
                 {loading ? (
                     <div style={{ display: 'flex', justifyContent: 'center', padding: '40px' }}>
                         <div className="spinner" />
                     </div>
                 ) : newspapers.length === 0 ? (
                     <div className="empty-state">
-                        <div className="empty-state-icon">📰</div>
-                        <h3>कोई संस्करण नहीं मिला</h3>
-                        <p style={{ color: 'var(--gray-600)', fontSize: '0.85rem' }}>ऊपर "+ नया संस्करण जोड़ें" पर क्लिक करके शुरू करें</p>
+                        <div className="empty-state-icon">🗞️</div>
+                        <h3>कोई संस्करण नहीं</h3>
+                        <p style={{ color: 'var(--gray-600)', fontSize: '0.85rem' }}>ऊपर "+ नया संस्करण जोड़ें" से शुरू करें</p>
                     </div>
                 ) : (
                     <div style={{ overflowX: 'auto' }}>
@@ -197,7 +248,7 @@ export default function NewspaperManager() {
                                     <th>थंबनेल</th>
                                     <th>शीर्षक / संस्करण</th>
                                     <th>दिनांक</th>
-                                    <th>PDF</th>
+                                    <th>PDF Status</th>
                                     <th>क्रियाएं</th>
                                 </tr>
                             </thead>
@@ -206,36 +257,33 @@ export default function NewspaperManager() {
                                     <tr key={paper.id}>
                                         <td>
                                             {paper.thumbnail ? (
-                                                <img src={paper.thumbnail} alt="" className="data-table__thumb" onError={e => { e.target.style.display = 'none'; }} />
+                                                <img src={paper.thumbnail} alt="" className="data-table__thumb"
+                                                    onError={e => e.target.style.display = 'none'} />
                                             ) : (
-                                                <div style={{ width: '60px', height: '44px', background: 'var(--navy)', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem' }}>
-                                                    📰
-                                                </div>
+                                                <div style={{ width: '60px', height: '44px', background: 'var(--navy)', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.3rem' }}>🗞️</div>
                                             )}
                                         </td>
                                         <td>
                                             <div className="data-table__title">{paper.title}</div>
-                                            <div style={{ fontSize: '0.75rem', color: 'var(--teal)', marginTop: '2px' }}>{paper.edition}</div>
+                                            <div style={{ fontSize: '0.72rem', color: 'var(--teal)', marginTop: '2px' }}>{paper.edition}</div>
                                         </td>
                                         <td style={{ whiteSpace: 'nowrap', fontSize: '0.82rem' }}>
                                             {formatDate(paper.publishDate)}
                                         </td>
                                         <td>
-                                            <a href={paper.pdfUrl} target="_blank" rel="noreferrer"
-                                                style={{ color: 'var(--teal)', fontWeight: 700, fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                                    <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3" />
-                                                </svg>
-                                                खोलें
-                                            </a>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                                <span style={{ width: '8px', height: '8px', background: '#16a34a', borderRadius: '50%', display: 'inline-block' }} />
+                                                <span style={{ fontSize: '0.75rem', color: '#16a34a', fontWeight: 700 }}>Website पर पढ़ें</span>
+                                            </div>
                                         </td>
                                         <td>
                                             <div className="data-table__actions">
-                                                <button
-                                                    className="btn btn-danger btn-sm"
-                                                    onClick={() => setConfirmDelete(paper)}
-                                                    style={{ padding: '5px 12px', fontSize: '0.78rem' }}
-                                                >
+                                                <a href={paper.pdfUrl} target="_blank" rel="noreferrer"
+                                                    style={{ padding: '5px 10px', background: 'var(--teal)', color: 'white', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 700, textDecoration: 'none' }}>
+                                                    👁️ देखें
+                                                </a>
+                                                <button className="btn btn-danger btn-sm" onClick={() => setConfirmDelete(paper)}
+                                                    style={{ padding: '5px 10px', fontSize: '0.75rem' }}>
                                                     🗑️ हटाएं
                                                 </button>
                                             </div>
@@ -248,7 +296,7 @@ export default function NewspaperManager() {
                 )}
             </div>
 
-            {/* Delete Confirmation Modal */}
+            {/* Delete Confirm Modal */}
             {confirmDelete && (
                 <div className="modal-wrap" style={{ background: 'rgba(0,0,0,0.5)' }}>
                     <div className="modal">
