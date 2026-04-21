@@ -43,6 +43,47 @@
 
 ---
 
+## 🏗️ System Architecture
+
+```mermaid
+graph TD
+    User((User/Admin)) -->|React + Vite| Frontend[Frontend Portal]
+    Frontend -->|Direct Upload| Cloudinary[(Cloudinary Storage)]
+    Frontend -->|API Requests| Backend[Node.js / Express Server]
+    Backend -->|CRUD Operations| MongoDB[(MongoDB Atlas)]
+    Cloudinary -->|Asset Delivery| Frontend
+```
+
+---
+
+## 📂 Project Structure
+
+```text
+├── backend/
+│   ├── models/        # Mongoose database schemas
+│   ├── routes/        # API endpoints (News, Newspaper, Category, etc.)
+│   └── server.js      # Main Express entry point
+├── src/
+│   ├── admin/         # Administrative Panel components
+│   ├── components/    # Reusable UI components (PDFViewer, Skeletons, etc.)
+│   ├── context/       # State management (NewsContext, LangContext)
+│   ├── pages/         # Frontend pages (Home, Category, EPaper, etc.)
+│   ├── store/         # API service logic and axios instances
+│   └── utils/         # Helper functions and constants
+├── public/            # Static assets (logo, icons, etc.)
+└── index.css          # Professional Global Design System
+```
+
+---
+
+## 🔑 Admin Access
+
+Access the power-user dashboard to manage your news portal:
+- **Route:** `/login` or your defined admin entry point.
+- **Features:** Article creation, PDF uploading, Live TV stream updates, and Category management.
+
+---
+
 ## 🛠️ Installation & Setup
 
 ### 1. Clone the repository
