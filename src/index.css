@@ -1339,3 +1339,26 @@ textarea.form-control {
     display: none;
   }
 }
+
+/* ─── Skeleton Loading Animations ─── */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.skeleton {
+  background: #f6f7f8;
+  background: linear-gradient(to right, #eeeeee 8%, #dddddd 18%, #eeeeee 33%);
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite linear forwards;
+}
+
+.skeleton-card {
+  background: white;
+  border: 1px solid var(--gray-200);
+}
+

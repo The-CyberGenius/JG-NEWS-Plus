@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useNews } from '../context/NewsContext';
 import { timeAgo, formatDate } from '../utils/helpers';
+import { NewsCardSkeleton } from '../components/Skeletons';
 
 function NewsCard({ article }) {
     return (
@@ -25,7 +26,7 @@ function NewsCard({ article }) {
 
 export default function CategoryPage() {
     const { category } = useParams();
-    const { articles } = useNews();
+    const { articles, isLoading } = useNews();
 
     const filtered = useMemo(() =>
         articles.filter(a => a.category === category),
@@ -49,7 +50,11 @@ export default function CategoryPage() {
                 </div>
             </div>
 
-            {filtered.length === 0 ? (
+            {isLoading ? (
+                <div className="news-grid news-grid-3">
+                    {Array.from({ length: 6 }).map((_, i) => <NewsCardSkeleton key={i} />)}
+                </div>
+            ) : filtered.length === 0 ? (
                 <div className="empty-state">
                     <div className="empty-state-icon">📰</div>
                     <h3>इस श्रेणी में कोई खबर नहीं है</h3>

@@ -2,6 +2,7 @@ import React, { useMemo, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useNews } from '../context/NewsContext';
 import { formatDate, timeAgo } from '../utils/helpers';
+import { NewsCardSkeleton, CategorySectionSkeleton, ListSkeleton, FeaturedCardSkeleton } from '../components/Skeletons';
 
 const INITIAL_WEATHER = [
     { city: 'रतनगढ़', temp: '34°C', icon: '☀️', desc: 'धूप' },
@@ -85,7 +86,7 @@ function SectionHeader({ title, linkTo, linkLabel = 'और देखें' }) 
 }
 
 export default function Home() {
-    const { articles, settings } = useNews();
+    const { articles, settings, categories, isLoading } = useNews();
     const [weatherData, setWeatherData] = useState(INITIAL_WEATHER);
 
     useEffect(() => {
@@ -119,12 +120,13 @@ export default function Home() {
     const breaking = useMemo(() => articles.filter(a => a.isBreaking).slice(0, 3), [articles]);
     const latest = useMemo(() => articles.slice(0, 8), [articles]);
     const byCategory = useMemo(() => {
-        const cats = ['राजनीति', 'खेल', 'मनोरंजन', 'अपराध'];
+        // Pick first 4 categories from DB
+        const cats = categories.slice(0, 4);
         return cats.map(cat => ({
             cat,
             articles: articles.filter(a => a.category === cat).slice(0, 3),
         })).filter(c => c.articles.length > 0);
-    }, [articles]);
+    }, [articles, categories]);
 
     return (
         <div>
@@ -134,8 +136,15 @@ export default function Home() {
                     <div style={{ display: 'grid', gap: '20px' }}>
                         <style>{`@media (min-width: 1024px) { .hero-grid { grid-template-columns: 2fr 1fr !important; } }`}</style>
                         <div className="hero-grid" style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '20px' }}>
-                            <FeaturedCard article={featured} />
-                            {breaking.length > 0 && (
+                            {isLoading ? <FeaturedCardSkeleton /> : <FeaturedCard article={featured} />}
+                            {isLoading ? (
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                                    <h2 className="section-title" style={{ marginBottom: '4px' }}>
+                                        <div className="skeleton" style={{ width: '120px', height: '24px', borderRadius: '4px' }}></div>
+                                    </h2>
+                                    <ListSkeleton count={3} />
+                                </div>
+                            ) : breaking.length > 0 && (
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                                     <h2 className="section-title" style={{ marginBottom: '4px' }}>ताज़ी खबरें</h2>
                                     {breaking.map(a => (
@@ -196,7 +205,9 @@ export default function Home() {
             <div className="container section-gap">
                 <SectionHeader title="ताजा समाचार" linkTo="/category/राजस्थान" />
                 <div className="news-grid news-grid-4">
-                    {latest.map(a => <NewsCard key={a.id} article={a} />)}
+                    {isLoading ? (
+                        Array.from({ length: 4 }).map((_, i) => <NewsCardSkeleton key={i} />)
+                    ) : latest.map(a => <NewsCard key={a.id} article={a} />)}
                 </div>
             </div>
 
@@ -235,14 +246,21 @@ export default function Home() {
             )}
 
             {/* Category Sections */}
-            {byCategory.map(({ cat, articles: catArticles }) => (
-                <div key={cat} className="container section-gap">
-                    <SectionHeader title={cat} linkTo={`/category/${cat}`} />
-                    <div className="news-grid news-grid-3">
-                        {catArticles.map(a => <NewsCard key={a.id} article={a} />)}
+            {isLoading ? (
+                <>
+                    <CategorySectionSkeleton title="श्रेणियाँ लोड हो रही हैं..." />
+                    <CategorySectionSkeleton />
+                </>
+            ) : (
+                byCategory.map(({ cat, articles: catArticles }) => (
+                    <div key={cat} className="container section-gap">
+                        <SectionHeader title={cat} linkTo={`/category/${cat}`} />
+                        <div className="news-grid news-grid-3">
+                            {catArticles.map(a => <NewsCard key={a.id} article={a} />)}
+                        </div>
                     </div>
-                </div>
-            ))}
+                ))
+            )}
 
             {/* Video News Section */}
             <div style={{ background: 'var(--gray-100)', padding: '40px 0' }}>

@@ -4,21 +4,18 @@ import { useNews } from '../context/NewsContext';
 import { useLang } from '../context/LangContext';
 
 export default function Header() {
-    const { articles } = useNews();
+    const { articles, categories: dbCategories } = useNews();
     const { lang, toggleLang, t } = useLang();
     const [menuOpen, setMenuOpen] = useState(false);
     const [searchOpen, setSearchOpen] = useState(false);
     const [searchQ, setSearchQ] = useState('');
     const navigate = useNavigate();
 
+    // Dynamically insert categories into the center of the navbar. Limit main navbar categories to 6.
+    const displayCategories = dbCategories.slice(0, 6);
     const NAV_LINKS = [
         { label: t.home, path: '/' },
-        { label: lang === 'hi' ? 'राजस्थान' : 'Rajasthan', path: '/category/राजस्थान' },
-        { label: t.politics, path: '/category/राजनीति' },
-        { label: t.sports, path: '/category/खेल' },
-        { label: t.entertainment, path: '/category/मनोरंजन' },
-        { label: t.crime, path: '/category/अपराध' },
-        { label: t.business, path: '/category/व्यापार' },
+        ...displayCategories.map(c => ({ label: c, path: `/category/${c}` })),
         { label: lang === 'hi' ? 'ई-अखबार' : 'E-Paper', path: '/epaper' },
         { label: t.liveTV, path: '/live' },
     ];

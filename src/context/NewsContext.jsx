@@ -12,9 +12,11 @@ export const NewsProvider = ({ children }) => {
     const [articles, setArticles] = useState([]);
     const [categories, setCategories] = useState([]);
     const [settings, setSettings] = useState({});
+    const [isLoading, setIsLoading] = useState(true);
     const [adminAuth, setAdminAuth] = useState(() => isAdminLoggedIn());
 
     const refresh = useCallback(async () => {
+        setIsLoading(true);
         try {
             const fetchedArticles = await getArticles();
             const fetchedCategories = await getCategories();
@@ -24,6 +26,8 @@ export const NewsProvider = ({ children }) => {
             setSettings(fetchedSettings);
         } catch (error) {
             console.error(error);
+        } finally {
+            setIsLoading(false);
         }
     }, []);
 
@@ -78,6 +82,7 @@ export const NewsProvider = ({ children }) => {
             categories,
             settings,
             adminAuth,
+            isLoading,
             refresh,
             addArticle: handleAdd,
             updateArticle: handleUpdate,
