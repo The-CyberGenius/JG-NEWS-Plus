@@ -159,3 +159,28 @@ export const deleteNewspaper = async (id) => {
     }
 };
 
+// Upload PDF/Image to Cloudinary via backend
+export const uploadPDF = async (file, onProgress) => {
+    const formData = new FormData();
+    formData.append('pdf', file);
+    const response = await api.post('/upload/pdf', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+        onUploadProgress: (evt) => {
+            if (onProgress && evt.total) {
+                onProgress(Math.round((evt.loaded * 100) / evt.total));
+            }
+        },
+    });
+    return response.data;
+};
+
+export const uploadImage = async (file) => {
+    const formData = new FormData();
+    formData.append('image', file);
+    const response = await api.post('/upload/image', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response.data;
+};
+
+
