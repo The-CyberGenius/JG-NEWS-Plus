@@ -22,7 +22,6 @@ import ArticleForm from './admin/ArticleForm';
 import LiveTVManager from './admin/LiveTVManager';
 import CategoryManager from './admin/CategoryManager';
 import NewspaperManager from './admin/NewspaperManager';
-import SettingsManager from './admin/SettingsManager';
 import AdminGuard from './admin/AdminGuard';
 
 function PublicLayout({ children }) {
@@ -66,7 +65,6 @@ export default function App() {
                                         <Route path="live" element={<LiveTVManager />} />
                                         <Route path="categories" element={<CategoryManager />} />
                                         <Route path="epaper" element={<NewspaperManager />} />
-                                        <Route path="settings" element={<SettingsManager />} />
                                     </Routes>
                                 </AdminLayout>
                             </AdminGuard>

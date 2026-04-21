@@ -7,7 +7,6 @@ export default function SettingsManager() {
         siteTitle: '',
         breakingLabel: '',
         liveUrl: '',
-        adminPassword: ''
     });
     const [loading, setLoading] = useState(false);
     const [toast, setToast] = useState({ msg: '', type: '' });
@@ -18,7 +17,6 @@ export default function SettingsManager() {
                 siteTitle: settings.siteTitle || 'JG NEWS Plus',
                 breakingLabel: settings.breakingLabel || 'ब्रेकिंग न्यूज़',
                 liveUrl: settings.liveUrl || '',
-                adminPassword: settings.adminPassword || ''
             });
         }
     }, [settings]);
@@ -38,7 +36,7 @@ export default function SettingsManager() {
         setLoading(true);
         try {
             await updateSettings(formData);
-            showToast('✅ सेटिंग्स सफलतापूर्वक अपडेट की गईं!');
+            showToast('✅ सेटings सफलतापूर्वक अपडेट की गईं!');
         } catch (error) {
             console.error(error);
             showToast('❌ अपडेट करने में विफल', 'error');
@@ -56,8 +54,8 @@ export default function SettingsManager() {
             )}
 
             <div style={{ marginBottom: '28px' }}>
-                <h1 style={{ fontSize: '1.6rem', fontWeight: 900, color: 'var(--navy)', marginBottom: '4px' }}>⚙️ सेटिंग्स (Settings)</h1>
-                <p style={{ color: 'var(--gray-600)', fontSize: '0.88rem' }}>वेबसाइट की मुख्य सेटिंग्स और पासवर्ड यहाँ से बदलें</p>
+                <h1 style={{ fontSize: '1.6rem', fontWeight: 900, color: 'var(--navy)', marginBottom: '4px' }}>⚙️ वेबसाइट सेटिंग्स (Site Settings)</h1>
+                <p style={{ color: 'var(--gray-600)', fontSize: '0.88rem' }}>वेबसाइट का नाम और अन्य जानकारी यहाँ से बदलें</p>
             </div>
 
             <form onSubmit={handleSubmit} className="admin-card" style={{ padding: '32px' }}>
@@ -74,7 +72,6 @@ export default function SettingsManager() {
                             onChange={handleChange}
                             placeholder="जैसे: JG NEWS Plus"
                         />
-                        <p style={{ fontSize: '0.75rem', color: 'var(--gray-400)', marginTop: '4px' }}>यह आपकी पूरी वेबसाइट पर टाइटल की तरह दिखेगा।</p>
                     </div>
 
                     {/* Breaking Label */}
@@ -99,24 +96,15 @@ export default function SettingsManager() {
                             className="form-control"
                             value={formData.liveUrl}
                             onChange={handleChange}
-                            placeholder="YouTube Embed URL (जैसे: https://www.youtube.com/embed/...) "
+                            placeholder="YouTube Embed URL"
                         />
                     </div>
 
-                    {/* Admin Password */}
-                    <div style={{ padding: '20px', background: 'rgba(229,57,53,0.05)', borderRadius: '12px', border: '1px solid rgba(229,57,53,0.1)' }}>
-                        <label className="form-label" style={{ fontWeight: 800, color: 'var(--red)' }}>🛡️ एडमिन पासवर्ड बदलें (Admin Password)</label>
-                        <input
-                            type="text"
-                            name="adminPassword"
-                            className="form-control"
-                            value={formData.adminPassword}
-                            onChange={handleChange}
-                            placeholder="नया पासवर्ड डालें"
-                            style={{ borderColor: 'rgba(229,57,53,0.2)' }}
-                        />
-                        <p style={{ fontSize: '0.75rem', color: 'var(--red)', marginTop: '8px', fontWeight: 600 }}>
-                            ⚠️ ध्यान दें: पासवर्ड बदलने के बाद आपको अगली बार लॉग-इन करने के लिए इसी नए पासवर्ड का उपयोग करना होगा।
+                    {/* Developer Info Box */}
+                    <div style={{ padding: '20px', background: 'var(--gray-100)', borderRadius: '12px', border: '1px solid var(--gray-200)' }}>
+                        <label className="form-label" style={{ fontWeight: 800, color: 'var(--navy)' }}>🛡️ सुरक्षा (Developer Control)</label>
+                        <p style={{ fontSize: '0.82rem', color: 'var(--gray-600)', margin: '0', lineHeight: '1.5' }}>
+                            आपकी पसंद के अनुसार, **एडमिन पासवर्ड** को सुरक्षा के लिए सीधे और केवल **Backend Code (.env file)** से कंट्रोल किया जा रहा है। इसे यहाँ पैनल से नहीं बदला जा सकता।
                         </p>
                     </div>
 
@@ -132,10 +120,6 @@ export default function SettingsManager() {
                     </div>
                 </div>
             </form>
-
-            <div style={{ marginTop: '32px', textAlign: 'center', color: 'var(--gray-400)', fontSize: '0.8rem' }}>
-                JG News Plus V1.0 • Built with Security in Mind
-            </div>
         </div>
     );
 }
