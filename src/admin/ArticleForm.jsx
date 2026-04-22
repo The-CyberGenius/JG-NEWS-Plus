@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useNews } from '../context/NewsContext';
 import { uploadImage } from '../store/newsStore';
@@ -27,29 +27,59 @@ const EMPTY_FORM = {
     isFeatured: false,
 };
 
-// Quill Modules & Formats
-const modules = {
-    toolbar: [
-        [{ 'header': [1, 2, 3, false] }],
-        ['bold', 'italic', 'underline', 'strike'],
-        [{ 'color': [] }, { 'background': [] }],
-        [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-        ['link', 'image', 'video'],
-        ['clean']
-    ],
-};
-
 export default function ArticleForm() {
     const { id } = useParams();
     const { articles, categories, addArticle, updateArticle } = useNews();
     const navigate = useNavigate();
     const isEdit = Boolean(id);
+    const quillRef = useRef(null);
 
     const [form, setForm] = useState(EMPTY_FORM);
     const [saving, setSaving] = useState(false);
     const [toast, setToast] = useState('');
     const [imgPreview, setImgPreview] = useState('');
     const [imageFile, setImageFile] = useState(null);
+
+    // --- Optimized Image Handler for Editor ---
+    const imageHandler = () => {
+        const input = document.createElement('input');
+        input.setAttribute('type', 'file');
+        input.setAttribute('accept', 'image/*');
+        input.click();
+
+        input.onchange = async () => {
+            const file = input.files[0];
+            if (file) {
+                setToast('⏳ फोटो अपलोड हो रही है...');
+                try {
+                    const res = await uploadImage(file);
+                    const quill = quillRef.current.getEditor();
+                    const range = quill.getSelection();
+                    quill.insertEmbed(range.index, 'image', res.url);
+                    setToast('✅ फोटो आर्टिकल में लग गई!');
+                } catch (err) {
+                    setToast('❌ अपलोड विफल');
+                }
+            }
+        };
+    };
+
+    // UseMemo to prevent unnecessary re-renders of modules
+    const modules = useMemo(() => ({
+        toolbar: {
+            container: [
+                [{ 'header': [1, 2, 3, false] }],
+                ['bold', 'italic', 'underline', 'strike'],
+                [{ 'color': [] }, { 'background': [] }],
+                [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                ['link', 'image', 'video'],
+                ['clean']
+            ],
+            handlers: {
+                image: imageHandler
+            }
+        },
+    }), []);
 
     useEffect(() => {
         if (isEdit && id) {
@@ -100,7 +130,7 @@ export default function ArticleForm() {
 
         try {
             if (imageFile) {
-                setToast('⏳ फोटो अपलोड हो रही है...');
+                setToast('⏳ मुख्य फोटो अपलोड हो रही है...');
                 const uploadResult = await uploadImage(imageFile);
                 finalImageUrl = uploadResult.url;
             }
@@ -149,7 +179,7 @@ export default function ArticleForm() {
                         {isEdit ? '✏️ खबर संपादित करें' : '➕ नई खबर जोड़ें'}
                     </h1>
                     <p style={{ color: 'var(--gray-500)', fontSize: '0.85rem', fontWeight: 600, marginTop: '4px' }}>
-                        Rich Text Editor के साथ खबर में media insert करें
+                        Optimized Cloudinary uploads के साथ मीडिया मैनेज करें
                     </p>
                 </div>
             </div>
@@ -160,7 +190,7 @@ export default function ArticleForm() {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
                         <div style={{ background: 'white', borderRadius: '24px', padding: '32px', boxShadow: '0 4px 25px rgba(0,0,0,0.05)', border: '1px solid var(--gray-100)' }}>
                             <h3 style={{ fontWeight: 900, color: 'var(--navy)', marginBottom: '24px', fontSize: '1.1rem' }}>
-                                📝 मुख्य सामग्री (Rich Text)
+                                📝 मुख्य सामग्री
                             </h3>
 
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -191,6 +221,7 @@ export default function ArticleForm() {
                                     <label style={{ display: 'block', fontWeight: 800, fontSize: '0.75rem', color: 'var(--gray-500)', marginBottom: '8px', textTransform: 'uppercase' }}>पूर्ण खबर (Content) *</label>
                                     <div className="editor-container" style={{ borderRadius: '14px', overflow: 'hidden', border: '1px solid var(--gray-200)' }}>
                                         <ReactQuill
+                                            ref={quillRef}
                                             theme="snow"
                                             value={form.content}
                                             onChange={val => set('content', val)}
@@ -198,8 +229,8 @@ export default function ArticleForm() {
                                             style={{ height: '400px', background: 'white' }}
                                         />
                                     </div>
-                                    <p style={{ marginTop: '50px', fontSize: '0.75rem', color: 'var(--gray-500)' }}>
-                                        💡 Toolbar में 🖼️ icon से फोटो और 🎬 icon से वीडियो लिंक डाल सकते हैं।
+                                    <p style={{ marginTop: '50px', fontSize: '0.75rem', color: 'var(--gray-500)', fontStyle: 'italic' }}>
+                                        💡 Tip: एडिटर के बीच में फोटो डालने पर वो Cloudinary पर ऑटो-अपलोड होगी।
                                     </p>
                                 </div>
                             </div>
@@ -249,18 +280,6 @@ export default function ArticleForm() {
                             </div>
                         </div>
 
-                        <div style={{ background: 'white', borderRadius: '24px', padding: '24px', boxShadow: '0 4px 25px rgba(0,0,0,0.05)', border: '1px solid var(--gray-100)' }}>
-                            <h3 style={{ fontWeight: 900, color: 'var(--navy)', marginBottom: '20px', fontSize: '1rem' }}>⚙️ विकल्प</h3>
-                            <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', marginBottom: '10px' }}>
-                                <input type="checkbox" checked={form.isBreaking} onChange={e => set('isBreaking', e.target.checked)} />
-                                <span style={{ fontWeight: 700, fontSize: '0.85rem' }}>🔴 ब्रेकिंग न्यूज़</span>
-                            </label>
-                            <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}>
-                                <input type="checkbox" checked={form.isFeatured} onChange={e => set('isFeatured', e.target.checked)} />
-                                <span style={{ fontWeight: 700, fontSize: '0.85rem' }}>⭐ फीचर्ड खबर</span>
-                            </label>
-                        </div>
-
                         <button type="submit" className="btn btn-primary" style={{ padding: '18px', width: '100%', borderRadius: '16px' }} disabled={saving}>
                             {saving ? '⏳ सुरक्षित हो रहा है...' : isEdit ? '✅ अपडेट करें' : '🚀 प्रकाशित करें'}
                         </button>
@@ -269,9 +288,10 @@ export default function ArticleForm() {
             </form>
 
             <style>{`
-                .ql-editor { min-height: 350px; font-size: 1rem; line-height: 1.6; }
-                .ql-toolbar.ql-snow { border-top-left-radius: 14px; border-top-right-radius: 14px; background: #f8fafc; }
+                .ql-editor { min-height: 350px; font-size: 1.1rem; line-height: 1.7; color: #334155; }
+                .ql-toolbar.ql-snow { border-top-left-radius: 14px; border-top-right-radius: 14px; background: #f8fafc; padding: 12px; }
                 .ql-container.ql-snow { border-bottom-left-radius: 14px; border-bottom-right-radius: 14px; }
+                .ql-editor img { max-width: 100%; border-radius: 12px; margin: 15px 0; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
             `}</style>
         </div>
     );
