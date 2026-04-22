@@ -14,20 +14,19 @@ const parser = new Parser({
 
 const FEED_MAP = {
     india: [
-        { name: 'TOI India', url: 'https://timesofindia.indiatimes.com/rssfeeds/-2128936835.cms' },
-        { name: 'NDTV India', url: 'https://feeds.feedburner.com/ndtvnews-india-news' }
+        { name: 'NDTV India', url: 'https://feeds.feedburner.com/ndtvnews-india-news' },
+        { name: 'TOI India', url: 'https://timesofindia.indiatimes.com/rssfeeds/-2128936835.cms' }
     ],
     world: [
-        { name: 'TOI World', url: 'https://timesofindia.indiatimes.com/rssfeeds/296589292.cms' },
-        { name: 'BBC World', url: 'http://feeds.bbci.co.uk/news/world/rss.xml' }
+        { name: 'BBC World', url: 'http://feeds.bbci.co.uk/news/world/rss.xml' },
+        { name: 'TOI World', url: 'https://timesofindia.indiatimes.com/rssfeeds/296589292.cms' }
     ],
     rajasthan: [
-        { name: 'TOI Rajasthan', url: 'https://timesofindia.indiatimes.com/rssfeeds/-2128819658.cms' },
-        { name: 'Zee News Rajasthan', url: 'https://zeenews.india.com/rss/india-rajasthan-news.xml' }
+        { name: 'Patrika Rajasthan', url: 'https://www.patrika.com/rss/rajasthan-news/' },
+        { name: 'Google Rajasthan', url: 'https://news.google.com/rss/search?q=rajasthan+news&hl=hi&gl=IN&ceid=IN:hi' }
     ]
 };
 
-// Function to extract image URL from HTML string
 const extractImage = (html) => {
     if (!html) return '';
     const match = html.match(/<img[^>]+src="([^">]+)"/);
@@ -44,7 +43,6 @@ router.get('/sync', async (req, res) => {
         for (const feed of feeds) {
             const data = await parser.parseURL(feed.url);
             const items = data.items.map(item => {
-                // Try to find image in various fields
                 let img = item.media?.$?.url || item.enclosure?.url || '';
                 if (!img) img = extractImage(item.content) || extractImage(item.contentEncoded);
 
@@ -52,7 +50,8 @@ router.get('/sync', async (req, res) => {
                     title: item.title,
                     link: item.link,
                     pubDate: item.pubDate,
-                    content: (item.contentSnippet || item.content || '').replace(/<[^>]*>?/gm, '').slice(0, 300),
+                    // Keeping more content for description
+                    fullContent: (item.contentSnippet || item.contentEncoded || item.content || '').replace(/<[^>]*>?/gm, ''),
                     source: feed.name,
                     image: img
                 };
@@ -61,7 +60,7 @@ router.get('/sync', async (req, res) => {
         }
 
         allItems.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
-        res.json(allItems.slice(0, 20));
+        res.json(allItems.slice(0, 30)); 
     } catch (error) {
         console.error('RSS Sync Error:', error);
         res.status(500).json({ message: 'News fetch karne mein problem aayi' });
