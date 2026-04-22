@@ -2,7 +2,12 @@ import express from 'express';
 import Parser from 'rss-parser';
 
 const router = express.Router();
+
+// Adding User-Agent to prevent getting blocked by RSS sources
 const parser = new Parser({
+    headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+    },
     customFields: {
         item: [
             ['media:content', 'media'],
@@ -15,15 +20,15 @@ const parser = new Parser({
 const FEED_MAP = {
     india: [
         { name: 'NDTV India', url: 'https://feeds.feedburner.com/ndtvnews-india-news' },
-        { name: 'TOI India', url: 'https://timesofindia.indiatimes.com/rssfeeds/-2128936835.cms' }
+        { name: 'Google India', url: 'https://news.google.com/rss/search?q=India+News&hl=hi&gl=IN&ceid=IN:hi' }
     ],
     world: [
-        { name: 'BBC World', url: 'http://feeds.bbci.co.uk/news/world/rss.xml' },
-        { name: 'TOI World', url: 'https://timesofindia.indiatimes.com/rssfeeds/296589292.cms' }
+        { name: 'Google World', url: 'https://news.google.com/rss/search?q=World+News&hl=hi&gl=IN&ceid=IN:hi' },
+        { name: 'BBC World', url: 'http://feeds.bbci.co.uk/news/world/rss.xml' }
     ],
     rajasthan: [
-        { name: 'Patrika Rajasthan', url: 'https://www.patrika.com/rss/rajasthan-news/' },
-        { name: 'Google Rajasthan', url: 'https://news.google.com/rss/search?q=rajasthan+news&hl=hi&gl=IN&ceid=IN:hi' }
+        { name: 'Google Rajasthan', url: 'https://news.google.com/rss/search?q=Rajasthan+News&hl=hi&gl=IN&ceid=IN:hi' },
+        { name: 'Amar Ujala Raj', url: 'https://www.amarujala.com/rss/rajasthan.xml' }
     ]
 };
 
@@ -41,22 +46,30 @@ router.get('/sync', async (req, res) => {
         let allItems = [];
         
         for (const feed of feeds) {
-            const data = await parser.parseURL(feed.url);
-            const items = data.items.map(item => {
-                let img = item.media?.$?.url || item.enclosure?.url || '';
-                if (!img) img = extractImage(item.content) || extractImage(item.contentEncoded);
+            try {
+                const data = await parser.parseURL(feed.url);
+                const items = data.items.map(item => {
+                    let img = item.media?.$?.url || item.enclosure?.url || '';
+                    if (!img) img = extractImage(item.content) || extractImage(item.contentEncoded);
 
-                return {
-                    title: item.title,
-                    link: item.link,
-                    pubDate: item.pubDate,
-                    // Keeping more content for description
-                    fullContent: (item.contentSnippet || item.contentEncoded || item.content || '').replace(/<[^>]*>?/gm, ''),
-                    source: feed.name,
-                    image: img
-                };
-            });
-            allItems = [...allItems, ...items];
+                    return {
+                        title: item.title,
+                        link: item.link,
+                        pubDate: item.pubDate,
+                        fullContent: (item.contentSnippet || item.contentEncoded || item.content || '').replace(/<[^>]*>?/gm, ''),
+                        source: feed.name,
+                        image: img
+                    };
+                });
+                allItems = [...allItems, ...items];
+            } catch (err) {
+                console.error(`Feed ${feed.name} failed:`, err.message);
+                // Continue to next feed if one fails
+            }
+        }
+
+        if (allItems.length === 0) {
+            return res.status(404).json({ message: 'Koi khabar nahi mili' });
         }
 
         allItems.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
