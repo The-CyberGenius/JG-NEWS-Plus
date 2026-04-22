@@ -23,6 +23,7 @@ import LiveTVManager from './admin/LiveTVManager';
 import CategoryManager from './admin/CategoryManager';
 import NewspaperManager from './admin/NewspaperManager';
 import AdminGuard from './admin/AdminGuard';
+import NewsSyncManager from './admin/NewsSyncManager';
 
 function PublicLayout({ children }) {
     return (
@@ -65,6 +66,7 @@ export default function App() {
                                         <Route path="live" element={<LiveTVManager />} />
                                         <Route path="categories" element={<CategoryManager />} />
                                         <Route path="epaper" element={<NewspaperManager />} />
+                                        <Route path="sync" element={<NewsSyncManager />} />
                                     </Routes>
                                 </AdminLayout>
                             </AdminGuard>

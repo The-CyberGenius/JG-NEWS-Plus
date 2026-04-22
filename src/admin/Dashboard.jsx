@@ -41,6 +41,7 @@ export default function Dashboard() {
             {/* Quick Actions */}
             <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '32px' }}>
                 <Link to="/admin/news/add" className="btn btn-primary">➕ खबर जोड़ें</Link>
+                <Link to="/admin/sync" className="btn" style={{ background: 'var(--teal)', color: 'white' }}>🤖 AI News Sync (MCP)</Link>
                 <Link to="/admin/news" className="btn btn-navy">📰 सभी खबरें</Link>
                 <Link to="/admin/live" className="btn" style={{ background: 'var(--red)', color: 'white' }}>📺 Live TV</Link>
                 <Link to="/admin/categories" className="btn" style={{ background: 'var(--saffron)', color: 'white' }}>🏷️ श्रेणियाँ</Link>

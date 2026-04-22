@@ -205,3 +205,13 @@ export const uploadImage = async (file, onProgress) => {
     );
     return { url: data.secure_url, publicId: data.public_id };
 };
+// ─── News Sync (RSS) ────────────────────────────────────────────────────────
+export const syncNews = async () => {
+    try {
+        const response = await api.get('/news-sync/sync');
+        return response.data;
+    } catch (error) {
+        console.error("Error syncing news", error);
+        return [];
+    }
+};

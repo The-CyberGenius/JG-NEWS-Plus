@@ -9,6 +9,7 @@ const NAV_ITEMS = [
     { path: '/admin/live', icon: '📺', label: 'Live TV' },
     { path: '/admin/categories', icon: '🏷️', label: 'श्रेणियाँ' },
     { path: '/admin/epaper', icon: '🗞️', label: 'ई-अखबार (PDF)' },
+    { path: '/admin/sync', icon: '🤖', label: 'AI News Sync (MCP)' },
 ];
 
 export default function AdminLayout({ children }) {
