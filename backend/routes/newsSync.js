@@ -4,7 +4,11 @@ import Parser from 'rss-parser';
 const router = express.Router();
 const parser = new Parser({
     customFields: {
-        item: [['media:content', 'media'], ['enclosure', 'media']],
+        item: [
+            ['media:content', 'media'],
+            ['enclosure', 'media'],
+            ['content:encoded', 'contentEncoded']
+        ],
     }
 });
 
@@ -19,8 +23,15 @@ const FEED_MAP = {
     ],
     rajasthan: [
         { name: 'TOI Rajasthan', url: 'https://timesofindia.indiatimes.com/rssfeeds/-2128819658.cms' },
-        { name: 'Google News Rajasthan', url: 'https://news.google.com/rss/search?q=rajasthan+news&hl=hi&gl=IN&ceid=IN:hi' }
+        { name: 'Zee News Rajasthan', url: 'https://zeenews.india.com/rss/india-rajasthan-news.xml' }
     ]
+};
+
+// Function to extract image URL from HTML string
+const extractImage = (html) => {
+    if (!html) return '';
+    const match = html.match(/<img[^>]+src="([^">]+)"/);
+    return match ? match[1] : '';
 };
 
 router.get('/sync', async (req, res) => {
@@ -32,14 +43,20 @@ router.get('/sync', async (req, res) => {
         
         for (const feed of feeds) {
             const data = await parser.parseURL(feed.url);
-            const items = data.items.map(item => ({
-                title: item.title,
-                link: item.link,
-                pubDate: item.pubDate,
-                content: item.contentSnippet || item.content,
-                source: feed.name,
-                image: item.media?.$?.url || item.enclosure?.url || ''
-            }));
+            const items = data.items.map(item => {
+                // Try to find image in various fields
+                let img = item.media?.$?.url || item.enclosure?.url || '';
+                if (!img) img = extractImage(item.content) || extractImage(item.contentEncoded);
+
+                return {
+                    title: item.title,
+                    link: item.link,
+                    pubDate: item.pubDate,
+                    content: (item.contentSnippet || item.content || '').replace(/<[^>]*>?/gm, '').slice(0, 300),
+                    source: feed.name,
+                    image: img
+                };
+            });
             allItems = [...allItems, ...items];
         }
 
