@@ -70,83 +70,57 @@ export default function NewsManager() {
             </div>
 
             {/* Table - Desktop */}
-            <div className="hide-mobile" style={{ overflowX: 'auto' }}>
+            <div style={{ overflowX: 'auto', background: 'white', borderRadius: '12px', boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}>
                 <table className="data-table">
                     <thead>
                         <tr>
-                            <th>खबर</th>
-                            <th>श्रेणी</th>
-                            <th>स्थान</th>
-                            <th>ब्रेकिंग</th>
-                            <th>फीचर्ड</th>
-                            <th>तारीख</th>
-                            <th>Actions</th>
+                            <th style={{ padding: '12px 16px' }}>खबर</th>
+                            <th style={{ padding: '12px 16px' }}>श्रेणी</th>
+                            <th style={{ padding: '12px 16px' }}>स्थान</th>
+                            <th style={{ padding: '12px 16px' }}>ब्रेकिंग</th>
+                            <th style={{ padding: '12px 16px' }}>फीचर्ड</th>
+                            <th style={{ padding: '12px 16px' }}>तारीख</th>
+                            <th style={{ padding: '12px 16px' }}>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {paginated.map(a => (
                             <tr key={a.id}>
-                                <td>
+                                <td style={{ padding: '8px 16px' }}>
                                     <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                                        <img src={a.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=100&q=60'} alt="" className="data-table__thumb" />
-                                        <div className="data-table__title">{a.title}</div>
+                                        <img src={a.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=100&q=60'} alt="" style={{ width: '40px', height: '30px', objectFit: 'cover', borderRadius: '4px' }} />
+                                        <div style={{ fontWeight: 700, fontSize: '0.85rem', color: 'var(--navy)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '250px' }}>{a.title}</div>
                                     </div>
                                 </td>
-                                <td><span className="badge badge-teal">{a.category}</span></td>
-                                <td style={{ fontSize: '0.8rem' }}>📍 {a.location}</td>
-                                <td>
+                                <td style={{ padding: '8px 16px' }}><span className="badge badge-teal" style={{ fontSize: '0.7rem' }}>{a.category}</span></td>
+                                <td style={{ padding: '8px 16px', fontSize: '0.75rem', whiteSpace: 'nowrap' }}>📍 {a.location}</td>
+                                <td style={{ padding: '8px 16px' }}>
                                     <button
                                         onClick={() => toggleBreaking(a)}
-                                        style={{ background: a.isBreaking ? 'var(--red)' : 'var(--gray-200)', color: a.isBreaking ? 'white' : 'var(--gray-600)', padding: '4px 10px', borderRadius: '100px', fontSize: '0.75rem', fontWeight: 700, border: 'none', cursor: 'pointer' }}
+                                        style={{ background: a.isBreaking ? 'var(--red)' : 'var(--gray-100)', color: a.isBreaking ? 'white' : 'var(--gray-600)', padding: '3px 8px', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 800, border: 'none', cursor: 'pointer' }}
                                     >
-                                        {a.isBreaking ? '🔴 हाँ' : 'नहीं'}
+                                        {a.isBreaking ? 'हाँ' : 'नहीं'}
                                     </button>
                                 </td>
-                                <td>
+                                <td style={{ padding: '8px 16px' }}>
                                     <button
                                         onClick={() => toggleFeatured(a)}
-                                        style={{ background: a.isFeatured ? 'var(--saffron)' : 'var(--gray-200)', color: a.isFeatured ? 'white' : 'var(--gray-600)', padding: '4px 10px', borderRadius: '100px', fontSize: '0.75rem', fontWeight: 700, border: 'none', cursor: 'pointer' }}
+                                        style={{ background: a.isFeatured ? 'var(--saffron)' : 'var(--gray-100)', color: a.isFeatured ? 'white' : 'var(--gray-600)', padding: '3px 8px', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 800, border: 'none', cursor: 'pointer' }}
                                     >
-                                        {a.isFeatured ? '⭐ हाँ' : 'नहीं'}
+                                        {a.isFeatured ? 'हाँ' : 'नहीं'}
                                     </button>
                                 </td>
-                                <td style={{ fontSize: '0.78rem', color: 'var(--gray-600)' }}>{timeAgo(a.date)}</td>
-                                <td>
-                                    <div className="data-table__actions">
-                                        <Link to={`/article/${a.id}`} target="_blank" className="btn btn-sm" style={{ background: 'var(--gray-200)', color: 'var(--navy)' }}>👁️</Link>
-                                        <Link to={`/admin/news/edit/${a.id}`} className="btn btn-sm btn-outline">✏️</Link>
-                                        <button className="btn btn-sm btn-danger" onClick={() => setConfirm(a.id)}>🗑️</button>
+                                <td style={{ padding: '8px 16px', fontSize: '0.7rem', color: 'var(--gray-500)', whiteSpace: 'nowrap' }}>{timeAgo(a.date)}</td>
+                                <td style={{ padding: '8px 16px' }}>
+                                    <div style={{ display: 'flex', gap: '5px' }}>
+                                        <Link to={`/admin/news/edit/${a.id}`} className="btn btn-sm" style={{ padding: '4px 8px', fontSize: '0.75rem', background: 'var(--teal)', color: 'white' }}>✏️</Link>
+                                        <button className="btn btn-sm" style={{ padding: '4px 8px', fontSize: '0.75rem', background: 'var(--red)', color: 'white' }} onClick={() => setConfirm(a.id)}>🗑️</button>
                                     </div>
                                 </td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
-            </div>
-
-            {/* Mobile Card List */}
-            <div className="hide-desktop" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                {paginated.map(a => (
-                    <div key={a.id} style={{ background: 'white', borderRadius: 'var(--radius-md)', padding: '14px', boxShadow: 'var(--card-shadow)' }}>
-                        <div style={{ display: 'flex', gap: '12px', marginBottom: '10px' }}>
-                            <img src={a.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=100&q=60'} alt="" style={{ width: '64px', height: '48px', objectFit: 'cover', borderRadius: '6px', flexShrink: 0 }} />
-                            <div style={{ flex: 1, minWidth: 0 }}>
-                                <div style={{ fontWeight: 700, fontSize: '0.88rem', color: 'var(--navy)', marginBottom: '4px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{a.title}</div>
-                                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-                                    <span className="badge badge-teal" style={{ fontSize: '0.65rem' }}>{a.category}</span>
-                                    {a.isBreaking && <span className="badge badge-red" style={{ fontSize: '0.65rem' }}>ब्रेकिंग</span>}
-                                </div>
-                            </div>
-                        </div>
-                        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                            <Link to={`/admin/news/edit/${a.id}`} className="btn btn-sm btn-outline">✏️ Edit</Link>
-                            <button onClick={() => toggleBreaking(a)} className="btn btn-sm" style={{ background: a.isBreaking ? 'var(--red)' : 'var(--gray-200)', color: a.isBreaking ? 'white' : 'var(--navy)' }}>
-                                {a.isBreaking ? '🔴 Remove' : '+ Breaking'}
-                            </button>
-                            <button className="btn btn-sm btn-danger" onClick={() => setConfirm(a.id)}>🗑️</button>
-                        </div>
-                    </div>
-                ))}
             </div>
 
             {/* Pagination */}
