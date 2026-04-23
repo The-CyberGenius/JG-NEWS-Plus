@@ -17,13 +17,6 @@ export default function AdminLayout({ children }) {
     const [sidebarOpen, setSidebarOpen] = useState(true);
     const navigate = useNavigate();
     const location = useLocation();
-    
-    // Auto-close on mobile when mounting
-    React.useEffect(() => {
-        if (window.innerWidth < 1024) {
-            setSidebarOpen(false);
-        }
-    }, []);
 
     const handleLogout = () => {
         logout();
@@ -68,7 +61,6 @@ export default function AdminLayout({ children }) {
                             key={item.path}
                             to={item.path}
                             className={`sidebar-nav-item ${location.pathname === item.path ? 'active' : ''}`}
-                            onClick={() => setSidebarOpen(false)}
                         >
                             <span style={{ fontSize: '1.1rem' }}>{item.icon}</span>
                             {item.label}
