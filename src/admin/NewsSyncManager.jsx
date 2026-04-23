@@ -20,7 +20,7 @@ export default function NewsSyncManager() {
     const [loading, setLoading] = useState(false);
     const [toast, setToast] = useState('');
     const [expandedIdx, setExpandedIdx] = useState(null);
-    
+
     // Preview Modal State
     const [previewItem, setPreviewItem] = useState(null);
     const [posting, setPosting] = useState(false);
@@ -114,8 +114,8 @@ export default function NewsSyncManager() {
                     {fetchedNews.map((item, idx) => {
                         const isExpanded = expandedIdx === idx;
                         return (
-                            <div key={idx} style={{ 
-                                background: 'white', padding: '20px', borderRadius: '20px', 
+                            <div key={idx} style={{
+                                background: 'white', padding: '20px', borderRadius: '20px',
                                 boxShadow: '0 4px 25px rgba(0,0,0,0.06)', border: '1px solid var(--gray-100)',
                                 transition: 'all 0.3s'
                             }}>
@@ -127,16 +127,16 @@ export default function NewsSyncManager() {
                                             <span style={{ fontSize: '0.75rem', color: 'var(--gray-500)', fontWeight: 600 }}>{timeAgo(item.pubDate)}</span>
                                         </div>
                                         <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--navy)', marginBottom: '10px', lineHeight: 1.4 }}>{item.title}</h3>
-                                        
-                                        <div style={{ 
-                                            fontSize: '0.9rem', color: 'var(--gray-600)', lineHeight: 1.6, 
-                                            display: isExpanded ? 'block' : '-webkit-box', 
-                                            WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', 
-                                            overflow: 'hidden' 
+
+                                        <div style={{
+                                            fontSize: '0.9rem', color: 'var(--gray-600)', lineHeight: 1.6,
+                                            display: isExpanded ? 'block' : '-webkit-box',
+                                            WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
+                                            overflow: 'hidden'
                                         }}>
                                             {item.fullContent}
                                         </div>
-                                        
+
                                         <div style={{ display: 'flex', gap: '15px', marginTop: '15px' }}>
                                             <button onClick={() => setExpandedIdx(isExpanded ? null : idx)} style={{ background: 'none', border: 'none', color: 'var(--teal)', fontWeight: 800, fontSize: '0.85rem', cursor: 'pointer', padding: 0 }}>
                                                 {isExpanded ? '↑ कम देखें' : '↓ पूरा विवरण पढ़ें'}
@@ -171,11 +171,11 @@ export default function NewsSyncManager() {
                                 🚀 Review & Publish
                                 <button onClick={() => setPreviewItem(null)} style={{ background: 'none', border: 'none', fontSize: '1.2rem', cursor: 'pointer' }}>✕</button>
                             </div>
-                            
+
                             <div style={{ padding: '10px 0' }}>
                                 <img src={previewItem.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&q=80'} alt="" style={{ width: '100%', maxHeight: '250px', objectFit: 'cover', borderRadius: '16px', marginBottom: '20px' }} />
                                 <h3 style={{ fontWeight: 900, color: 'var(--navy)', marginBottom: '15px', lineHeight: 1.4 }}>{previewItem.title}</h3>
-                                
+
                                 <div style={{ background: 'var(--gray-50)', padding: '15px', borderRadius: '12px', marginBottom: '20px', maxHeight: '200px', overflowY: 'auto', fontSize: '0.9rem', color: 'var(--gray-700)', lineHeight: 1.6 }}>
                                     <strong>Description:</strong><br />
                                     {previewItem.fullContent}
@@ -184,13 +184,13 @@ export default function NewsSyncManager() {
                                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '20px' }}>
                                     <div className="form-group">
                                         <label style={{ fontSize: '0.75rem', fontWeight: 900, color: 'var(--gray-500)', textTransform: 'uppercase' }}>City / Location</label>
-                                        <select className="form-control" value={previewItem.location} onChange={e => setPreviewItem({...previewItem, location: e.target.value})} style={{ borderRadius: '10px' }}>
+                                        <select className="form-control" value={previewItem.location} onChange={e => setPreviewItem({ ...previewItem, location: e.target.value })} style={{ borderRadius: '10px' }}>
                                             {RAJASTHAN_CITIES.map(c => <option key={c} value={c}>{c}</option>)}
                                         </select>
                                     </div>
                                     <div className="form-group">
                                         <label style={{ fontSize: '0.75rem', fontWeight: 900, color: 'var(--gray-500)', textTransform: 'uppercase' }}>Website Category</label>
-                                        <select className="form-control" value={previewItem.assignedCat} onChange={e => setPreviewItem({...previewItem, assignedCat: e.target.value})} style={{ borderRadius: '10px' }}>
+                                        <select className="form-control" value={previewItem.assignedCat} onChange={e => setPreviewItem({ ...previewItem, assignedCat: e.target.value })} style={{ borderRadius: '10px' }}>
                                             {categories.map(c => <option key={c} value={c}>{c}</option>)}
                                         </select>
                                     </div>

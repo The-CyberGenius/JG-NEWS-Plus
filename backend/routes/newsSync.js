@@ -44,7 +44,7 @@ router.get('/sync', async (req, res) => {
 
     try {
         let allItems = [];
-        
+
         for (const feed of feeds) {
             try {
                 const data = await parser.parseURL(feed.url);
@@ -73,7 +73,7 @@ router.get('/sync', async (req, res) => {
         }
 
         allItems.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
-        res.json(allItems.slice(0, 30)); 
+        res.json(allItems.slice(0, 30));
     } catch (error) {
         console.error('RSS Sync Error:', error);
         res.status(500).json({ message: 'News fetch karne mein problem aayi' });
