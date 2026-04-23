@@ -43,10 +43,6 @@ export default function AdminLayout({ children }) {
                 </button>
             </div>
 
-            {/* Mobile Overlay */}
-            {sidebarOpen && (
-                <div className="mobile-menu-overlay show" onClick={() => setSidebarOpen(false)} />
-            )}
 
             {/* Sidebar */}
             <div className={`admin-sidebar ${sidebarOpen ? '' : 'collapsed'}`} style={{ paddingTop: '60px' }}>
