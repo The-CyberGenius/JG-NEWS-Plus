@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { getNewspapers, addNewspaper, deleteNewspaper, uploadPDF, uploadImage } from '../store/newsStore';
+import { getNewspapers, addNewspaper, updateNewspaper, deleteNewspaper, uploadPDF, uploadImage } from '../store/newsStore';
 
 const EMPTY_FORM = {
     title: '',
@@ -91,6 +91,7 @@ export default function NewspaperManager() {
     const [form, setForm] = useState(EMPTY_FORM);
     const [saving, setSaving] = useState(false);
     const [toast, setToast] = useState({ msg: '', type: '' });
+    const [editId, setEditId] = useState(null);
     const [confirmDelete, setConfirmDelete] = useState(null);
 
     // Upload states
@@ -149,9 +150,15 @@ export default function NewspaperManager() {
         }
         setSaving(true);
         try {
-            await addNewspaper(form);
-            showToast('✅ ई-अखबार सफलतापूर्वक प्रकाशित!');
+            if (editId) {
+                await updateNewspaper(editId, form);
+                showToast('✅ ई-अखबार सफलतापूर्वक अपडेट किया गया!');
+            } else {
+                await addNewspaper(form);
+                showToast('✅ ई-अखबार सफलतापूर्वक प्रकाशित!');
+            }
             setForm(EMPTY_FORM);
+            setEditId(null);
             setPdfProgress(0);
             setShowForm(false);
             await load();
@@ -159,6 +166,20 @@ export default function NewspaperManager() {
             showToast('❌ त्रुटि हुई। दोबारा कोशिश करें।', 'error');
         }
         setSaving(false);
+    };
+
+    const handleEdit = (paper) => {
+        setForm({
+            title: paper.title,
+            edition: paper.edition,
+            pdfUrl: paper.pdfUrl,
+            thumbnail: paper.thumbnail,
+            publishDate: paper.publishDate.split('T')[0],
+            isActive: paper.isActive,
+        });
+        setEditId(paper.id);
+        setShowForm(true);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     const handleDelete = async (id) => {
@@ -189,7 +210,7 @@ export default function NewspaperManager() {
                         PDF सीधे यहाँ अपलोड करें — यूज़र वेबसाइट पर ही पढ़ सकेंगे
                     </p>
                 </div>
-                <button className="btn btn-primary" onClick={() => setShowForm(!showForm)} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <button className="btn btn-primary" onClick={() => { setShowForm(!showForm); if(showForm) { setForm(EMPTY_FORM); setEditId(null); } }} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     {showForm ? '✕ बंद करें' : '+ नया संस्करण जोड़ें'}
                 </button>
             </div>
@@ -208,7 +229,7 @@ export default function NewspaperManager() {
             {showForm && (
                 <div style={{ background: 'white', borderRadius: 'var(--radius-md)', padding: '24px', boxShadow: 'var(--card-shadow)', marginBottom: '28px' }}>
                     <h3 style={{ fontWeight: 800, color: 'var(--navy)', marginBottom: '20px', paddingBottom: '12px', borderBottom: '2px solid var(--gray-200)' }}>
-                        📋 नया ई-अखबार प्रकाशित करें
+                        📋 {editId ? 'ई-अखबार संपादित करें' : 'नया ई-अखबार प्रकाशित करें'}
                     </h3>
                     <form onSubmit={handleSubmit}>
                         {/* Basic details */}
@@ -285,9 +306,9 @@ export default function NewspaperManager() {
 
                         <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
                             <button type="submit" className="btn btn-primary" disabled={saving || pdfUploading || !form.pdfUrl}>
-                                {saving ? '⏳ प्रकाशित हो रहा है...' : '✅ प्रकाशित करें'}
+                                {saving ? '⏳ सेव हो रहा है...' : editId ? '💾 अपडेट करें' : '✅ प्रकाशित करें'}
                             </button>
-                            <button type="button" className="btn btn-outline" onClick={() => { setShowForm(false); setForm(EMPTY_FORM); setPdfProgress(0); }}>
+                            <button type="button" className="btn btn-outline" onClick={() => { setShowForm(false); setForm(EMPTY_FORM); setEditId(null); setPdfProgress(0); }}>
                                 रद्द करें
                             </button>
                         </div>
@@ -353,8 +374,12 @@ export default function NewspaperManager() {
                                             <div className="data-table__actions">
                                                 <a href={paper.pdfUrl} target="_blank" rel="noreferrer"
                                                     style={{ padding: '5px 10px', background: 'var(--teal)', color: 'white', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 700, textDecoration: 'none', whiteSpace: 'nowrap' }}>
-                                                    👁️ देखें
+                                                    👁️
                                                 </a>
+                                                <button className="btn btn-navy btn-sm" onClick={() => handleEdit(paper)}
+                                                    style={{ padding: '5px 10px', fontSize: '0.75rem', background: 'var(--navy-mid)' }}>
+                                                    ✏️
+                                                </button>
                                                 <button className="btn btn-danger btn-sm" onClick={() => setConfirmDelete(paper)}
                                                     style={{ padding: '5px 10px', fontSize: '0.75rem' }}>
                                                     🗑️

@@ -8,7 +8,7 @@ router.get('/', async (req, res) => {
     try {
         let settings = await Setting.findOne();
         if (!settings) {
-            settings = await Setting.create({ adminPassword: 'jgnews@2024' });
+            settings = await Setting.create({ siteTitle: 'JG News Plus' });
         }
         res.json(settings);
     } catch (error) {

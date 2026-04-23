@@ -159,6 +159,16 @@ export const deleteNewspaper = async (id) => {
     }
 };
 
+export const updateNewspaper = async (id, data) => {
+    try {
+        const response = await api.put(`/newspapers/${id}`, data);
+        return { ...response.data, id: response.data._id };
+    } catch (error) {
+        console.error('Error updating newspaper', error);
+        throw error;
+    }
+};
+
 // ─── Direct Cloudinary Upload (Frontend → Cloudinary Directly) ────────────────
 // No backend needed, no size limit, works on Vercel too
 // Requires "jgnews_pdf" unsigned upload preset in Cloudinary Dashboard

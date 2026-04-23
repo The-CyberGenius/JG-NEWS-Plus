@@ -105,7 +105,6 @@ const SEED_SETTINGS = {
     liveUrl: 'https://www.youtube.com/embed/5qap5aO4i9A',
     siteTitle: 'JG News Plus',
     breakingLabel: 'ब्रेकिंग न्यूज़',
-    adminPassword: 'jgnews@2024',
 };
 
 const importData = async () => {

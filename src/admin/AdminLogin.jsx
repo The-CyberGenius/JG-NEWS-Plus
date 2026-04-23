@@ -71,11 +71,6 @@ export default function AdminLogin() {
                     </button>
                 </form>
 
-                <div style={{ marginTop: '20px', padding: '14px', background: 'var(--gray-100)', borderRadius: 'var(--radius-sm)', textAlign: 'left' }}>
-                    <div style={{ fontSize: '0.78rem', color: 'var(--gray-600)', fontWeight: 600, marginBottom: '6px' }}>Default Credentials:</div>
-                    <div style={{ fontSize: '0.82rem' }}>Password: <strong>jgnews@2024</strong></div>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--gray-600)', marginTop: '4px' }}>(Settings से बदला जा सकता है)</div>
-                </div>
 
                 <a href="/" style={{ display: 'block', marginTop: '20px', color: 'var(--teal)', fontSize: '0.85rem', fontWeight: 600 }}>
                     ← वेबसाइट पर वापस जाएं

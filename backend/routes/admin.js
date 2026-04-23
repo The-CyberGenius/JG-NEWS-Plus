@@ -7,8 +7,8 @@ const router = express.Router();
 router.post('/login', async (req, res) => {
     const { password } = req.body;
 
-    // Developer choice: Password is now strictly controlled via .env (Default: jgnews@2024)
-    const DEV_PASSWORD = process.env.ADMIN_PASSWORD || 'jgnews@2026';
+    // Developer choice: Password is now strictly controlled via .env
+    const DEV_PASSWORD = process.env.ADMIN_PASSWORD;
 
     if (password === DEV_PASSWORD) {
         res.json({ success: true, message: 'Login successful (Dev Controlled)' });
