@@ -663,6 +663,11 @@ textarea.form-control {
   flex: 1;
   margin-left: 260px;
   min-height: 100vh;
+  transition: margin-left var(--transition);
+}
+
+.admin-main.expanded {
+  margin-left: 0;
 }
 
 @media (max-width: 1023px) {
@@ -670,11 +675,12 @@ textarea.form-control {
     transform: translateX(-100%);
   }
 
-  .admin-sidebar.open {
+  .admin-sidebar:not(.collapsed) {
     transform: translateX(0);
   }
 
-  .admin-main {
+  .admin-main,
+  .admin-main.expanded {
     margin-left: 0;
   }
 }

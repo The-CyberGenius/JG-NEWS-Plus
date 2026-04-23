@@ -14,9 +14,16 @@ const NAV_ITEMS = [
 
 export default function AdminLayout({ children }) {
     const { logout } = useNews();
-    const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [sidebarOpen, setSidebarOpen] = useState(true);
     const navigate = useNavigate();
     const location = useLocation();
+    
+    // Auto-close on mobile when mounting
+    React.useEffect(() => {
+        if (window.innerWidth < 1024) {
+            setSidebarOpen(false);
+        }
+    }, []);
 
     const handleLogout = () => {
         logout();
@@ -49,7 +56,7 @@ export default function AdminLayout({ children }) {
             )}
 
             {/* Sidebar */}
-            <div className={`admin-sidebar ${sidebarOpen ? 'open' : ''}`} style={{ paddingTop: '60px' }}>
+            <div className={`admin-sidebar ${sidebarOpen ? '' : 'collapsed'}`} style={{ paddingTop: '60px' }}>
                 <div style={{ padding: '20px 16px 12px' }}>
                     <div style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.4)', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '8px' }}>
                         Navigation
@@ -77,7 +84,7 @@ export default function AdminLayout({ children }) {
             </div>
 
             {/* Main Content */}
-            <div className="admin-main">
+            <div className={`admin-main ${sidebarOpen ? '' : 'expanded'}`}>
                 <div className="admin-content">
                     {children}
                 </div>
