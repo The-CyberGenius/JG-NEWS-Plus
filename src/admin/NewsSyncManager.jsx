@@ -9,14 +9,23 @@ const CATEGORIES = [
     { id: 'world', label: '🌍 दुनिया', color: 'var(--navy)' },
 ];
 
-const RAJASTHAN_CITIES = [
-    'जयपुर', 'जोधपुर', 'उदयपुर', 'कोटा', 'बीकानेर', 'अजमेर', 'भरतपुर', 'सीकर', 'पाली', 'अलवर', 'अन्य'
+const RAJASTHAN_DISTRICTS = [
+    'अजमेर', 'अलवर', 'अनूपगढ़', 'बालोतरा', 'बांसवाड़ा', 'बारां', 'बाड़मेर', 'ब्यावर', 'भरतपुर', 'भीलवाड़ा', 'बीकानेर', 'बूंदी', 'चित्तौड़गढ़', 'चूरू', 'दौसा', 'डीग', 'धौलपुर', 'डीडवाना-कुचामन', 'दूदू', 'डूंगरपुर', 'गंगानगर', 'गंगापुर सिटी', 'हनुमानगढ़', 'जयपुर', 'जयपुर ग्रामीण', 'जैसलमेर', 'जालौर', 'झालावाड़', 'झुंझुनूं', 'जोधपुर', 'जोधपुर ग्रामीण', 'करौली', 'केकड़ी', 'खैरथल-तिजारा', 'कोटा', 'कोटपुतली-बहरोड़', 'नागौर', 'नीम का थाना', 'पाली', 'फलोदी', 'प्रतापगढ़', 'राजसमंद', 'सलुंबर', 'सांचौर', 'सवाई माधोपुर', 'शाहपुरा', 'सीकर', 'सिरोही', 'टोंक', 'उदयपुर', 'अन्य'
 ];
+
+const detectLocation = (title, content) => {
+    const text = (title + ' ' + content);
+    for (const district of RAJASTHAN_DISTRICTS) {
+        if (district === 'अन्य') continue;
+        if (text.includes(district)) return district;
+    }
+    return 'अन्य';
+};
 
 export default function NewsSyncManager() {
     const { addArticle, categories } = useNews();
     const [fetchedNews, setFetchedNews] = useState([]);
-    const [activeTab, setActiveTab] = useState('india');
+    const [activeTab, setActiveTab] = useState('rajasthan');
     const [loading, setLoading] = useState(false);
     const [toast, setToast] = useState('');
     const [expandedIdx, setExpandedIdx] = useState(null);
@@ -65,9 +74,10 @@ export default function NewsSyncManager() {
     };
 
     const openPreview = (item) => {
+        const detected = activeTab === 'rajasthan' ? detectLocation(item.title, item.fullContent) : 'अन्य';
         setPreviewItem({
             ...item,
-            location: activeTab === 'rajasthan' ? 'जयपुर' : 'अन्य',
+            location: detected,
             assignedCat: activeTab === 'rajasthan' ? 'राजस्थान' : categories[0] || 'अन्य'
         });
     };
@@ -185,7 +195,7 @@ export default function NewsSyncManager() {
                                     <div className="form-group">
                                         <label style={{ fontSize: '0.75rem', fontWeight: 900, color: 'var(--gray-500)', textTransform: 'uppercase' }}>City / Location</label>
                                         <select className="form-control" value={previewItem.location} onChange={e => setPreviewItem({ ...previewItem, location: e.target.value })} style={{ borderRadius: '10px' }}>
-                                            {RAJASTHAN_CITIES.map(c => <option key={c} value={c}>{c}</option>)}
+                                            {RAJASTHAN_DISTRICTS.map(c => <option key={c} value={c}>{c}</option>)}
                                         </select>
                                     </div>
                                     <div className="form-group">

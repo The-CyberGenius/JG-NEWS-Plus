@@ -5,12 +5,8 @@ import { uploadImage } from '../store/newsStore';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 
-const RAJASTHAN_CITIES = [
-    'जयपुर', 'जोधपुर', 'उदयपुर', 'कोटा', 'बीकानेर', 'अजमेर', 'भरतपुर',
-    'सीकर', 'टोंक', 'अलवर', 'दौसा', 'पाली', 'बाड़मेर', 'जैसलमेर',
-    'नागौर', 'श्रीगंगानगर', 'हनुमानगढ़', 'चूरू', 'झुंझुनू', 'सवाई माधोपुर',
-    'धौलपुर', 'करौली', 'बूंदी', 'झालावाड़', 'बारां', 'राजसमंद', 'चित्तौड़गढ़',
-    'प्रतापगढ़', 'डूंगरपुर', 'बांसवाड़ा', 'सिरोही', 'जालौर', 'अन्य'
+const RAJASTHAN_DISTRICTS = [
+    'अजमेर', 'अलवर', 'अनूपगढ़', 'बालोतरा', 'बांसवाड़ा', 'बारां', 'बाड़मेर', 'ब्यावर', 'भरतपुर', 'भीलवाड़ा', 'बीकानेर', 'बूंदी', 'चित्तौड़गढ़', 'चूरू', 'दौसा', 'डीग', 'धौलपुर', 'डीडवाना-कुचामन', 'दूदू', 'डूंगरपुर', 'गंगानगर', 'गंगापुर सिटी', 'हनुमानगढ़', 'जयपुर', 'जयपुर ग्रामीण', 'जैसलमेर', 'जालौर', 'झालावाड़', 'झुंझुनूं', 'जोधपुर', 'जोधपुर ग्रामीण', 'करौली', 'केकड़ी', 'खैरथल-तिजारा', 'कोटा', 'कोटपुतली-बहरोड़', 'नागौर', 'नीम का थाना', 'पाली', 'फलोदी', 'प्रतापगढ़', 'राजसमंद', 'सलुंबर', 'सांचौर', 'सवाई माधोपुर', 'शाहpura', 'सीकर', 'सिरोही', 'टोंक', 'उदयपुर', 'अन्य'
 ];
 
 const EMPTY_FORM = {
@@ -274,7 +270,7 @@ export default function ArticleForm() {
                                 </select>
                                 <select className="form-control" value={form.location} onChange={e => set('location', e.target.value)} required>
                                     <option value="">-- शहर --</option>
-                                    {RAJASTHAN_CITIES.map(c => <option key={c} value={c}>{c}</option>)}
+                                    {RAJASTHAN_DISTRICTS.map(c => <option key={c} value={c}>{c}</option>)}
                                 </select>
                                 <input className="form-control" value={form.author} onChange={e => set('author', e.target.value)} placeholder="लेखक का नाम" />
                             </div>
