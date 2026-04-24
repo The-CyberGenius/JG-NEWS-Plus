@@ -14,18 +14,21 @@ export default function AdminLogin() {
         return null;
     }
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
-        setTimeout(() => {
-            const ok = login(password);
+        try {
+            const ok = await login(password);
             if (ok) {
                 navigate('/admin/dashboard');
             } else {
                 setError('गलत पासवर्ड। फिर से कोशिश करें।');
                 setLoading(false);
             }
-        }, 600);
+        } catch (err) {
+            setError('सर्वर से संपर्क करने में त्रुटि।');
+            setLoading(false);
+        }
     };
 
     return (
