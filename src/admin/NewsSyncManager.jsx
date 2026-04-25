@@ -28,7 +28,8 @@ export default function NewsSyncManager() {
     const [activeTab, setActiveTab] = useState('rajasthan');
     const [loading, setLoading] = useState(false);
     const [toast, setToast] = useState('');
-    const [expandedIdx, setExpandedIdx] = useState(null);
+    const [toast, setToast] = useState('');
+    const [readingItem, setReadingItem] = useState(null);
 
     // Preview Modal State
     const [previewItem, setPreviewItem] = useState(null);
@@ -233,7 +234,6 @@ export default function NewsSyncManager() {
             {!loading && (
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '20px' }}>
                     {fetchedNews.map((item, idx) => {
-                        const isExpanded = expandedIdx === idx;
                         return (
                             <div key={idx} style={{
                                 background: 'white', padding: '20px', borderRadius: '20px',
@@ -256,16 +256,13 @@ export default function NewsSyncManager() {
 
                                         <div style={{
                                             fontSize: '0.9rem', color: 'var(--gray-600)', lineHeight: 1.6,
-                                            display: isExpanded ? 'block' : '-webkit-box',
-                                            WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
+                                            display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
                                             overflow: 'hidden'
-                                        }}>
-                                            {item.fullContent}
-                                        </div>
+                                        }} dangerouslySetInnerHTML={{ __html: item.fullContent }} />
 
                                         <div style={{ display: 'flex', gap: '15px', marginTop: '15px' }}>
-                                            <button onClick={() => setExpandedIdx(isExpanded ? null : idx)} style={{ background: 'none', border: 'none', color: 'var(--teal)', fontWeight: 800, fontSize: '0.85rem', cursor: 'pointer', padding: 0 }}>
-                                                {isExpanded ? '↑ कम देखें' : '↓ पूरा विवरण पढ़ें'}
+                                            <button onClick={() => setReadingItem(item)} style={{ background: 'none', border: 'none', color: 'var(--teal)', fontWeight: 800, fontSize: '0.85rem', cursor: 'pointer', padding: 0 }}>
+                                                📖 पूरी खबर पढ़ें
                                             </button>
                                             <button onClick={() => openPreview(item)} className="btn btn-sm" style={{ background: CATEGORIES.find(c => c.id === activeTab).color, color: 'white', padding: '6px 16px' }}>
                                                 ⚡ Quick Post
@@ -287,6 +284,39 @@ export default function NewsSyncManager() {
                 </div>
             )}
 
+            {/* ======= READING MODAL ======= */}
+            {readingItem && (
+                <>
+                    <div className="mobile-menu-overlay show" style={{ zIndex: 9998 }} onClick={() => setReadingItem(null)} />
+                    <div className="modal-wrap" style={{ zIndex: 9999 }}>
+                        <div className="modal" style={{ maxWidth: '700px', width: '95%', maxHeight: '90vh', overflowY: 'auto' }}>
+                            <div className="modal-title" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                📖 पूरी खबर (Full Article)
+                                <button onClick={() => setReadingItem(null)} style={{ background: 'none', border: 'none', fontSize: '1.2rem', cursor: 'pointer' }}>✕</button>
+                            </div>
+
+                            <div style={{ padding: '10px 0' }}>
+                                <img src={readingItem.image || getRandomFallbackImage()} alt="" style={{ width: '100%', maxHeight: '350px', objectFit: 'cover', borderRadius: '16px', marginBottom: '20px' }} />
+                                <h2 style={{ fontWeight: 900, color: 'var(--navy)', marginBottom: '15px', lineHeight: 1.4, fontSize: '1.4rem' }}>{readingItem.title}</h2>
+                                <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
+                                    <span style={{ background: 'var(--gray-100)', color: 'var(--navy)', padding: '5px 12px', borderRadius: '6px', fontSize: '0.8rem', fontWeight: 800 }}>{readingItem.source}</span>
+                                    <span style={{ fontSize: '0.8rem', color: 'var(--gray-500)', fontWeight: 600, display: 'flex', alignItems: 'center' }}>{timeAgo(readingItem.pubDate)}</span>
+                                </div>
+
+                                <div className="article-content" style={{ fontSize: '1.05rem', color: 'var(--gray-800)', lineHeight: 1.8 }} dangerouslySetInnerHTML={{ __html: readingItem.fullContent }} />
+                            </div>
+
+                            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', borderTop: '1px solid var(--gray-100)', paddingTop: '20px', marginTop: '20px' }}>
+                                <button className="btn btn-navy btn-sm" onClick={() => setReadingItem(null)} style={{ background: 'var(--gray-200)', color: 'var(--navy)' }}>बंद करें (Close)</button>
+                                <button className="btn" onClick={() => { setReadingItem(null); openPreview(readingItem); }} style={{ background: CATEGORIES.find(c => c.id === activeTab).color, color: 'white', padding: '10px 25px', borderRadius: '12px', fontWeight: 800 }}>
+                                    ⚡ Quick Post
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </>
+            )}
+
             {/* ======= PREVIEW MODAL ======= */}
             {previewItem && (
                 <>
@@ -304,7 +334,7 @@ export default function NewsSyncManager() {
 
                                 <div style={{ background: 'var(--gray-50)', padding: '15px', borderRadius: '12px', marginBottom: '20px', maxHeight: '200px', overflowY: 'auto', fontSize: '0.9rem', color: 'var(--gray-700)', lineHeight: 1.6 }}>
                                     <strong>Description:</strong><br />
-                                    {previewItem.fullContent}
+                                    <div dangerouslySetInnerHTML={{ __html: previewItem.fullContent }} />
                                 </div>
 
                                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '20px' }}>
