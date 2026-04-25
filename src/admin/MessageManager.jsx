@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import useAuthStore from '../store/authStore';
+import { api } from '../store/newsStore';
 
 export default function MessageManager() {
     const { user } = useAuthStore();
@@ -15,14 +16,12 @@ export default function MessageManager() {
         try {
             setLoading(true);
             const token = localStorage.getItem('adminToken');
-            const res = await fetch('/api/messages', {
+            const res = await api.get('/messages', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
-            if (!res.ok) throw new Error('Failed to fetch messages');
-            const data = await res.json();
-            setMessages(data);
+            setMessages(res.data);
         } catch (err) {
-            setError(err.message);
+            setError(err.response?.data?.message || err.message);
         } finally {
             setLoading(false);
         }
@@ -32,28 +31,24 @@ export default function MessageManager() {
         if (!window.confirm('क्या आप वाकई इस संदेश को हटाना चाहते हैं?')) return;
         try {
             const token = localStorage.getItem('adminToken');
-            const res = await fetch(`/api/messages/${id}`, {
-                method: 'DELETE',
+            await api.delete(`/messages/${id}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
-            if (!res.ok) throw new Error('Failed to delete message');
             setMessages(messages.filter(msg => msg._id !== id));
         } catch (err) {
-            alert(err.message);
+            alert(err.response?.data?.message || err.message);
         }
     };
 
     const markAsRead = async (id) => {
         try {
             const token = localStorage.getItem('adminToken');
-            const res = await fetch(`/api/messages/${id}/read`, {
-                method: 'PUT',
+            await api.put(`/messages/${id}/read`, {}, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
-            if (!res.ok) throw new Error('Failed to mark as read');
             setMessages(messages.map(msg => msg._id === id ? { ...msg, isRead: true } : msg));
         } catch (err) {
-            alert(err.message);
+            alert(err.response?.data?.message || err.message);
         }
     };
 

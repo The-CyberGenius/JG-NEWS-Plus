@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { api } from '../store/newsStore';
 
 export default function Contact() {
     const [form, setForm] = useState({ name: '', phone: '', email: '', subject: '', message: '' });
@@ -12,16 +13,7 @@ export default function Contact() {
         setError('');
         
         try {
-            const res = await fetch('/api/messages', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(form)
-            });
-            
-            if (!res.ok) {
-                const data = await res.json();
-                throw new Error(data.message || 'Failed to send message');
-            }
+            await api.post('/messages', form);
             
             setSent(true);
             setTimeout(() => setSent(false), 4000);
