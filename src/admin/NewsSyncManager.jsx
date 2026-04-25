@@ -40,7 +40,8 @@ export default function NewsSyncManager() {
     const fetchLatest = async (cat = activeTab) => {
         setLoading(true);
         const data = await syncNews(cat);
-        setFetchedNews(data);
+        const initializedData = data.map(item => ({ ...item, extracted: false, isExtracting: false }));
+        setFetchedNews(initializedData);
         setLoading(false);
     };
 
@@ -48,21 +49,69 @@ export default function NewsSyncManager() {
         fetchLatest(activeTab);
     }, [activeTab]);
 
+    // Background extraction worker
+    useEffect(() => {
+        const processQueue = async () => {
+            const itemToExtractIdx = fetchedNews.findIndex(item => !item.extracted && !item.isExtracting);
+            if (itemToExtractIdx === -1) return; // All done
+
+            // Mark as extracting
+            setFetchedNews(prev => {
+                const next = [...prev];
+                next[itemToExtractIdx] = { ...next[itemToExtractIdx], isExtracting: true };
+                return next;
+            });
+
+            const item = fetchedNews[itemToExtractIdx];
+            try {
+                const extracted = await extractArticle(item.link);
+                const finalContent = extracted && extracted.content ? extracted.content : `<p>${item.fullContent}</p>`;
+                const finalImage = (extracted && extracted.image) ? extracted.image : (item.image || getRandomFallbackImage());
+
+                setFetchedNews(prev => {
+                    const next = [...prev];
+                    if (next[itemToExtractIdx] && next[itemToExtractIdx].link === item.link) {
+                        next[itemToExtractIdx] = {
+                            ...next[itemToExtractIdx],
+                            fullContent: finalContent,
+                            image: finalImage,
+                            extracted: true,
+                            isExtracting: false
+                        };
+                    }
+                    return next;
+                });
+            } catch (err) {
+                setFetchedNews(prev => {
+                    const next = [...prev];
+                    if (next[itemToExtractIdx] && next[itemToExtractIdx].link === item.link) {
+                        next[itemToExtractIdx] = {
+                            ...next[itemToExtractIdx],
+                            extracted: true,
+                            isExtracting: false
+                        };
+                    }
+                    return next;
+                });
+            }
+        };
+
+        if (fetchedNews.length > 0) {
+            processQueue();
+        }
+    }, [fetchedNews]);
+
     const handleConfirmPost = async () => {
         if (!previewItem) return;
         setPosting(true);
         try {
-            const extracted = await extractArticle(previewItem.link);
-            const finalContent = extracted && extracted.content ? extracted.content : `<p>${previewItem.fullContent}</p>`;
-            const finalImage = (extracted && extracted.image) ? extracted.image : (previewItem.image || getRandomFallbackImage());
-
             const data = {
                 title: previewItem.title,
                 excerpt: previewItem.fullContent.slice(0, 150) + '...',
-                content: `${finalContent}<p><br/>Source: <a href="${previewItem.link}" target="_blank">${previewItem.source}</a></p>`,
+                content: `${previewItem.fullContent}<p><br/>Source: <a href="${previewItem.link}" target="_blank">${previewItem.source}</a></p>`,
                 category: previewItem.assignedCat,
                 location: previewItem.location,
-                image: finalImage,
+                image: previewItem.image || getRandomFallbackImage(),
                 author: 'AI Sync',
                 isBreaking: false,
                 isFeatured: false,
@@ -93,17 +142,13 @@ export default function NewsSyncManager() {
                 const location = activeTab === 'rajasthan' ? detectLocation(item.title, item.fullContent) : 'अन्य';
                 const assignedCat = activeTab === 'rajasthan' ? 'राजस्थान' : categories[0] || 'अन्य';
 
-                const extracted = await extractArticle(item.link);
-                const finalContent = extracted && extracted.content ? extracted.content : `<p>${item.fullContent}</p>`;
-                const finalImage = (extracted && extracted.image) ? extracted.image : (item.image || getRandomFallbackImage());
-
                 const data = {
                     title: item.title,
                     excerpt: item.fullContent.slice(0, 150) + '...',
-                    content: `${finalContent}<p><br/>Source: <a href="${item.link}" target="_blank">${item.source}</a></p>`,
+                    content: `${item.fullContent}<p><br/>Source: <a href="${item.link}" target="_blank">${item.source}</a></p>`,
                     category: assignedCat,
                     location: location,
-                    image: finalImage,
+                    image: item.image || getRandomFallbackImage(),
                     author: 'AI Sync',
                     isBreaking: false,
                     isFeatured: false,
@@ -198,9 +243,14 @@ export default function NewsSyncManager() {
                                 <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start' }}>
                                     <img src={item.image || getRandomFallbackImage()} alt="" style={{ width: '140px', height: '100px', objectFit: 'cover', borderRadius: '14px', background: 'var(--gray-100)' }} />
                                     <div style={{ flex: 1 }}>
-                                        <div style={{ display: 'flex', gap: '10px', marginBottom: '8px' }}>
+                                        <div style={{ display: 'flex', gap: '10px', marginBottom: '8px', alignItems: 'center' }}>
                                             <span style={{ background: 'var(--gray-100)', color: 'var(--navy)', padding: '3px 10px', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 800 }}>{item.source}</span>
-                                            <span style={{ fontSize: '0.75rem', color: 'var(--gray-500)', fontWeight: 600 }}>{timeAgo(item.pubDate)}</span>
+                                            <span style={{ fontSize: '0.8rem', color: 'var(--gray-500)', fontWeight: 600 }}>{timeAgo(item.pubDate)}</span>
+                                            {item.isExtracting && (
+                                                <span style={{ fontSize: '0.7rem', color: 'var(--teal)', background: 'var(--gray-50)', padding: '2px 8px', borderRadius: '6px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                                    <span style={{ animation: 'spin 1s linear infinite' }}>⏳</span> असली फोटो लोड हो रही है...
+                                                </span>
+                                            )}
                                         </div>
                                         <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--navy)', marginBottom: '10px', lineHeight: 1.4 }}>{item.title}</h3>
 
