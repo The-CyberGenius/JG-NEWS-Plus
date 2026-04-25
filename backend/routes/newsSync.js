@@ -1,6 +1,7 @@
 import express from 'express';
 import Parser from 'rss-parser';
 import { extract } from '@extractus/article-extractor';
+import axios from 'axios';
 
 const router = express.Router();
 
@@ -88,13 +89,37 @@ router.post('/extract', async (req, res) => {
         const { url } = req.body;
         if (!url) return res.status(400).json({ message: 'URL is required' });
         
-        const article = await extract(url);
-        if (!article) return res.status(404).json({ message: 'Could not extract article content' });
+        let article = null;
+        try {
+            article = await extract(url);
+        } catch(err) {
+            console.log("article-extractor failed, trying fallback...", err.message);
+        }
+
+        let fallbackImage = '';
+        if (!article || !article.image) {
+            try {
+                const { data: htmlData } = await axios.get(url, { 
+                    headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' }, 
+                    timeout: 8000 
+                });
+                const ogImageMatch = htmlData.match(/<meta[^>]*property=["']og:image["'][^>]*content=["']([^"']+)["'][^>]*>|<meta[^>]*content=["']([^"']+)["'][^>]*property=["']og:image["'][^>]*>/i);
+                if (ogImageMatch) {
+                    fallbackImage = ogImageMatch[1] || ogImageMatch[2];
+                }
+            } catch(e) {
+                // ignore fallback error
+            }
+        }
+        
+        if (!article && !fallbackImage) {
+            return res.status(404).json({ message: 'Could not extract article content or image' });
+        }
         
         res.json({
-            content: article.content || '', // HTML content
-            text: article.text || '',       // Plain text content
-            image: article.image || ''
+            content: article?.content || '', 
+            text: article?.text || '',       
+            image: article?.image || fallbackImage || ''
         });
     } catch (error) {
         console.error('Article Extraction Error:', error.message);

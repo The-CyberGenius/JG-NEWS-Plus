@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNews } from '../context/NewsContext';
 import { syncNews, extractArticle } from '../store/newsStore';
-import { timeAgo } from '../utils/helpers';
+import { timeAgo, getRandomFallbackImage } from '../utils/helpers';
 
 const CATEGORIES = [
     { id: 'rajasthan', label: '🚩 राजस्थान', color: 'var(--saffron)' },
@@ -54,7 +54,7 @@ export default function NewsSyncManager() {
         try {
             const extracted = await extractArticle(previewItem.link);
             const finalContent = extracted && extracted.content ? extracted.content : `<p>${previewItem.fullContent}</p>`;
-            const finalImage = (extracted && extracted.image) ? extracted.image : (previewItem.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&q=80');
+            const finalImage = (extracted && extracted.image) ? extracted.image : (previewItem.image || getRandomFallbackImage());
 
             const data = {
                 title: previewItem.title,
@@ -95,7 +95,7 @@ export default function NewsSyncManager() {
 
                 const extracted = await extractArticle(item.link);
                 const finalContent = extracted && extracted.content ? extracted.content : `<p>${item.fullContent}</p>`;
-                const finalImage = (extracted && extracted.image) ? extracted.image : (item.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&q=80');
+                const finalImage = (extracted && extracted.image) ? extracted.image : (item.image || getRandomFallbackImage());
 
                 const data = {
                     title: item.title,
@@ -196,7 +196,7 @@ export default function NewsSyncManager() {
                                 transition: 'all 0.3s'
                             }}>
                                 <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start' }}>
-                                    <img src={item.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=400&q=80'} alt="" style={{ width: '140px', height: '100px', objectFit: 'cover', borderRadius: '14px', background: 'var(--gray-100)' }} />
+                                    <img src={item.image || getRandomFallbackImage()} alt="" style={{ width: '140px', height: '100px', objectFit: 'cover', borderRadius: '14px', background: 'var(--gray-100)' }} />
                                     <div style={{ flex: 1 }}>
                                         <div style={{ display: 'flex', gap: '10px', marginBottom: '8px' }}>
                                             <span style={{ background: 'var(--gray-100)', color: 'var(--navy)', padding: '3px 10px', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 800 }}>{item.source}</span>
@@ -249,7 +249,7 @@ export default function NewsSyncManager() {
                             </div>
 
                             <div style={{ padding: '10px 0' }}>
-                                <img src={previewItem.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&q=80'} alt="" style={{ width: '100%', maxHeight: '250px', objectFit: 'cover', borderRadius: '16px', marginBottom: '20px' }} />
+                                <img src={previewItem.image || getRandomFallbackImage()} alt="" style={{ width: '100%', maxHeight: '250px', objectFit: 'cover', borderRadius: '16px', marginBottom: '20px' }} />
                                 <h3 style={{ fontWeight: 900, color: 'var(--navy)', marginBottom: '15px', lineHeight: 1.4 }}>{previewItem.title}</h3>
 
                                 <div style={{ background: 'var(--gray-50)', padding: '15px', borderRadius: '12px', marginBottom: '20px', maxHeight: '200px', overflowY: 'auto', fontSize: '0.9rem', color: 'var(--gray-700)', lineHeight: 1.6 }}>
