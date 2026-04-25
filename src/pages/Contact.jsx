@@ -3,12 +3,34 @@ import React, { useState } from 'react';
 export default function Contact() {
     const [form, setForm] = useState({ name: '', phone: '', email: '', subject: '', message: '' });
     const [sent, setSent] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        setSent(true);
-        setTimeout(() => setSent(false), 4000);
-        setForm({ name: '', phone: '', email: '', subject: '', message: '' });
+        setLoading(true);
+        setError('');
+        
+        try {
+            const res = await fetch('/api/messages', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(form)
+            });
+            
+            if (!res.ok) {
+                const data = await res.json();
+                throw new Error(data.message || 'Failed to send message');
+            }
+            
+            setSent(true);
+            setTimeout(() => setSent(false), 4000);
+            setForm({ name: '', phone: '', email: '', subject: '', message: '' });
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -24,6 +46,11 @@ export default function Contact() {
                         {sent && (
                             <div className="toast toast-success" style={{ position: 'relative', bottom: 'auto', right: 'auto', marginBottom: '16px' }}>
                                 ✅ आपका संदेश भेज दिया गया! हम जल्द संपर्क करेंगे।
+                            </div>
+                        )}
+                        {error && (
+                            <div className="toast toast-error" style={{ position: 'relative', bottom: 'auto', right: 'auto', marginBottom: '16px', background: 'var(--red)', color: 'white' }}>
+                                ❌ {error}
                             </div>
                         )}
                         <form onSubmit={handleSubmit}>
@@ -52,8 +79,8 @@ export default function Contact() {
                                 <label className="form-label">संदेश *</label>
                                 <textarea className="form-control" required value={form.message} onChange={e => setForm({ ...form, message: e.target.value })} placeholder="अपना संदेश लिखें..." />
                             </div>
-                            <button type="submit" className="btn btn-primary" style={{ width: '100%', justifyContent: 'center', padding: '12px' }}>
-                                📤 भेजें
+                            <button type="submit" className="btn btn-primary" style={{ width: '100%', justifyContent: 'center', padding: '12px' }} disabled={loading}>
+                                {loading ? '⏳ भेज रहे हैं...' : '📤 भेजें'}
                             </button>
                         </form>
                     </div>

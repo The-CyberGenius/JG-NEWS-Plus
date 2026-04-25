@@ -27,6 +27,7 @@ const CategoryManager = lazy(() => import('./admin/CategoryManager'));
 const NewspaperManager = lazy(() => import('./admin/NewspaperManager'));
 const AdminGuard = lazy(() => import('./admin/AdminGuard'));
 const NewsSyncManager = lazy(() => import('./admin/NewsSyncManager'));
+const MessageManager = lazy(() => import('./admin/MessageManager'));
 
 function PublicLayout({ children }) {
     return (
@@ -77,6 +78,7 @@ export default function App() {
                                             <Route path="categories" element={<CategoryManager />} />
                                             <Route path="epaper" element={<NewspaperManager />} />
                                             <Route path="sync" element={<NewsSyncManager />} />
+                                            <Route path="messages" element={<MessageManager />} />
                                         </Routes>
                                     </AdminLayout>
                                 </AdminGuard>

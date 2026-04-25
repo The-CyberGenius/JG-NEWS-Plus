@@ -2,6 +2,7 @@ import express from 'express';
 import Parser from 'rss-parser';
 import { extract } from '@extractus/article-extractor';
 import axios from 'axios';
+import { GoogleDecoder } from 'google-news-url-decoder';
 
 const router = express.Router();
 

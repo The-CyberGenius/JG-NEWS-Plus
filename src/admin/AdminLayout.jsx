@@ -10,6 +10,7 @@ const NAV_ITEMS = [
     { path: '/admin/categories', icon: '🏷️', label: 'श्रेणियाँ' },
     { path: '/admin/epaper', icon: '🗞️', label: 'ई-अखबार (PDF)' },
     { path: '/admin/sync', icon: '🤖', label: 'AI News Sync (MCP)' },
+    { path: '/admin/messages', icon: '📩', label: 'संदेश (Messages)' },
 ];
 
 export default function AdminLayout({ children }) {
