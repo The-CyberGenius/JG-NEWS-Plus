@@ -28,7 +28,6 @@ export default function NewsSyncManager() {
     const [activeTab, setActiveTab] = useState('rajasthan');
     const [loading, setLoading] = useState(false);
     const [toast, setToast] = useState('');
-    const [toast, setToast] = useState('');
     const [readingItem, setReadingItem] = useState(null);
 
     // Preview Modal State
