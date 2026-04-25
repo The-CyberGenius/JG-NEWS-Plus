@@ -1,6 +1,5 @@
 import express from 'express';
 import Message from '../models/Message.js';
-import { protect } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
@@ -33,7 +32,7 @@ router.post('/', async (req, res) => {
 // @desc    Get all messages
 // @route   GET /api/messages
 // @access  Private/Admin
-router.get('/', protect, async (req, res) => {
+router.get('/', async (req, res) => {
     try {
         const messages = await Message.find({}).sort({ createdAt: -1 });
         res.json(messages);
@@ -46,7 +45,7 @@ router.get('/', protect, async (req, res) => {
 // @desc    Delete a message
 // @route   DELETE /api/messages/:id
 // @access  Private/Admin
-router.delete('/:id', protect, async (req, res) => {
+router.delete('/:id', async (req, res) => {
     try {
         const message = await Message.findById(req.params.id);
         if (message) {
@@ -64,7 +63,7 @@ router.delete('/:id', protect, async (req, res) => {
 // @desc    Mark a message as read
 // @route   PUT /api/messages/:id/read
 // @access  Private/Admin
-router.put('/:id/read', protect, async (req, res) => {
+router.put('/:id/read', async (req, res) => {
     try {
         const message = await Message.findById(req.params.id);
         if (message) {
