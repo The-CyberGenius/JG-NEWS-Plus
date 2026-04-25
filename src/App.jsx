@@ -16,6 +16,7 @@ const About = lazy(() => import('./pages/About'));
 const Contact = lazy(() => import('./pages/Contact'));
 const SearchResults = lazy(() => import('./pages/SearchResults'));
 const EPaper = lazy(() => import('./pages/EPaper'));
+const PublicDocs = lazy(() => import('./pages/PublicDocs'));
 
 const AdminLayout = lazy(() => import('./admin/AdminLayout'));
 const AdminLogin = lazy(() => import('./admin/AdminLogin'));
@@ -63,6 +64,7 @@ export default function App() {
                             <Route path="/contact" element={<PublicLayout><Contact /></PublicLayout>} />
                             <Route path="/search" element={<PublicLayout><SearchResults /></PublicLayout>} />
                             <Route path="/epaper" element={<PublicLayout><EPaper /></PublicLayout>} />
+                            <Route path="/public" element={<PublicLayout><PublicDocs /></PublicLayout>} />
 
                             {/* Admin */}
                             <Route path="/admin" element={<AdminLogin />} />
