@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNews } from '../context/NewsContext';
-import { syncNews } from '../store/newsStore';
+import { syncNews, extractArticle } from '../store/newsStore';
 import { timeAgo } from '../utils/helpers';
 
 const CATEGORIES = [
@@ -33,6 +33,9 @@ export default function NewsSyncManager() {
     // Preview Modal State
     const [previewItem, setPreviewItem] = useState(null);
     const [posting, setPosting] = useState(false);
+    
+    // Auto Post All State
+    const [progress, setProgress] = useState(null);
 
     const fetchLatest = async (cat = activeTab) => {
         setLoading(true);
@@ -49,13 +52,17 @@ export default function NewsSyncManager() {
         if (!previewItem) return;
         setPosting(true);
         try {
+            const extracted = await extractArticle(previewItem.link);
+            const finalContent = extracted && extracted.content ? extracted.content : `<p>${previewItem.fullContent}</p>`;
+            const finalImage = (extracted && extracted.image) ? extracted.image : (previewItem.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&q=80');
+
             const data = {
                 title: previewItem.title,
                 excerpt: previewItem.fullContent.slice(0, 150) + '...',
-                content: `<p>${previewItem.fullContent}</p><p>Source: ${previewItem.source}</p>`,
+                content: `${finalContent}<p><br/>Source: <a href="${previewItem.link}" target="_blank">${previewItem.source}</a></p>`,
                 category: previewItem.assignedCat,
                 location: previewItem.location,
-                image: previewItem.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&q=80',
+                image: finalImage,
                 author: 'AI Sync',
                 isBreaking: false,
                 isFeatured: false,
@@ -71,6 +78,51 @@ export default function NewsSyncManager() {
             setPosting(false);
             setTimeout(() => setToast(''), 3000);
         }
+    };
+
+    const handlePostAll = async () => {
+        if (fetchedNews.length === 0) return;
+        if (!window.confirm(`क्या आप वाकई ${fetchedNews.length} खबरें एक साथ पोस्ट करना चाहते हैं? इसमें कुछ समय लग सकता है।`)) return;
+
+        setProgress({ current: 0, total: fetchedNews.length });
+        let successCount = 0;
+
+        for (let i = 0; i < fetchedNews.length; i++) {
+            const item = fetchedNews[i];
+            try {
+                const location = activeTab === 'rajasthan' ? detectLocation(item.title, item.fullContent) : 'अन्य';
+                const assignedCat = activeTab === 'rajasthan' ? 'राजस्थान' : categories[0] || 'अन्य';
+
+                const extracted = await extractArticle(item.link);
+                const finalContent = extracted && extracted.content ? extracted.content : `<p>${item.fullContent}</p>`;
+                const finalImage = (extracted && extracted.image) ? extracted.image : (item.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&q=80');
+
+                const data = {
+                    title: item.title,
+                    excerpt: item.fullContent.slice(0, 150) + '...',
+                    content: `${finalContent}<p><br/>Source: <a href="${item.link}" target="_blank">${item.source}</a></p>`,
+                    category: assignedCat,
+                    location: location,
+                    image: finalImage,
+                    author: 'AI Sync',
+                    isBreaking: false,
+                    isFeatured: false,
+                    tags: ['AI Sync', item.source, activeTab]
+                };
+
+                await addArticle(data);
+                successCount++;
+                setProgress(prev => ({ ...prev, current: i + 1 }));
+            } catch (err) {
+                console.error('Error auto-posting item', item.title, err);
+                setProgress(prev => ({ ...prev, current: i + 1 }));
+            }
+        }
+
+        setToast(`✅ ${successCount} खबरें सफलतापूर्वक पोस्ट हो गईं!`);
+        setProgress(null);
+        setFetchedNews([]);
+        setTimeout(() => setToast(''), 4000);
     };
 
     const openPreview = (item) => {
@@ -91,10 +143,24 @@ export default function NewsSyncManager() {
                     <h1 style={{ fontSize: '1.6rem', fontWeight: 900, color: 'var(--navy)' }}>🤖 AI News Sync (MCP)</h1>
                     <p style={{ color: 'var(--gray-600)', fontSize: '0.88rem' }}>ताज़ा खबरें सीधे आपके पोर्टल पर</p>
                 </div>
-                <button onClick={() => fetchLatest()} className="btn btn-navy" disabled={loading}>
-                    {loading ? '⏳ Syncing...' : '🔄 Refresh List'}
-                </button>
+                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                    <button onClick={handlePostAll} className="btn" style={{ background: 'var(--teal)', color: 'white' }} disabled={loading || progress || fetchedNews.length === 0}>
+                        🚀 Post All (Auto)
+                    </button>
+                    <button onClick={() => fetchLatest()} className="btn btn-navy" disabled={loading || progress}>
+                        {loading ? '⏳ Syncing...' : '🔄 Refresh List'}
+                    </button>
+                </div>
             </div>
+
+            {progress && (
+                <div style={{ marginBottom: '24px', background: 'white', padding: '20px', borderRadius: '12px', boxShadow: 'var(--card-shadow)' }}>
+                    <h3 style={{ color: 'var(--navy)', marginBottom: '10px' }}>⏳ खबरें पोस्ट हो रही हैं... ({progress.current} / {progress.total})</h3>
+                    <div style={{ width: '100%', background: 'var(--gray-200)', height: '10px', borderRadius: '10px', overflow: 'hidden' }}>
+                        <div style={{ width: `${(progress.current / progress.total) * 100}%`, background: 'var(--teal)', height: '100%', transition: 'width 0.3s ease' }}></div>
+                    </div>
+                </div>
+            )}
 
             <div style={{ display: 'flex', gap: '10px', marginBottom: '24px', background: 'var(--gray-100)', padding: '6px', borderRadius: '12px', width: 'fit-content' }}>
                 {CATEGORIES.map(cat => (

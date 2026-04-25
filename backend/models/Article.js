@@ -15,4 +15,10 @@ const articleSchema = new mongoose.Schema({
     date: { type: Date, default: Date.now },
 }, { timestamps: true });
 
+// Add indexes for optimized querying
+articleSchema.index({ date: -1 });
+articleSchema.index({ category: 1, date: -1 });
+articleSchema.index({ isFeatured: 1, date: -1 });
+articleSchema.index({ isBreaking: 1, date: -1 });
+
 export default mongoose.model('Article', articleSchema);

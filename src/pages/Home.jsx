@@ -56,6 +56,7 @@ function FeaturedCard({ article }) {
                 className="featured-card__img"
                 src={article.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=900&q=80'}
                 alt={article.title}
+                loading="lazy"
             />
             <div className="featured-card__overlay" />
             <div className="featured-card__body">
@@ -161,6 +162,7 @@ export default function Home() {
                                                     src={a.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=200&q=70'}
                                                     alt={a.title}
                                                     style={{ width: '80px', height: '60px', objectFit: 'cover', borderRadius: '8px', flexShrink: 0 }}
+                                                    loading="lazy"
                                                 />
                                                 <div style={{ flex: 1, minWidth: 0 }}>
                                                     <span className="badge badge-red" style={{ marginBottom: '6px' }}>ब्रेकिंग</span>
@@ -270,7 +272,7 @@ export default function Home() {
                         {articles.filter(a => a.videoUrl).slice(0, 3).map(a => (
                             <Link key={a.id} to={`/article/${a.id}`} style={{ textDecoration: 'none' }} className="news-card">
                                 <div style={{ position: 'relative', paddingTop: '56.25%', background: 'var(--navy)', borderRadius: '12px 12px 0 0', overflow: 'hidden' }}>
-                                    <img src={a.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600&q=80'} alt={a.title}
+                                    <img src={a.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600&q=80'} alt={a.title} loading="lazy"
                                         style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.8 }} />
                                     <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                         <div style={{ width: '52px', height: '52px', background: 'rgba(255,255,255,0.9)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>

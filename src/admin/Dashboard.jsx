@@ -56,7 +56,7 @@ export default function Dashboard() {
                 <div>
                     {recent.map((a, i) => (
                         <div key={a.id} style={{ display: 'flex', gap: '12px', padding: '14px 20px', borderBottom: i < recent.length - 1 ? '1px solid var(--gray-200)' : 'none', alignItems: 'center' }}>
-                            <img src={a.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=100&q=60'} alt={a.title} style={{ width: '56px', height: '42px', objectFit: 'cover', borderRadius: '6px', flexShrink: 0 }} />
+                            <img src={a.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=100&q=60'} alt={a.title} style={{ width: '56px', height: '42px', objectFit: 'cover', borderRadius: '6px', flexShrink: 0 }} loading="lazy" />
                             <div style={{ flex: 1, minWidth: 0 }}>
                                 <div style={{ fontWeight: 700, fontSize: '0.88rem', color: 'var(--navy)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{a.title}</div>
                                 <div style={{ fontSize: '0.75rem', color: 'var(--gray-600)', marginTop: '2px' }}>

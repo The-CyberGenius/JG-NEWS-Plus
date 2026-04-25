@@ -1,5 +1,6 @@
 import express from 'express';
 import Parser from 'rss-parser';
+import { extract } from '@extractus/article-extractor';
 
 const router = express.Router();
 
@@ -28,7 +29,9 @@ const FEED_MAP = {
     ],
     rajasthan: [
         { name: 'Google Rajasthan', url: 'https://news.google.com/rss/search?q=Rajasthan+News&hl=hi&gl=IN&ceid=IN:hi' },
-        { name: 'Amar Ujala Raj', url: 'https://www.amarujala.com/rss/rajasthan.xml' }
+        { name: 'Amar Ujala Raj', url: 'https://www.amarujala.com/rss/rajasthan.xml' },
+        { name: 'News18 Rajasthan', url: 'https://hindi.news18.com/rss/rajasthan.xml' },
+        { name: 'Zee Rajasthan', url: 'https://zeenews.india.com/hindi/india/rajasthan/rss' }
     ]
 };
 
@@ -77,6 +80,25 @@ router.get('/sync', async (req, res) => {
     } catch (error) {
         console.error('RSS Sync Error:', error);
         res.status(500).json({ message: 'News fetch karne mein problem aayi' });
+    }
+});
+
+router.post('/extract', async (req, res) => {
+    try {
+        const { url } = req.body;
+        if (!url) return res.status(400).json({ message: 'URL is required' });
+        
+        const article = await extract(url);
+        if (!article) return res.status(404).json({ message: 'Could not extract article content' });
+        
+        res.json({
+            content: article.content || '', // HTML content
+            text: article.text || '',       // Plain text content
+            image: article.image || ''
+        });
+    } catch (error) {
+        console.error('Article Extraction Error:', error.message);
+        res.status(500).json({ message: 'Failed to extract article content' });
     }
 });
 

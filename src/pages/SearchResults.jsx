@@ -44,7 +44,7 @@ export default function SearchResults() {
                                 onMouseEnter={e => e.currentTarget.style.boxShadow = 'var(--card-shadow-hover)'}
                                 onMouseLeave={e => e.currentTarget.style.boxShadow = 'var(--card-shadow)'}
                             >
-                                <img src={a.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=200&q=70'} alt={a.title}
+                                <img src={a.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=200&q=70'} alt={a.title} loading="lazy"
                                     style={{ width: '100px', height: '72px', objectFit: 'cover', borderRadius: 'var(--radius-sm)', flexShrink: 0 }} />
                                 <div style={{ flex: 1, minWidth: 0 }}>
                                     <div style={{ display: 'flex', gap: '8px', marginBottom: '6px', flexWrap: 'wrap' }}>

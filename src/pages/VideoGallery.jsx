@@ -25,7 +25,7 @@ export default function VideoGallery() {
                     {videoArticles.map(a => (
                         <Link key={a.id} to={`/article/${a.id}`} className="news-card" style={{ textDecoration: 'none' }}>
                             <div style={{ position: 'relative', paddingTop: '56.25%', overflow: 'hidden', borderRadius: '12px 12px 0 0', background: 'var(--navy)' }}>
-                                <img src={a.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600&q=80'} alt={a.title}
+                                <img src={a.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600&q=80'} alt={a.title} loading="lazy"
                                     style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.8 }} />
                                 <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                     <div style={{ width: '52px', height: '52px', background: 'rgba(255,255,255,0.9)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem' }}>▶</div>

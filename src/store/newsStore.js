@@ -225,3 +225,13 @@ export const syncNews = async (category = 'india') => {
         return [];
     }
 };
+
+export const extractArticle = async (url) => {
+    try {
+        const response = await api.post('/news-sync/extract', { url });
+        return response.data;
+    } catch (error) {
+        console.error("Error extracting article", error);
+        return null;
+    }
+};
