@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import useAuthStore from '../store/authStore';
 import { api } from '../store/newsStore';
 
 export default function MessageManager() {
-    const { user } = useAuthStore();
     const [messages, setMessages] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
