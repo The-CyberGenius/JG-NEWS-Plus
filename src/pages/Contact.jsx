@@ -11,10 +11,10 @@ export default function Contact() {
         e.preventDefault();
         setLoading(true);
         setError('');
-        
+
         try {
             await api.post('/messages', form);
-            
+
             setSent(true);
             setTimeout(() => setSent(false), 4000);
             setForm({ name: '', phone: '', email: '', subject: '', message: '' });
@@ -81,7 +81,7 @@ export default function Contact() {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                         {[
                             { icon: '📍', label: 'पता', value: 'जयपुर, राजस्थान — 302001' },
-                            { icon: '📞', label: 'फ़ोन', value: '+91 98000 00000' },
+                            { icon: '📞', label: 'फ़ोन', value: '+91 7240116211' },
                             { icon: '✉️', label: 'ईमेल', value: 'news@jgnewsplus.in' },
                             { icon: '🕐', label: 'कार्यालय समय', value: '24x7 उपलब्ध' },
                         ].map(item => (
