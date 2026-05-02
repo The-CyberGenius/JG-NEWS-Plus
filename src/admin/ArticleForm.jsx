@@ -21,6 +21,16 @@ const EMPTY_FORM = {
     tags: '',
     isBreaking: false,
     isFeatured: false,
+    date: '',
+};
+
+const toLocalInput = (d) => {
+    if (!d) return '';
+    try {
+        const dt = new Date(d);
+        const tz = dt.getTimezoneOffset() * 60000;
+        return new Date(dt - tz).toISOString().slice(0, 16);
+    } catch { return ''; }
 };
 
 export default function ArticleForm() {
@@ -93,6 +103,7 @@ export default function ArticleForm() {
                     tags: (art.tags || []).join(', '),
                     isBreaking: art.isBreaking || false,
                     isFeatured: art.isFeatured || false,
+                    date: toLocalInput(art.date) || '',
                 });
                 setImgPreview(art.image || '');
             }
@@ -135,6 +146,8 @@ export default function ArticleForm() {
                 ...form,
                 image: finalImageUrl,
                 tags: form.tags.split(',').map(t => t.trim()).filter(Boolean),
+                // If a date was set, use it; otherwise let backend use default (now)
+                ...(form.date ? { date: new Date(form.date).toISOString() } : {}),
             };
 
             if (isEdit) {
@@ -273,6 +286,17 @@ export default function ArticleForm() {
                                     {RAJASTHAN_DISTRICTS.map(c => <option key={c} value={c}>{c}</option>)}
                                 </select>
                                 <input className="form-control" value={form.author} onChange={e => set('author', e.target.value)} placeholder="लेखक का नाम" />
+                                <div>
+                                    <label style={{ fontSize: '0.78rem', color: 'var(--gray-600)', fontWeight: 700, marginBottom: '4px', display: 'block' }}>
+                                        📅 अपलोड तारीख {!isEdit && <span style={{ color: 'var(--gray-400)', fontWeight: 400 }}>(खाली = अभी)</span>}
+                                    </label>
+                                    <input
+                                        type="datetime-local"
+                                        className="form-control"
+                                        value={form.date}
+                                        onChange={e => set('date', e.target.value)}
+                                    />
+                                </div>
                             </div>
                         </div>
 
