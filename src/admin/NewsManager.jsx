@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useNews } from '../context/NewsContext';
-import { timeAgo } from '../utils/helpers';
+import { timeAgo, formatDate } from '../utils/helpers';
 
-const PER_PAGE = 10;
+const PER_PAGE = 50;
 
 export default function NewsManager() {
     const { articles, deleteArticle, updateArticle } = useNews();
@@ -11,9 +11,27 @@ export default function NewsManager() {
     const [confirm, setConfirm] = useState(null);
     const [toast, setToast] = useState('');
     const [filterCat, setFilterCat] = useState('');
+    const [sortDir, setSortDir] = useState('desc'); // 'desc' = newest first
+    const [searchQ, setSearchQ] = useState('');
     const navigate = useNavigate();
 
-    const filtered = filterCat ? articles.filter(a => a.category === filterCat) : articles;
+    const filtered = useMemo(() => {
+        let list = filterCat ? articles.filter(a => a.category === filterCat) : [...articles];
+        if (searchQ.trim()) {
+            const q = searchQ.toLowerCase();
+            list = list.filter(a =>
+                (a.title || '').toLowerCase().includes(q) ||
+                (a.location || '').toLowerCase().includes(q)
+            );
+        }
+        list.sort((a, b) => {
+            const da = new Date(a.date || a.createdAt || 0).getTime();
+            const db = new Date(b.date || b.createdAt || 0).getTime();
+            return sortDir === 'desc' ? db - da : da - db;
+        });
+        return list;
+    }, [articles, filterCat, sortDir, searchQ]);
+
     const totalPages = Math.ceil(filtered.length / PER_PAGE);
     const paginated = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE);
 
@@ -38,6 +56,22 @@ export default function NewsManager() {
         showToast(a.isFeatured ? '⭐ फीचर्ड हटाया' : '⭐ फीचर्ड में जोड़ा');
     };
 
+    const handleDateChange = (a, newDate) => {
+        if (!newDate) return;
+        updateArticle(a.id, { date: new Date(newDate).toISOString() });
+        showToast('📅 तारीख अपडेट हो गई');
+    };
+
+    const toIsoLocal = (d) => {
+        if (!d) return '';
+        try {
+            const dt = new Date(d);
+            // Format as yyyy-MM-ddTHH:mm for datetime-local input
+            const tz = dt.getTimezoneOffset() * 60000;
+            return new Date(dt - tz).toISOString().slice(0, 16);
+        } catch { return ''; }
+    };
+
     const categories = [...new Set(articles.map(a => a.category))];
 
     return (
@@ -51,6 +85,26 @@ export default function NewsManager() {
                     <p style={{ color: 'var(--gray-600)', fontSize: '0.85rem' }}>{filtered.length} खबरें</p>
                 </div>
                 <Link to="/admin/news/add" className="btn btn-primary">➕ नई खबर जोड़ें</Link>
+            </div>
+
+            {/* Search + Sort */}
+            <div style={{ marginBottom: '12px', display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
+                <input
+                    type="text"
+                    className="form-control"
+                    placeholder="🔍 शीर्षक या स्थान से खोजें..."
+                    value={searchQ}
+                    onChange={e => { setSearchQ(e.target.value); setPage(1); }}
+                    style={{ flex: 1, minWidth: '200px', maxWidth: '320px' }}
+                />
+                <button
+                    onClick={() => setSortDir(sortDir === 'desc' ? 'asc' : 'desc')}
+                    className="btn btn-sm"
+                    style={{ background: 'var(--navy)', color: 'white', whiteSpace: 'nowrap' }}
+                    title="तारीख से सॉर्ट करें"
+                >
+                    📅 {sortDir === 'desc' ? 'नई पहले ↓' : 'पुरानी पहले ↑'}
+                </button>
             </div>
 
             {/* Filter */}
@@ -110,7 +164,24 @@ export default function NewsManager() {
                                         {a.isFeatured ? 'हाँ' : 'नहीं'}
                                     </button>
                                 </td>
-                                <td style={{ padding: '8px 16px', fontSize: '0.7rem', color: 'var(--gray-500)', whiteSpace: 'nowrap' }}>{timeAgo(a.date)}</td>
+                                <td style={{ padding: '8px 16px', fontSize: '0.7rem', color: 'var(--gray-500)', whiteSpace: 'nowrap' }}>
+                                    <input
+                                        type="datetime-local"
+                                        value={toIsoLocal(a.date)}
+                                        onChange={e => handleDateChange(a, e.target.value)}
+                                        style={{
+                                            border: '1px solid var(--gray-200)',
+                                            borderRadius: '4px',
+                                            padding: '3px 6px',
+                                            fontSize: '0.7rem',
+                                            color: 'var(--navy)',
+                                            background: 'white',
+                                            cursor: 'pointer',
+                                        }}
+                                        title={`${formatDate(a.date)} • ${timeAgo(a.date)}`}
+                                    />
+                                    <div style={{ fontSize: '0.65rem', color: 'var(--gray-400)', marginTop: '2px' }}>{timeAgo(a.date)}</div>
+                                </td>
                                 <td style={{ padding: '8px 16px' }}>
                                     <div style={{ display: 'flex', gap: '5px' }}>
                                         <Link to={`/admin/news/edit/${a.id}`} className="btn btn-sm" style={{ padding: '4px 8px', fontSize: '0.75rem', background: 'var(--teal)', color: 'white' }}>✏️</Link>
@@ -125,12 +196,27 @@ export default function NewsManager() {
 
             {/* Pagination */}
             {totalPages > 1 && (
-                <div className="pagination">
-                    {Array.from({ length: totalPages }, (_, i) => (
-                        <button key={i} className={`page-btn ${page === i + 1 ? 'active' : ''}`} onClick={() => setPage(i + 1)}>
-                            {i + 1}
-                        </button>
-                    ))}
+                <div className="pagination" style={{ flexWrap: 'wrap' }}>
+                    <button
+                        className="page-btn"
+                        onClick={() => setPage(Math.max(1, page - 1))}
+                        disabled={page === 1}
+                    >‹ पिछला</button>
+                    {Array.from({ length: totalPages }, (_, i) => i + 1)
+                        .filter(p => p === 1 || p === totalPages || Math.abs(p - page) <= 2)
+                        .map((p, idx, arr) => (
+                            <React.Fragment key={p}>
+                                {idx > 0 && arr[idx - 1] !== p - 1 && <span style={{ padding: '0 4px' }}>…</span>}
+                                <button className={`page-btn ${page === p ? 'active' : ''}`} onClick={() => setPage(p)}>
+                                    {p}
+                                </button>
+                            </React.Fragment>
+                        ))}
+                    <button
+                        className="page-btn"
+                        onClick={() => setPage(Math.min(totalPages, page + 1))}
+                        disabled={page === totalPages}
+                    >अगला ›</button>
                 </div>
             )}
 
