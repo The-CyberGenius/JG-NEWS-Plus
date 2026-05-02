@@ -1,8 +1,8 @@
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useNews } from '../context/NewsContext';
-import { formatDate, timeAgo } from '../utils/helpers';
-import { NewsCardSkeleton, CategorySectionSkeleton, ListSkeleton, FeaturedCardSkeleton } from '../components/Skeletons';
+import { timeAgo } from '../utils/helpers';
+import { NewsCardSkeleton, CategorySectionSkeleton, ListSkeleton } from '../components/Skeletons';
 
 const INITIAL_WEATHER = [
     { city: 'रतनगढ़', temp: '34°C', icon: '☀️', desc: 'धूप' },
@@ -48,30 +48,6 @@ function NewsCard({ article }) {
     );
 }
 
-function FeaturedCard({ article }) {
-    if (!article) return null;
-    return (
-        <Link to={`/article/${article.id}`} className="featured-card" style={{ textDecoration: 'none', display: 'flex' }}>
-            <img
-                className="featured-card__img"
-                src={article.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=900&q=80'}
-                alt={article.title}
-                loading="lazy"
-            />
-            <div className="featured-card__overlay" />
-            <div className="featured-card__body">
-                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '8px' }}>
-                    {article.isBreaking && <span className="badge badge-red">ब्रेकिंग</span>}
-                    <span className="badge badge-teal">{article.category}</span>
-                    <span style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.78rem', alignSelf: 'center' }}>📍 {article.location}</span>
-                </div>
-                <div className="featured-card__title">{article.title}</div>
-                <div className="featured-card__excerpt">{article.excerpt}</div>
-                <span className="btn btn-primary btn-sm" style={{ alignSelf: 'flex-start' }}>पूरी खबर पढ़ें →</span>
-            </div>
-        </Link>
-    );
-}
 
 function SectionHeader({ title, linkTo, linkLabel = 'और देखें' }) {
     return (
@@ -117,9 +93,32 @@ export default function Home() {
         fetchWeather();
     }, []);
 
-    const featured = useMemo(() => articles.find(a => a.isFeatured) || articles[0], [articles]);
-    const breaking = useMemo(() => articles.filter(a => a.isBreaking).slice(0, 3), [articles]);
+    // Hero slider articles: featured first, then breaking, then latest
+    const heroSlides = useMemo(() => {
+        const featured = articles.filter(a => a.isFeatured);
+        const breaking = articles.filter(a => a.isBreaking && !a.isFeatured);
+        const pool = [...featured, ...breaking, ...articles.filter(a => !a.isFeatured && !a.isBreaking)];
+        return pool.slice(0, 5);
+    }, [articles]);
+
+    const newsFlash = useMemo(() => articles.slice(0, 10), [articles]);
     const latest = useMemo(() => articles.slice(0, 8), [articles]);
+
+    // Auto-slide logic
+    const [slideIdx, setSlideIdx] = useState(0);
+    const slideTimer = useRef(null);
+
+    const startSlideTimer = useCallback(() => {
+        if (slideTimer.current) clearInterval(slideTimer.current);
+        slideTimer.current = setInterval(() => {
+            setSlideIdx(prev => (prev + 1) % Math.max(1, heroSlides.length));
+        }, 4000);
+    }, [heroSlides.length]);
+
+    useEffect(() => {
+        if (heroSlides.length > 1) startSlideTimer();
+        return () => { if (slideTimer.current) clearInterval(slideTimer.current); };
+    }, [heroSlides.length, startSlideTimer]);
     const byCategory = useMemo(() => {
         // Pick first 4 categories from DB
         const cats = categories.slice(0, 4);
@@ -131,56 +130,69 @@ export default function Home() {
 
     return (
         <div>
-            {/* Hero Section */}
-            <div className="container section-gap">
-                <div style={{ display: 'grid', gap: '20px', gridTemplateColumns: '1fr' }}>
-                    <div style={{ display: 'grid', gap: '20px' }}>
-                        <style>{`@media (min-width: 1024px) { .hero-grid { grid-template-columns: 2fr 1fr !important; } }`}</style>
-                        <div className="hero-grid" style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '20px' }}>
-                            {isLoading ? <FeaturedCardSkeleton /> : <FeaturedCard article={featured} />}
-                            {isLoading ? (
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                                    <h2 className="section-title" style={{ marginBottom: '4px' }}>
-                                        <div className="skeleton" style={{ width: '120px', height: '24px', borderRadius: '4px' }}></div>
-                                    </h2>
-                                    <ListSkeleton count={3} />
-                                </div>
-                            ) : breaking.length > 0 && (
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                                    <h2 className="section-title" style={{ marginBottom: '4px' }}>ताज़ी खबरें</h2>
-                                    {breaking.map(a => (
-                                        <Link key={a.id} to={`/article/${a.id}`} style={{ textDecoration: 'none' }}>
-                                            <div style={{
-                                                background: 'white', borderRadius: '12px', padding: '14px',
-                                                boxShadow: 'var(--card-shadow)', display: 'flex', gap: '12px',
-                                                transition: 'var(--transition)', alignItems: 'flex-start',
-                                            }}
-                                                onMouseEnter={e => e.currentTarget.style.boxShadow = 'var(--card-shadow-hover)'}
-                                                onMouseLeave={e => e.currentTarget.style.boxShadow = 'var(--card-shadow)'}
-                                            >
-                                                <img
-                                                    src={a.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=200&q=70'}
-                                                    alt={a.title}
-                                                    style={{ width: '80px', height: '60px', objectFit: 'cover', borderRadius: '8px', flexShrink: 0 }}
-                                                    loading="lazy"
-                                                />
-                                                <div style={{ flex: 1, minWidth: 0 }}>
-                                                    <span className="badge badge-red" style={{ marginBottom: '6px' }}>ब्रेकिंग</span>
-                                                    <div style={{ fontWeight: 700, fontSize: '0.88rem', lineHeight: 1.4, color: 'var(--text-primary)', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
-                                                        {a.title}
-                                                    </div>
-                                                    <div style={{ fontSize: '0.72rem', color: 'var(--gray-600)', marginTop: '4px' }}>
-                                                        📍 {a.location} • {timeAgo(a.date)}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </Link>
-                                    ))}
-                                </div>
-                            )}
+            {/* Hero Section — Slider + News Flash */}
+            <div className="container">
+                {isLoading ? (
+                    <div className="hero-section">
+                        <div className="skeleton" style={{ height: '420px', borderRadius: '20px' }}></div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                            <ListSkeleton count={6} />
                         </div>
                     </div>
-                </div>
+                ) : (
+                    <div className="hero-section">
+                        {/* Auto-sliding Hero */}
+                        <div className="hero-slider">
+                            {heroSlides.map((a, i) => (
+                                <Link
+                                    key={a.id}
+                                    to={`/article/${a.id}`}
+                                    className={`hero-slide ${i === slideIdx ? 'active' : ''}`}
+                                >
+                                    <img
+                                        className="hero-slide__img"
+                                        src={a.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=900&q=80'}
+                                        alt={a.title}
+                                    />
+                                    <div className="hero-slide__overlay" />
+                                    <div className="hero-slide__body">
+                                        <span className="hero-slide__category">
+                                            {a.isBreaking ? 'ब्रेकिंग' : a.category}
+                                        </span>
+                                        <div className="hero-slide__title">{a.title}</div>
+                                        <div className="hero-slide__meta">
+                                            📍 {a.location} • {timeAgo(a.date)}
+                                        </div>
+                                    </div>
+                                </Link>
+                            ))}
+                            <div className="hero-dots">
+                                {heroSlides.map((_, i) => (
+                                    <button
+                                        key={i}
+                                        className={`hero-dot ${i === slideIdx ? 'active' : ''}`}
+                                        onClick={(e) => { e.preventDefault(); setSlideIdx(i); startSlideTimer(); }}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* News Flash Sidebar */}
+                        <div className="news-flash">
+                            <div className="news-flash__header">
+                                ताज़ा अपडेट
+                            </div>
+                            <div className="news-flash__list">
+                                {newsFlash.map(a => (
+                                    <Link key={a.id} to={`/article/${a.id}`} className="news-flash__item">
+                                        <span className="news-flash__time">{timeAgo(a.date)}</span>
+                                        <span className="news-flash__text">{a.title}</span>
+                                    </Link>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* Weather Strip */}
