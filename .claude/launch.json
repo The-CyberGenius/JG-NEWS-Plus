@@ -11,13 +11,15 @@
       "name": "backend (node)",
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "server"],
-      "port": 5001
+      "port": 5001,
+      "autoPort": false
     },
     {
       "name": "backend (nodemon)",
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev:server"],
-      "port": 5001
+      "port": 5001,
+      "autoPort": false
     }
   ]
 }

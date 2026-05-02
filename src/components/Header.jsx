@@ -20,7 +20,14 @@ export default function Header() {
         { label: t.liveTV, path: '/live' },
     ];
 
-    const breakingArticles = articles.filter(a => a.isBreaking);
+    const breakingArticles = (() => {
+        const filtered = articles.filter(a => a.isBreaking);
+        const list = filtered.length > 0 ? filtered : articles;
+        return list
+            .slice()
+            .sort((a, b) => new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt))
+            .slice(0, 12);
+    })();
 
     const handleSearch = (e) => {
         e.preventDefault();

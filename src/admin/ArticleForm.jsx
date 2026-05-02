@@ -276,6 +276,76 @@ export default function ArticleForm() {
                             </div>
                         </div>
 
+                        {/* Publishing Options */}
+                        <div style={{ background: 'white', borderRadius: '24px', padding: '24px', boxShadow: '0 4px 25px rgba(0,0,0,0.05)', border: '1px solid var(--gray-100)' }}>
+                            <h3 style={{ fontWeight: 900, color: 'var(--navy)', marginBottom: '8px', fontSize: '1rem' }}>🚀 प्रकाशन विकल्प</h3>
+                            <p style={{ fontSize: '0.78rem', color: 'var(--gray-500)', marginBottom: '18px' }}>
+                                यहाँ से तय करें खबर वेबसाइट पर कहाँ-कहाँ दिखेगी
+                            </p>
+
+                            <label style={{
+                                display: 'flex', alignItems: 'flex-start', gap: '12px', padding: '14px',
+                                background: form.isBreaking ? 'rgba(220,38,38,0.08)' : 'var(--gray-50)',
+                                borderRadius: '14px', marginBottom: '12px', cursor: 'pointer',
+                                border: `2px solid ${form.isBreaking ? '#dc2626' : 'transparent'}`,
+                                transition: 'all 0.2s'
+                            }}>
+                                <input
+                                    type="checkbox"
+                                    checked={form.isBreaking}
+                                    onChange={e => set('isBreaking', e.target.checked)}
+                                    style={{ marginTop: '3px', width: '18px', height: '18px', accentColor: '#dc2626', cursor: 'pointer' }}
+                                />
+                                <div style={{ flex: 1 }}>
+                                    <div style={{ fontWeight: 800, color: '#dc2626', fontSize: '0.92rem' }}>
+                                        🔴 ब्रेकिंग न्यूज (Breaking)
+                                    </div>
+                                    <div style={{ fontSize: '0.75rem', color: 'var(--gray-600)', marginTop: '3px' }}>
+                                        ऊपर वाले लाल टिकर में चलेगी
+                                    </div>
+                                </div>
+                            </label>
+
+                            <label style={{
+                                display: 'flex', alignItems: 'flex-start', gap: '12px', padding: '14px',
+                                background: form.isFeatured ? 'rgba(245,158,11,0.1)' : 'var(--gray-50)',
+                                borderRadius: '14px', marginBottom: '12px', cursor: 'pointer',
+                                border: `2px solid ${form.isFeatured ? '#f59e0b' : 'transparent'}`,
+                                transition: 'all 0.2s'
+                            }}>
+                                <input
+                                    type="checkbox"
+                                    checked={form.isFeatured}
+                                    onChange={e => set('isFeatured', e.target.checked)}
+                                    style={{ marginTop: '3px', width: '18px', height: '18px', accentColor: '#f59e0b', cursor: 'pointer' }}
+                                />
+                                <div style={{ flex: 1 }}>
+                                    <div style={{ fontWeight: 800, color: '#b45309', fontSize: '0.92rem' }}>
+                                        ⭐ फीचर्ड / स्लाइड (Featured)
+                                    </div>
+                                    <div style={{ fontSize: '0.75rem', color: 'var(--gray-600)', marginTop: '3px' }}>
+                                        होमपेज के मुख्य स्लाइडर में दिखेगी
+                                    </div>
+                                </div>
+                            </label>
+
+                            <div style={{ marginTop: '16px' }}>
+                                <label style={{ display: 'block', fontWeight: 800, fontSize: '0.72rem', color: 'var(--gray-500)', marginBottom: '6px', textTransform: 'uppercase' }}>
+                                    Tags (कीवर्ड्स)
+                                </label>
+                                <input
+                                    className="form-control"
+                                    value={form.tags}
+                                    onChange={e => set('tags', e.target.value)}
+                                    placeholder="जयपुर, राजनीति, मौसम"
+                                    style={{ fontSize: '0.88rem' }}
+                                />
+                                <div style={{ fontSize: '0.7rem', color: 'var(--gray-500)', marginTop: '5px' }}>
+                                    कॉमा से अलग करें
+                                </div>
+                            </div>
+                        </div>
+
                         <button type="submit" className="btn btn-primary" style={{ padding: '18px', width: '100%', borderRadius: '16px' }} disabled={saving}>
                             {saving ? '⏳ सुरक्षित हो रहा है...' : isEdit ? '✅ अपडेट करें' : '🚀 प्रकाशित करें'}
                         </button>

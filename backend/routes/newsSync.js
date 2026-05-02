@@ -43,6 +43,32 @@ const extractImage = (html) => {
     return match ? match[1] : '';
 };
 
+// Resolve Google News redirect URLs to the original publisher URL
+const resolveGoogleNewsUrl = async (url) => {
+    if (!url || !url.includes('news.google.com')) return url;
+    try {
+        const decoder = new GoogleDecoder();
+        const result = await decoder.decode(url);
+        if (result && result.status && result.decoded_url) {
+            return result.decoded_url;
+        }
+        console.log('GoogleDecoder returned non-success:', result?.message);
+    } catch (err) {
+        console.log('GoogleDecoder failed:', err.message);
+    }
+    // Fallback: follow redirects via axios
+    try {
+        const response = await axios.get(url, {
+            maxRedirects: 5,
+            timeout: 8000,
+            headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' }
+        });
+        return response.request?.res?.responseUrl || url;
+    } catch (e) {
+        return url;
+    }
+};
+
 router.get('/sync', async (req, res) => {
     const { category = 'india' } = req.query;
     const feeds = FEED_MAP[category] || FEED_MAP.india;
@@ -57,11 +83,14 @@ router.get('/sync', async (req, res) => {
                     let img = item.media?.$?.url || item.enclosure?.url || '';
                     if (!img) img = extractImage(item.content) || extractImage(item.contentEncoded);
 
+                    const rawContent = item.contentEncoded || item.content || item.contentSnippet || item.summary || item.description || '';
+                    const cleanContent = rawContent.replace(/<[^>]*>?/gm, '').trim();
+
                     return {
                         title: item.title,
                         link: item.link,
                         pubDate: item.pubDate,
-                        fullContent: (item.contentSnippet || item.contentEncoded || item.content || '').replace(/<[^>]*>?/gm, ''),
+                        fullContent: cleanContent || item.title,
                         source: feed.name,
                         image: img
                     };
@@ -89,38 +118,50 @@ router.post('/extract', async (req, res) => {
     try {
         const { url } = req.body;
         if (!url) return res.status(400).json({ message: 'URL is required' });
-        
+
+        // Decode Google News redirect URLs to the real publisher URL
+        const realUrl = await resolveGoogleNewsUrl(url);
+
         let article = null;
         try {
-            article = await extract(url);
+            article = await extract(realUrl);
         } catch(err) {
             console.log("article-extractor failed, trying fallback...", err.message);
         }
 
         let fallbackImage = '';
-        if (!article || !article.image) {
+        let fallbackDescription = '';
+        if (!article || !article.image || !article.content) {
             try {
-                const { data: htmlData } = await axios.get(url, { 
-                    headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' }, 
-                    timeout: 8000 
+                const { data: htmlData } = await axios.get(realUrl, {
+                    headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' },
+                    timeout: 10000,
+                    maxRedirects: 5
                 });
                 const ogImageMatch = htmlData.match(/<meta[^>]*property=["']og:image["'][^>]*content=["']([^"']+)["'][^>]*>|<meta[^>]*content=["']([^"']+)["'][^>]*property=["']og:image["'][^>]*>/i);
                 if (ogImageMatch) {
                     fallbackImage = ogImageMatch[1] || ogImageMatch[2];
                 }
+                const ogDescMatch = htmlData.match(/<meta[^>]*property=["']og:description["'][^>]*content=["']([^"']+)["'][^>]*>|<meta[^>]*name=["']description["'][^>]*content=["']([^"']+)["'][^>]*>/i);
+                if (ogDescMatch) {
+                    fallbackDescription = ogDescMatch[1] || ogDescMatch[2];
+                }
             } catch(e) {
                 // ignore fallback error
             }
         }
-        
-        if (!article && !fallbackImage) {
+
+        const finalContent = article?.content || (fallbackDescription ? `<p>${fallbackDescription}</p>` : '');
+        const finalImage = article?.image || fallbackImage || '';
+
+        if (!finalContent && !finalImage) {
             return res.status(404).json({ message: 'Could not extract article content or image' });
         }
-        
+
         res.json({
-            content: article?.content || '', 
-            text: article?.text || '',       
-            image: article?.image || fallbackImage || ''
+            content: finalContent,
+            text: article?.text || fallbackDescription || '',
+            image: finalImage
         });
     } catch (error) {
         console.error('Article Extraction Error:', error.message);
