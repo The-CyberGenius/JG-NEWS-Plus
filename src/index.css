@@ -494,23 +494,34 @@ ol {
 
 .ticker-inner {
   display: flex;
-  animation: ticker-scroll 7.5s linear infinite;
+  animation: ticker-scroll 35s linear infinite;
   white-space: nowrap;
+  will-change: transform;
 }
 
-.ticker-inner:hover {
+.ticker-wrap:hover .ticker-inner {
   animation-play-state: paused;
 }
 
 .ticker-item {
-  padding: 0 40px;
-  font-size: 0.82rem;
+  padding: 0 28px;
+  font-size: 0.88rem;
   font-weight: 600;
+  color: var(--white);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.ticker-item:hover {
+  color: #ffd400;
+  text-decoration: underline;
 }
 
 .ticker-dot {
-  color: var(--saffron);
-  margin-right: 8px;
+  color: #ffd400;
+  margin-right: 10px;
+  font-size: 0.55rem;
+  vertical-align: middle;
 }
 
 @keyframes ticker-scroll {

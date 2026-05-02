@@ -6,7 +6,7 @@ const router = express.Router();
 // Get all articles
 router.get('/', async (req, res) => {
     try {
-        const articles = await Article.find().sort({ date: -1 });
+        const articles = await Article.find().sort({ date: -1 }).lean();
         res.set('Cache-Control', 'public, max-age=60');
         res.json(articles);
     } catch (error) {
@@ -17,7 +17,7 @@ router.get('/', async (req, res) => {
 // Get a single article
 router.get('/:id', async (req, res) => {
     try {
-        const article = await Article.findById(req.params.id);
+        const article = await Article.findById(req.params.id).lean();
         if (!article) return res.status(404).json({ message: 'Article not found' });
         res.set('Cache-Control', 'public, max-age=60');
         res.json(article);
