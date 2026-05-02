@@ -17,10 +17,26 @@ const KEYS = {
 };
 
 // ─── Articles CRUD ────────────────────────────────────────────────────────────
-export const getArticles = async () => {
+export const getArticles = async ({ page, limit, fields } = {}) => {
     try {
-        const response = await api.get('/articles');
-        // Map _id from MongoDB back to id for frontend compatibility
+        const params = {};
+        if (page) params.page = page;
+        if (limit) params.limit = limit;
+        if (fields) params.fields = fields;
+
+        const response = await api.get('/articles', { params });
+
+        // Paginated response
+        if (response.data.articles) {
+            return {
+                articles: response.data.articles.map(a => ({ ...a, id: a._id })),
+                total: response.data.total,
+                page: response.data.page,
+                pages: response.data.pages,
+            };
+        }
+
+        // Legacy full-list response (admin panel)
         return response.data.map(article => ({ ...article, id: article._id }));
     } catch (error) {
         console.error("Error fetching articles", error);
