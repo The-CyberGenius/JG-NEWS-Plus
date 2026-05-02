@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useNews } from '../context/NewsContext';
 import { useLang } from '../context/LangContext';
 import { timeAgo, formatDate } from '../utils/helpers';
+import { api } from '../store/newsStore';
 
 export default function ArticlePage() {
     const { id } = useParams();
@@ -12,7 +13,30 @@ export default function ArticlePage() {
     const [copied, setCopied] = useState(false);
     const [lightbox, setLightbox] = useState(false);
 
-    const article = articles.find(a => a.id === id);
+    // Always fetch full article directly (context only has summary projection)
+    const [article, setArticle] = useState(() => articles.find(a => a.id === id) || null);
+    const [loadingArticle, setLoadingArticle] = useState(true);
+
+    useEffect(() => {
+        let cancelled = false;
+        setLoadingArticle(true);
+        api.get(`/articles/${id}`)
+            .then(res => {
+                if (!cancelled) {
+                    setArticle({ ...res.data, id: res.data._id });
+                }
+            })
+            .catch(() => {
+                // fallback to context if API fails
+                const found = articles.find(a => a.id === id);
+                if (!cancelled && found) setArticle(found);
+            })
+            .finally(() => {
+                if (!cancelled) setLoadingArticle(false);
+            });
+        return () => { cancelled = true; };
+    }, [id]);
+
     const related = articles.filter(a => a.id !== id && a.category === article?.category).slice(0, 4);
 
     useEffect(() => { window.scrollTo(0, 0); }, [id]);
@@ -40,7 +64,21 @@ export default function ArticlePage() {
     const shareFb = () => window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`);
     const shareTw = () => window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(article.title)}&url=${encodeURIComponent(window.location.href)}`);
 
-    if (!article) {
+    if (loadingArticle && !article) {
+        return (
+            <div className="container section-gap">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', maxWidth: '800px', margin: '0 auto' }}>
+                    <div className="skeleton" style={{ height: '32px', width: '60%', borderRadius: '6px' }} />
+                    <div className="skeleton" style={{ height: '420px', borderRadius: '14px' }} />
+                    <div className="skeleton" style={{ height: '20px', width: '90%', borderRadius: '4px' }} />
+                    <div className="skeleton" style={{ height: '20px', width: '80%', borderRadius: '4px' }} />
+                    <div className="skeleton" style={{ height: '20px', width: '85%', borderRadius: '4px' }} />
+                </div>
+            </div>
+        );
+    }
+
+    if (!article && !loadingArticle) {
         return (
             <div className="container section-gap">
                 <div className="empty-state">
@@ -153,11 +191,19 @@ export default function ArticlePage() {
                     )}
 
                     {/* Content */}
-                    <div
-                        className="article-content"
-                        dangerouslySetInnerHTML={{ __html: article.content }}
-                        style={{ marginBottom: '24px' }}
-                    />
+                    {loadingArticle ? (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '24px' }}>
+                            {[90, 100, 75, 95, 60].map((w, i) => (
+                                <div key={i} className="skeleton" style={{ height: '18px', width: `${w}%`, borderRadius: '4px' }} />
+                            ))}
+                        </div>
+                    ) : (
+                        <div
+                            className="article-content"
+                            dangerouslySetInnerHTML={{ __html: article.content }}
+                            style={{ marginBottom: '24px' }}
+                        />
+                    )}
 
                     {/* Tags */}
                     {article.tags?.length > 0 && (
