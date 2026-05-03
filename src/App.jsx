@@ -1,5 +1,7 @@
 import React, { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { HelmetProvider } from 'react-helmet-async';
+import { Analytics } from '@vercel/analytics/react';
 import { NewsProvider } from './context/NewsContext';
 import { LangProvider } from './context/LangContext';
 import Header from './components/Header';
@@ -29,6 +31,7 @@ const NewspaperManager = lazy(() => import('./admin/NewspaperManager'));
 const AdminGuard = lazy(() => import('./admin/AdminGuard'));
 const NewsSyncManager = lazy(() => import('./admin/NewsSyncManager'));
 const MessageManager = lazy(() => import('./admin/MessageManager'));
+const AnalyticsPage = lazy(() => import('./admin/AnalyticsPage'));
 
 function PublicLayout({ children }) {
     return (
@@ -48,9 +51,10 @@ const PageLoader = () => (
 
 export default function App() {
     return (
-        <LangProvider>
-            <NewsProvider>
-                <BrowserRouter>
+        <HelmetProvider>
+            <LangProvider>
+                <NewsProvider>
+                    <BrowserRouter>
                     <Suspense fallback={<PageLoader />}>
                         <Routes>
                             {/* Public */}
@@ -81,14 +85,17 @@ export default function App() {
                                             <Route path="epaper" element={<NewspaperManager />} />
                                             <Route path="sync" element={<NewsSyncManager />} />
                                             <Route path="messages" element={<MessageManager />} />
+                                            <Route path="analytics" element={<AnalyticsPage />} />
                                         </Routes>
                                     </AdminLayout>
                                 </AdminGuard>
                             } />
                         </Routes>
                     </Suspense>
-                </BrowserRouter>
-            </NewsProvider>
-        </LangProvider>
+                    </BrowserRouter>
+                    <Analytics />
+                </NewsProvider>
+            </LangProvider>
+        </HelmetProvider>
     );
 }
