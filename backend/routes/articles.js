@@ -80,4 +80,25 @@ router.delete('/:id', async (req, res) => {
     }
 });
 
+// Track article view (fire-and-forget from client)
+router.post('/:id/view', async (req, res) => {
+    try {
+        const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+        await Article.findByIdAndUpdate(
+            req.params.id,
+            {
+                $inc: {
+                    views: 1,
+                    [`viewsByDay.${today}`]: 1,
+                },
+            },
+            { new: false }
+        );
+        res.set('Cache-Control', 'no-store');
+        res.json({ ok: true });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
 export default router;

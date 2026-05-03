@@ -4,6 +4,7 @@ import { useNews } from '../context/NewsContext';
 
 const NAV_ITEMS = [
     { path: '/admin/dashboard', icon: '📊', label: 'Dashboard' },
+    { path: '/admin/analytics', icon: '📈', label: 'Analytics' },
     { path: '/admin/news', icon: '📰', label: 'खबरें प्रबंधन' },
     { path: '/admin/news/add', icon: '➕', label: 'खबर जोड़ें' },
     { path: '/admin/live', icon: '📺', label: 'Live TV' },

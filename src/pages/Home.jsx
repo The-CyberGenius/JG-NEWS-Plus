@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { useNews } from '../context/NewsContext';
 import { timeAgo } from '../utils/helpers';
 import { NewsCardSkeleton, CategorySectionSkeleton, ListSkeleton } from '../components/Skeletons';
+import { SEO } from '../utils/seo';
+import { optimizeImage, srcSet } from '../utils/imageUrl';
 
 const INITIAL_WEATHER = [
     { city: 'रतनगढ़', temp: '34°C', icon: '☀️', desc: 'धूप' },
@@ -24,13 +26,17 @@ const INITIAL_WEATHER = [
 ];
 
 function NewsCard({ article }) {
+    const imgUrl = article.image || `https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600&q=80`;
     return (
         <Link to={`/article/${article.id}`} className="news-card" style={{ textDecoration: 'none' }}>
             <div className="news-card__img">
                 <img
-                    src={article.image || `https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600&q=80`}
+                    src={optimizeImage(imgUrl, { width: 600 })}
+                    srcSet={srcSet(imgUrl, [400, 600, 800])}
+                    sizes="(max-width: 768px) 100vw, 33vw"
                     alt={article.title}
                     loading="lazy"
+                    decoding="async"
                 />
                 {article.isBreaking && <span className="badge badge-red">ब्रेकिंग</span>}
                 {article.isFeatured && !article.isBreaking && <span className="badge badge-teal">मुख्य</span>}
@@ -130,6 +136,12 @@ export default function Home() {
 
     return (
         <div>
+            <SEO
+                title="Rajasthan की ताज़ा खबरें"
+                description="JG News Plus पर पढ़ें राजस्थान की हर बड़ी खबर — राजनीति, अपराध, खेल, मौसम, ब्रेकिंग न्यूज़ और बहुत कुछ। निडर • निष्पक्ष • निर्भीक।"
+                url="/"
+                keywords="Rajasthan News, Hindi News, राजस्थान समाचार, Jaipur News, जयपुर समाचार, Breaking News, JG News"
+            />
             {/* Hero Section — Slider + News Flash */}
             <div className="container">
                 {isLoading ? (
@@ -151,8 +163,12 @@ export default function Home() {
                                 >
                                     <img
                                         className="hero-slide__img"
-                                        src={a.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=900&q=80'}
+                                        src={optimizeImage(a.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=900&q=80', { width: 1200 })}
+                                        srcSet={srcSet(a.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=900&q=80', [600, 900, 1200, 1600])}
+                                        sizes="(max-width: 1024px) 100vw, 66vw"
                                         alt={a.title}
+                                        loading={i === 0 ? 'eager' : 'lazy'}
+                                        decoding="async"
                                     />
                                     <div className="hero-slide__overlay" />
                                     <div className="hero-slide__body">
@@ -284,7 +300,7 @@ export default function Home() {
                         {articles.filter(a => a.videoUrl).slice(0, 3).map(a => (
                             <Link key={a.id} to={`/article/${a.id}`} style={{ textDecoration: 'none' }} className="news-card">
                                 <div style={{ position: 'relative', paddingTop: '56.25%', background: 'var(--navy)', borderRadius: '12px 12px 0 0', overflow: 'hidden' }}>
-                                    <img src={a.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600&q=80'} alt={a.title} loading="lazy"
+                                    <img src={a.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600&q=80&auto=format'} alt={a.title} loading="lazy"
                                         style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.8 }} />
                                     <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                         <div style={{ width: '52px', height: '52px', background: 'rgba(255,255,255,0.9)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>

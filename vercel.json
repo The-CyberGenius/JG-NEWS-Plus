@@ -15,6 +15,14 @@
     ],
     "routes": [
         {
+            "src": "/sitemap.xml",
+            "dest": "/api/seo/sitemap.xml"
+        },
+        {
+            "src": "/robots.txt",
+            "dest": "/api/seo/robots.txt"
+        },
+        {
             "src": "/api/(.*)",
             "dest": "backend/server.js"
         },

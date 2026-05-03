@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { useNews } from '../context/NewsContext';
 import { timeAgo, formatDate } from '../utils/helpers';
 import { NewsCardSkeleton } from '../components/Skeletons';
+import { SEO } from '../utils/seo';
 
 function NewsCard({ article }) {
     return (
@@ -35,6 +36,12 @@ export default function CategoryPage() {
 
     return (
         <div className="container section-gap">
+            <SEO
+                title={`${category} समाचार`}
+                description={`${category} की ताज़ा खबरें — JG News Plus पर पढ़ें ${category} से जुड़े सभी समाचार, अपडेट और विश्लेषण।`}
+                url={`/category/${category}`}
+                keywords={`${category}, ${category} News, ${category} समाचार, Rajasthan News`}
+            />
             {/* Breadcrumb */}
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '24px', fontSize: '0.85rem', color: 'var(--gray-600)' }}>
                 <Link to="/" style={{ color: 'var(--teal)' }}>होम</Link>

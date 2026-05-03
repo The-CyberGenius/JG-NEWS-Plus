@@ -13,6 +13,8 @@ import newspaperRoutes from './routes/newspapers.js';
 import uploadRoutes from './routes/upload.js';
 import newsSyncRoutes from './routes/newsSync.js';
 import messageRoutes from './routes/messages.js';
+import analyticsRoutes from './routes/analytics.js';
+import seoRoutes from './routes/seo.js';
 
 dotenv.config();
 
@@ -35,6 +37,8 @@ app.use('/api/newspapers', newspaperRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/news-sync', newsSyncRoutes);
 app.use('/api/messages', messageRoutes);
+app.use('/api/analytics', analyticsRoutes);
+app.use('/api/seo', seoRoutes);
 
 app.get('/api', (req, res) => {
     res.send('JG NEWS PLUS API is running...');

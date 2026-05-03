@@ -4,6 +4,8 @@ import { useNews } from '../context/NewsContext';
 import { useLang } from '../context/LangContext';
 import { timeAgo, formatDate } from '../utils/helpers';
 import { api } from '../store/newsStore';
+import { SEO, articleStructuredData } from '../utils/seo';
+import { optimizeImage } from '../utils/imageUrl';
 
 export default function ArticlePage() {
     const { id } = useParams();
@@ -34,6 +36,15 @@ export default function ArticlePage() {
             .finally(() => {
                 if (!cancelled) setLoadingArticle(false);
             });
+
+        // Fire-and-forget view tracking
+        // Use sessionStorage to avoid double-counting on refresh within same session
+        const viewKey = `viewed_${id}`;
+        if (!sessionStorage.getItem(viewKey)) {
+            sessionStorage.setItem(viewKey, '1');
+            api.post(`/articles/${id}/view`).catch(() => {});
+        }
+
         return () => { cancelled = true; };
     }, [id]);
 
@@ -90,10 +101,23 @@ export default function ArticlePage() {
         );
     }
 
-    const heroImg = article.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=1200&q=80';
+    const rawImg = article.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=1200&q=80';
+    const heroImg = optimizeImage(rawImg, { width: 1200 });
 
     return (
         <>
+            <SEO
+                title={article.title}
+                description={article.excerpt || article.title}
+                image={optimizeImage(article.image, { width: 1200 })}
+                url={`/article/${article.id}`}
+                type="article"
+                publishedAt={article.date}
+                modifiedAt={article.updatedAt || article.date}
+                author={article.author}
+                keywords={[article.category, article.location, ...(article.tags || [])].filter(Boolean).join(', ')}
+                structuredData={articleStructuredData(article)}
+            />
             <article>
 
 
