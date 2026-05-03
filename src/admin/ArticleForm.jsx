@@ -197,7 +197,7 @@ export default function ArticleForm() {
             </div>
 
             <form onSubmit={handleSubmit}>
-                <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '32px', alignItems: 'start' }}>
+                <div className="article-form-grid">
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
                         <div style={{ background: 'white', borderRadius: '24px', padding: '32px', boxShadow: '0 4px 25px rgba(0,0,0,0.05)', border: '1px solid var(--gray-100)' }}>
@@ -250,7 +250,7 @@ export default function ArticleForm() {
                         {/* Media Section */}
                         <div style={{ background: 'white', borderRadius: '24px', padding: '32px', boxShadow: '0 4px 25px rgba(0,0,0,0.05)', border: '1px solid var(--gray-100)' }}>
                             <h3 style={{ fontWeight: 900, color: 'var(--navy)', marginBottom: '24px', fontSize: '1.1rem' }}>🖼️ मुख्य मीडिया (Hero)</h3>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+                            <div className="hero-media-grid">
                                 <div>
                                     <label style={{ display: 'block', fontWeight: 800, fontSize: '0.75rem', color: 'var(--gray-500)', marginBottom: '8px', textTransform: 'uppercase' }}>मुख्य फोटो</label>
                                     <div style={{
@@ -405,6 +405,27 @@ export default function ArticleForm() {
             </form>
 
             <style>{`
+                .article-form-grid {
+                    display: grid;
+                    grid-template-columns: 1fr;
+                    gap: 24px;
+                    align-items: start;
+                }
+                .hero-media-grid {
+                    display: grid;
+                    grid-template-columns: 1fr;
+                    gap: 20px;
+                }
+                @media (min-width: 1024px) {
+                    .article-form-grid {
+                        grid-template-columns: 2fr 1fr;
+                        gap: 32px;
+                    }
+                    .hero-media-grid {
+                        grid-template-columns: 1fr 1fr;
+                        gap: 24px;
+                    }
+                }
                 .editor-container .ql-toolbar.ql-snow {
                     border-top-left-radius: 14px;
                     border-top-right-radius: 14px;
