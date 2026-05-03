@@ -16,11 +16,13 @@
     "routes": [
         {
             "src": "/sitemap.xml",
-            "dest": "/api/seo/sitemap.xml"
+            "dest": "/api/seo/sitemap.xml",
+            "continue": true
         },
         {
             "src": "/robots.txt",
-            "dest": "/api/seo/robots.txt"
+            "dest": "/api/seo/robots.txt",
+            "continue": true
         },
         {
             "src": "/api/(.*)",
