@@ -5,6 +5,7 @@ import { timeAgo } from '../utils/helpers';
 import { NewsCardSkeleton, CategorySectionSkeleton, ListSkeleton } from '../components/Skeletons';
 import { SEO } from '../utils/seo';
 import { optimizeImage, srcSet } from '../utils/imageUrl';
+import { api } from '../store/newsStore';
 
 const INITIAL_WEATHER = [
     { city: 'रतनगढ़', temp: '34°C', icon: '☀️', desc: 'धूप' },
@@ -107,8 +108,80 @@ export default function Home() {
         return pool.slice(0, 5);
     }, [articles]);
 
-    const newsFlash = useMemo(() => articles.slice(0, 10), [articles]);
-    const latest = useMemo(() => articles.slice(0, 8), [articles]);
+    // Sort articles by date desc explicitly so newest are always first
+    const sortedArticles = useMemo(() => {
+        return [...articles].sort((a, b) => {
+            const da = new Date(a.date || a.createdAt || 0).getTime();
+            const db = new Date(b.date || b.createdAt || 0).getTime();
+            return db - da;
+        });
+    }, [articles]);
+
+    const newsFlash = useMemo(() => sortedArticles.slice(0, 10), [sortedArticles]);
+
+    // Latest news with Load More — initially shows 8, +8 per click
+    const [latestCount, setLatestCount] = useState(8);
+    const [extraArticles, setExtraArticles] = useState([]);
+    const [loadingMore, setLoadingMore] = useState(false);
+    const [serverHasMore, setServerHasMore] = useState(true);
+
+    const combinedSorted = useMemo(() => {
+        const seen = new Set();
+        const merged = [];
+        for (const a of [...sortedArticles, ...extraArticles]) {
+            if (!seen.has(a.id || a._id)) {
+                seen.add(a.id || a._id);
+                merged.push(a);
+            }
+        }
+        return merged.sort((a, b) => {
+            const da = new Date(a.date || a.createdAt || 0).getTime();
+            const db = new Date(b.date || b.createdAt || 0).getTime();
+            return db - da;
+        });
+    }, [sortedArticles, extraArticles]);
+
+    const latest = useMemo(() => combinedSorted.slice(0, latestCount), [combinedSorted, latestCount]);
+    const hasMore = combinedSorted.length > latestCount || serverHasMore;
+
+    const handleLoadMore = useCallback(async () => {
+        // If we still have unseen articles in local cache, just expand count
+        if (combinedSorted.length > latestCount) {
+            setLatestCount(c => c + 8);
+            return;
+        }
+        // Otherwise fetch the next page from API
+        if (loadingMore || !serverHasMore) return;
+        setLoadingMore(true);
+        try {
+            const nextPage = Math.floor(combinedSorted.length / 30) + 1;
+            const res = await api.get('/articles', { params: { page: nextPage, limit: 30, fields: 'summary' } });
+            const newArticles = (res.data?.articles || []).map(a => ({ ...a, id: a._id }));
+            if (newArticles.length === 0) {
+                setServerHasMore(false);
+            } else {
+                setExtraArticles(prev => [...prev, ...newArticles]);
+                setLatestCount(c => c + 8);
+                if (res.data?.page >= res.data?.pages) setServerHasMore(false);
+            }
+        } catch (err) {
+            console.error('Load more failed', err);
+        } finally {
+            setLoadingMore(false);
+        }
+    }, [combinedSorted.length, latestCount, loadingMore, serverHasMore]);
+
+    // Trending Now (last 1 hour by views)
+    const [trending, setTrending] = useState([]);
+    useEffect(() => {
+        let cancelled = false;
+        api.get('/articles/trending/now', { params: { hours: 1, limit: 8 } })
+            .then(res => {
+                if (!cancelled) setTrending((res.data?.articles || []).map(a => ({ ...a, id: a._id })));
+            })
+            .catch(() => {});
+        return () => { cancelled = true; };
+    }, []);
 
     // Auto-slide logic
     const [slideIdx, setSlideIdx] = useState(0);
@@ -193,20 +266,50 @@ export default function Home() {
                             </div>
                         </div>
 
-                        {/* News Flash Sidebar */}
-                        <div className="news-flash">
-                            <div className="news-flash__header">
-                                ताज़ा अपडेट
+                        {/* Trending Now / News Flash Sidebar */}
+                        {trending.length > 0 ? (
+                            <div className="news-flash">
+                                <div className="news-flash__header" style={{ background: 'linear-gradient(90deg, #e53935, #c62828)' }}>
+                                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                                        🔥 ट्रेंडिंग अभी
+                                    </span>
+                                    <span style={{ marginLeft: 'auto', fontSize: '0.68rem', opacity: 0.85, fontWeight: 600 }}>last 1 hr</span>
+                                </div>
+                                <div className="news-flash__list">
+                                    {trending.map((a, i) => (
+                                        <Link key={a.id} to={`/article/${a.id}`} className="news-flash__item">
+                                            <span style={{
+                                                fontSize: '0.95rem',
+                                                fontWeight: 900,
+                                                color: i < 3 ? '#e53935' : 'var(--gray-400)',
+                                                minWidth: '20px',
+                                                flexShrink: 0,
+                                            }}>{i + 1}</span>
+                                            <div style={{ flex: 1, minWidth: 0 }}>
+                                                <div className="news-flash__text">{a.title}</div>
+                                                <div style={{ fontSize: '0.68rem', color: 'var(--gray-500)', marginTop: '2px' }}>
+                                                    👁️ {a.recentViews || a.views} views · {a.category}
+                                                </div>
+                                            </div>
+                                        </Link>
+                                    ))}
+                                </div>
                             </div>
-                            <div className="news-flash__list">
-                                {newsFlash.map(a => (
-                                    <Link key={a.id} to={`/article/${a.id}`} className="news-flash__item">
-                                        <span className="news-flash__time">{timeAgo(a.date)}</span>
-                                        <span className="news-flash__text">{a.title}</span>
-                                    </Link>
-                                ))}
+                        ) : (
+                            <div className="news-flash">
+                                <div className="news-flash__header">
+                                    ताज़ा अपडेट
+                                </div>
+                                <div className="news-flash__list">
+                                    {newsFlash.map(a => (
+                                        <Link key={a.id} to={`/article/${a.id}`} className="news-flash__item">
+                                            <span className="news-flash__time">{timeAgo(a.date)}</span>
+                                            <span className="news-flash__text">{a.title}</span>
+                                        </Link>
+                                    ))}
+                                </div>
                             </div>
-                        </div>
+                        )}
                     </div>
                 )}
             </div>
@@ -239,6 +342,43 @@ export default function Home() {
                         Array.from({ length: 4 }).map((_, i) => <NewsCardSkeleton key={i} />)
                     ) : latest.map(a => <NewsCard key={a.id} article={a} />)}
                 </div>
+                {!isLoading && hasMore && (
+                    <div style={{ display: 'flex', justifyContent: 'center', marginTop: '24px' }}>
+                        <button
+                            onClick={handleLoadMore}
+                            disabled={loadingMore}
+                            style={{
+                                background: loadingMore ? 'var(--gray-400)' : 'var(--navy)',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '100px',
+                                padding: '12px 32px',
+                                fontWeight: 700,
+                                fontSize: '0.9rem',
+                                cursor: loadingMore ? 'wait' : 'pointer',
+                                boxShadow: '0 4px 16px rgba(10,22,40,0.18)',
+                                transition: 'all 0.2s',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                            }}
+                            onMouseEnter={e => {
+                                if (!loadingMore) {
+                                    e.currentTarget.style.background = 'var(--teal)';
+                                    e.currentTarget.style.transform = 'translateY(-2px)';
+                                }
+                            }}
+                            onMouseLeave={e => {
+                                if (!loadingMore) {
+                                    e.currentTarget.style.background = 'var(--navy)';
+                                    e.currentTarget.style.transform = 'translateY(0)';
+                                }
+                            }}
+                        >
+                            {loadingMore ? '⏳ लोड हो रहा है...' : 'और खबरें देखें ↓'}
+                        </button>
+                    </div>
+                )}
             </div>
 
             {/* Live TV Banner */}

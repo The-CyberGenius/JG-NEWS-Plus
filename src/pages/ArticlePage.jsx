@@ -65,15 +65,29 @@ export default function ArticlePage() {
         return () => { document.body.style.overflow = ''; };
     }, [lightbox]);
 
+    const trackShare = (platform) => {
+        api.post(`/articles/${id}/share`, { platform }).catch(() => {});
+    };
+
     const handleCopy = () => {
         navigator.clipboard.writeText(window.location.href);
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
+        trackShare('copy');
     };
 
-    const shareWa = () => window.open(`https://wa.me/?text=${encodeURIComponent(article.title + ' ' + window.location.href)}`);
-    const shareFb = () => window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`);
-    const shareTw = () => window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(article.title)}&url=${encodeURIComponent(window.location.href)}`);
+    const shareWa = () => {
+        trackShare('whatsapp');
+        window.open(`https://wa.me/?text=${encodeURIComponent(article.title + ' ' + window.location.href)}`);
+    };
+    const shareFb = () => {
+        trackShare('facebook');
+        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`);
+    };
+    const shareTw = () => {
+        trackShare('twitter');
+        window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(article.title)}&url=${encodeURIComponent(window.location.href)}`);
+    };
 
     if (loadingArticle && !article) {
         return (

@@ -128,7 +128,7 @@ export default function AnalyticsPage() {
             </div>
 
             {/* Top KPI Stats */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '16px', marginBottom: '28px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '16px', marginBottom: '20px' }}>
                 <StatCard icon="👁️" label="Total Views" value={t.totalViews} color="#00bcd4" />
                 <StatCard icon="📰" label="Total Articles" value={t.totalArticles} color="#0a1628" />
                 <StatCard icon="🔴" label="Breaking" value={t.breakingCount} color="#e53935" />
@@ -136,6 +136,14 @@ export default function AnalyticsPage() {
                 <StatCard icon="📈" label={`Views (${days}d)`} value={dailyTotal} color="#7c3aed" />
                 <StatCard icon="📊" label="Avg/Day" value={avgPerDay} color="#059669" />
                 <StatCard icon="💬" label="Messages" value={t.messageCount} color="#4a90e2" />
+            </div>
+
+            {/* Share Stats */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '16px', marginBottom: '28px' }}>
+                <StatCard icon="🔗" label="Total Shares" value={t.totalShares || 0} color="#10b981" />
+                <StatCard icon="📱" label="WhatsApp" value={t.whatsappShares || 0} color="#25D366" />
+                <StatCard icon="📘" label="Facebook" value={t.facebookShares || 0} color="#1877F2" />
+                <StatCard icon="🐦" label="Twitter / X" value={t.twitterShares || 0} color="#000000" />
             </div>
 
             {/* Daily Views Chart */}
@@ -176,6 +184,30 @@ export default function AnalyticsPage() {
                             <div style={{ textAlign: 'right', flexShrink: 0 }}>
                                 <div style={{ fontWeight: 800, color: 'var(--teal)', fontSize: '0.95rem' }}>{NUMBER(a.views || 0)}</div>
                                 <div style={{ fontSize: '0.65rem', color: 'var(--gray-500)' }}>views</div>
+                            </div>
+                        </Link>
+                    ))}
+                </div>
+
+                {/* Top Shared Articles */}
+                <div style={{ background: 'white', borderRadius: '14px', padding: '20px', boxShadow: '0 2px 12px rgba(0,0,0,0.05)' }}>
+                    <h2 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--navy)', marginBottom: '14px' }}>📤 Most Shared Articles</h2>
+                    {(data?.topShared || []).length === 0 && (
+                        <p style={{ color: 'var(--gray-500)', fontSize: '0.85rem' }}>No shares recorded yet — share buttons will track once readers use them.</p>
+                    )}
+                    {(data?.topShared || []).map((a, i) => (
+                        <Link key={a._id} to={`/article/${a._id}`} target="_blank" style={{ display: 'flex', gap: '10px', padding: '10px 0', borderBottom: i < 9 ? '1px solid var(--gray-100)' : 'none', textDecoration: 'none', alignItems: 'center' }}>
+                            <span style={{ fontWeight: 900, color: '#10b981', minWidth: '24px', fontSize: '0.9rem' }}>#{i + 1}</span>
+                            <img src={a.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=100'} alt="" style={{ width: '44px', height: '34px', objectFit: 'cover', borderRadius: '4px', flexShrink: 0 }} loading="lazy" />
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                                <div style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--navy)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{a.title}</div>
+                                <div style={{ fontSize: '0.7rem', color: 'var(--gray-500)' }}>
+                                    📱 {a.shares?.whatsapp || 0} · 📘 {a.shares?.facebook || 0} · 🐦 {a.shares?.twitter || 0}
+                                </div>
+                            </div>
+                            <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                                <div style={{ fontWeight: 800, color: '#10b981', fontSize: '0.95rem' }}>{NUMBER(a.shares?.total || 0)}</div>
+                                <div style={{ fontSize: '0.65rem', color: 'var(--gray-500)' }}>shares</div>
                             </div>
                         </Link>
                     ))}

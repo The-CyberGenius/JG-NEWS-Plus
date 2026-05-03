@@ -18,7 +18,7 @@ router.get('/overview', async (req, res) => {
             dayKeys.push(d.toISOString().slice(0, 10));
         }
 
-        const [totals, topArticles, recentArticles, allArticlesForViews, messageCount] = await Promise.all([
+        const [totals, topArticles, topShared, recentArticles, allArticlesForViews, messageCount] = await Promise.all([
             // Totals
             Article.aggregate([
                 {
@@ -26,14 +26,23 @@ router.get('/overview', async (req, res) => {
                         _id: null,
                         totalArticles: { $sum: 1 },
                         totalViews: { $sum: { $ifNull: ['$views', 0] } },
+                        totalShares: { $sum: { $ifNull: ['$shares.total', 0] } },
+                        whatsappShares: { $sum: { $ifNull: ['$shares.whatsapp', 0] } },
+                        facebookShares: { $sum: { $ifNull: ['$shares.facebook', 0] } },
+                        twitterShares: { $sum: { $ifNull: ['$shares.twitter', 0] } },
                         breakingCount: { $sum: { $cond: ['$isBreaking', 1, 0] } },
                         featuredCount: { $sum: { $cond: ['$isFeatured', 1, 0] } },
                     },
                 },
             ]),
             // Top 10 most-viewed articles
-            Article.find({}, { title: 1, views: 1, category: 1, date: 1, image: 1 })
+            Article.find({}, { title: 1, views: 1, category: 1, date: 1, image: 1, shares: 1 })
                 .sort({ views: -1 })
+                .limit(10)
+                .lean(),
+            // Top 10 most-shared articles
+            Article.find({ 'shares.total': { $gt: 0 } }, { title: 1, views: 1, category: 1, date: 1, image: 1, shares: 1 })
+                .sort({ 'shares.total': -1 })
                 .limit(10)
                 .lean(),
             // Recent articles (last 30)
@@ -106,6 +115,7 @@ router.get('/overview', async (req, res) => {
                 messageCount,
             },
             topArticles,
+            topShared,
             recentArticles,
             dailyViews,
             articlesPosted,
