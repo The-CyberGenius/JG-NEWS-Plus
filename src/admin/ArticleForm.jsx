@@ -171,10 +171,13 @@ export default function ArticleForm() {
 
     return (
         <div style={{ animation: 'fadeIn 0.5s ease-in-out', paddingBottom: '50px' }}>
-            {toast && <div className="toast" style={{ 
-                zIndex: 10000, background: 'var(--navy)', color: 'var(--teal)', fontWeight: 800,
-                position: 'fixed', top: '20px', right: '20px', padding: '15px 25px', borderRadius: '12px',
-                boxShadow: '0 10px 30px rgba(0,0,0,0.2)'
+            {toast && <div className="toast" style={{
+                zIndex: 10000, background: 'var(--navy)', color: 'var(--teal)', fontWeight: 700,
+                position: 'fixed', bottom: '20px', right: '20px',
+                padding: '10px 16px', borderRadius: '8px',
+                fontSize: '0.85rem', maxWidth: '320px',
+                boxShadow: '0 6px 20px rgba(0,0,0,0.18)',
+                animation: 'fadeIn 0.2s ease',
             }}>{toast}</div>}
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '32px' }}>
@@ -228,17 +231,16 @@ export default function ArticleForm() {
 
                                 <div className="form-group">
                                     <label style={{ display: 'block', fontWeight: 800, fontSize: '0.75rem', color: 'var(--gray-500)', marginBottom: '8px', textTransform: 'uppercase' }}>पूर्ण खबर (Content) *</label>
-                                    <div className="editor-container" style={{ borderRadius: '14px', overflow: 'hidden', border: '1px solid var(--gray-200)' }}>
+                                    <div className="editor-container" style={{ borderRadius: '14px', overflow: 'hidden', border: '1px solid var(--gray-200)', display: 'flex', flexDirection: 'column' }}>
                                         <ReactQuill
                                             ref={quillRef}
                                             theme="snow"
                                             value={form.content}
                                             onChange={val => set('content', val)}
                                             modules={modules}
-                                            style={{ height: '400px', background: 'white' }}
                                         />
                                     </div>
-                                    <p style={{ marginTop: '50px', fontSize: '0.75rem', color: 'var(--gray-500)', fontStyle: 'italic' }}>
+                                    <p style={{ marginTop: '12px', fontSize: '0.75rem', color: 'var(--gray-500)', fontStyle: 'italic' }}>
                                         💡 Tip: एडिटर के बीच में फोटो डालने पर वो Cloudinary पर ऑटो-अपलोड होगी।
                                     </p>
                                 </div>
@@ -257,11 +259,36 @@ export default function ArticleForm() {
                                         minHeight: '180px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'
                                     }}>
                                         {imgPreview ? (
-                                            <img src={imgPreview} alt="Preview" style={{ width: '100%', maxHeight: '150px', objectFit: 'cover', borderRadius: '12px' }} />
+                                            <>
+                                                <img src={imgPreview} alt="Preview" style={{ width: '100%', maxHeight: '150px', objectFit: 'cover', borderRadius: '12px' }} />
+                                                <button
+                                                    type="button"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        e.preventDefault();
+                                                        setImgPreview('');
+                                                        setImageFile(null);
+                                                        set('image', '');
+                                                    }}
+                                                    title="फोटो हटाएं"
+                                                    style={{
+                                                        position: 'absolute', top: '10px', right: '10px',
+                                                        zIndex: 5, width: '32px', height: '32px',
+                                                        borderRadius: '50%', border: 'none',
+                                                        background: 'rgba(229, 57, 53, 0.95)', color: 'white',
+                                                        cursor: 'pointer', fontSize: '1rem', fontWeight: 800,
+                                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                        boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
+                                                        transition: 'transform 0.15s',
+                                                    }}
+                                                    onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.1)'}
+                                                    onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+                                                >✕</button>
+                                            </>
                                         ) : (
                                             <div style={{ fontSize: '0.85rem', color: 'var(--gray-500)', fontWeight: 700 }}>फोटो चुनें</div>
                                         )}
-                                        <input type="file" accept="image/*" onChange={handleImgFile} style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer' }} />
+                                        <input type="file" accept="image/*" onChange={handleImgFile} style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer', zIndex: imgPreview ? 1 : 2 }} />
                                     </div>
                                     <input className="form-control" value={form.image} onChange={handleImgChange} placeholder="या URL डालें..." style={{ marginTop: '10px' }} />
                                 </div>
@@ -378,10 +405,41 @@ export default function ArticleForm() {
             </form>
 
             <style>{`
-                .ql-editor { min-height: 350px; font-size: 1.1rem; line-height: 1.7; color: #334155; }
-                .ql-toolbar.ql-snow { border-top-left-radius: 14px; border-top-right-radius: 14px; background: #f8fafc; padding: 12px; }
-                .ql-container.ql-snow { border-bottom-left-radius: 14px; border-bottom-right-radius: 14px; }
-                .ql-editor img { max-width: 100%; border-radius: 12px; margin: 15px 0; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+                .editor-container .ql-toolbar.ql-snow {
+                    border-top-left-radius: 14px;
+                    border-top-right-radius: 14px;
+                    background: #f8fafc;
+                    padding: 12px;
+                    border: none;
+                    border-bottom: 1px solid var(--gray-200);
+                    position: sticky;
+                    top: 0;
+                    z-index: 5;
+                }
+                .editor-container .ql-container.ql-snow {
+                    border-bottom-left-radius: 14px;
+                    border-bottom-right-radius: 14px;
+                    border: none;
+                    height: auto;
+                }
+                .editor-container .ql-editor {
+                    min-height: 500px;
+                    max-height: 70vh;
+                    overflow-y: auto;
+                    font-size: 1.05rem;
+                    line-height: 1.7;
+                    color: #334155;
+                    padding: 18px 20px 60px;
+                }
+                .editor-container .ql-editor img {
+                    max-width: 100%;
+                    border-radius: 12px;
+                    margin: 15px 0;
+                    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+                }
+                .editor-container .ql-editor p:last-child {
+                    margin-bottom: 40px;
+                }
             `}</style>
         </div>
     );
