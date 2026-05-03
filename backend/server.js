@@ -15,6 +15,8 @@ import newsSyncRoutes from './routes/newsSync.js';
 import messageRoutes from './routes/messages.js';
 import analyticsRoutes from './routes/analytics.js';
 import seoRoutes from './routes/seo.js';
+import Article from './models/Article.js';
+import Category from './models/Category.js';
 
 dotenv.config();
 
@@ -41,8 +43,6 @@ app.use('/api/analytics', analyticsRoutes);
 app.use('/api/seo', seoRoutes);
 
 // Root-level SEO endpoints (Google expects /sitemap.xml at root)
-import Article from './models/Article.js';
-import Category from './models/Category.js';
 const SITE_URL = process.env.SITE_URL || 'https://jgnews.live';
 const xmlEsc = (s) => String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
 
