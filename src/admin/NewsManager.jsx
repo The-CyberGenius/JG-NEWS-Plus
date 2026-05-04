@@ -13,6 +13,8 @@ export default function NewsManager() {
     const [filterCat, setFilterCat] = useState('');
     const [sortDir, setSortDir] = useState('desc'); // 'desc' = newest first
     const [searchQ, setSearchQ] = useState('');
+    const [dateFrom, setDateFrom] = useState('');
+    const [dateTo, setDateTo] = useState('');
     const navigate = useNavigate();
 
     const filtered = useMemo(() => {
@@ -24,13 +26,22 @@ export default function NewsManager() {
                 (a.location || '').toLowerCase().includes(q)
             );
         }
+        if (dateFrom) {
+            const fromTs = new Date(dateFrom).getTime();
+            list = list.filter(a => new Date(a.date || a.createdAt || 0).getTime() >= fromTs);
+        }
+        if (dateTo) {
+            // Include the entire "to" day (until 23:59:59)
+            const toTs = new Date(dateTo).getTime() + 24 * 60 * 60 * 1000 - 1;
+            list = list.filter(a => new Date(a.date || a.createdAt || 0).getTime() <= toTs);
+        }
         list.sort((a, b) => {
             const da = new Date(a.date || a.createdAt || 0).getTime();
             const db = new Date(b.date || b.createdAt || 0).getTime();
             return sortDir === 'desc' ? db - da : da - db;
         });
         return list;
-    }, [articles, filterCat, sortDir, searchQ]);
+    }, [articles, filterCat, sortDir, searchQ, dateFrom, dateTo]);
 
     const totalPages = Math.ceil(filtered.length / PER_PAGE);
     const paginated = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE);
@@ -105,6 +116,41 @@ export default function NewsManager() {
                 >
                     📅 {sortDir === 'desc' ? 'नई पहले ↓' : 'पुरानी पहले ↑'}
                 </button>
+            </div>
+
+            {/* Date Range Filter */}
+            <div style={{ marginBottom: '12px', display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center', background: 'white', padding: '10px 14px', borderRadius: '10px', boxShadow: '0 1px 6px rgba(0,0,0,0.04)' }}>
+                <span style={{ fontWeight: 700, fontSize: '0.82rem', color: 'var(--navy)' }}>📅 तारीख:</span>
+                <label style={{ fontSize: '0.78rem', color: 'var(--gray-600)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    From:
+                    <input
+                        type="date"
+                        value={dateFrom}
+                        onChange={e => { setDateFrom(e.target.value); setPage(1); }}
+                        style={{ padding: '5px 8px', borderRadius: '6px', border: '1px solid var(--gray-200)', fontSize: '0.82rem' }}
+                    />
+                </label>
+                <label style={{ fontSize: '0.78rem', color: 'var(--gray-600)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    To:
+                    <input
+                        type="date"
+                        value={dateTo}
+                        onChange={e => { setDateTo(e.target.value); setPage(1); }}
+                        style={{ padding: '5px 8px', borderRadius: '6px', border: '1px solid var(--gray-200)', fontSize: '0.82rem' }}
+                    />
+                </label>
+                {(dateFrom || dateTo) && (
+                    <button
+                        onClick={() => { setDateFrom(''); setDateTo(''); setPage(1); }}
+                        style={{ background: 'var(--gray-100)', color: 'var(--navy)', border: 'none', padding: '4px 10px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 700 }}
+                        title="Clear date filter"
+                    >
+                        ✕ Clear
+                    </button>
+                )}
+                <span style={{ marginLeft: 'auto', fontSize: '0.78rem', color: 'var(--gray-500)' }}>
+                    Showing {filtered.length} of {articles.length}
+                </span>
             </div>
 
             {/* Filter */}
