@@ -308,10 +308,23 @@ export default function ArticleForm() {
                                     <option value="">-- श्रेणी --</option>
                                     {categories.map(c => <option key={c} value={c}>{c}</option>)}
                                 </select>
-                                <select className="form-control" value={form.location} onChange={e => set('location', e.target.value)} required>
-                                    <option value="">-- शहर --</option>
-                                    {RAJASTHAN_DISTRICTS.map(c => <option key={c} value={c}>{c}</option>)}
-                                </select>
+                                <div>
+                                    <input
+                                        className="form-control"
+                                        list="rajasthan-districts-list"
+                                        value={form.location}
+                                        onChange={e => set('location', e.target.value)}
+                                        placeholder="शहर चुनें या टाइप करें..."
+                                        required
+                                        autoComplete="off"
+                                    />
+                                    <datalist id="rajasthan-districts-list">
+                                        {RAJASTHAN_DISTRICTS.map(c => <option key={c} value={c} />)}
+                                    </datalist>
+                                    <p style={{ fontSize: '0.7rem', color: 'var(--gray-500)', marginTop: '4px' }}>
+                                        💡 list mein से चुनें या अपना custom location टाइप करें
+                                    </p>
+                                </div>
                                 <input className="form-control" value={form.author} onChange={e => set('author', e.target.value)} placeholder="लेखक का नाम" />
                                 <div>
                                     <label style={{ fontSize: '0.78rem', color: 'var(--gray-600)', fontWeight: 700, marginBottom: '4px', display: 'block' }}>

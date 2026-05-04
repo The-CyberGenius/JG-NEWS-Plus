@@ -178,7 +178,7 @@ export default function ArticlePage() {
                             cursor: 'zoom-in',
                             borderRadius: '14px',
                             overflow: 'hidden',
-                            marginBottom: '24px',
+                            marginBottom: article.videoUrl ? '12px' : '24px',
                             boxShadow: '0 4px 24px rgba(10,22,40,0.18)',
                             border: '3px solid rgba(0,188,212,0.20)',
                             position: 'relative',
@@ -210,6 +210,52 @@ export default function ArticlePage() {
                             </span>
                         </div>
                     </div>
+
+                    {/* Attached Video Link Button (right below hero) */}
+                    {article.videoUrl && (
+                        <a
+                            href={article.videoUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '12px',
+                                padding: '12px 16px',
+                                background: 'linear-gradient(135deg, #FF0000, #c00000)',
+                                color: 'white',
+                                borderRadius: '12px',
+                                textDecoration: 'none',
+                                fontWeight: 700,
+                                fontSize: '0.92rem',
+                                marginBottom: '24px',
+                                boxShadow: '0 4px 16px rgba(255,0,0,0.25)',
+                                transition: 'transform 0.2s, box-shadow 0.2s',
+                            }}
+                            onMouseEnter={e => {
+                                e.currentTarget.style.transform = 'translateY(-2px)';
+                                e.currentTarget.style.boxShadow = '0 8px 24px rgba(255,0,0,0.35)';
+                            }}
+                            onMouseLeave={e => {
+                                e.currentTarget.style.transform = 'translateY(0)';
+                                e.currentTarget.style.boxShadow = '0 4px 16px rgba(255,0,0,0.25)';
+                            }}
+                        >
+                            <span style={{
+                                width: '36px', height: '36px', borderRadius: '50%',
+                                background: 'rgba(255,255,255,0.22)', display: 'flex',
+                                alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                                fontSize: '1rem',
+                            }}>▶</span>
+                            <span style={{ flex: 1, minWidth: 0 }}>
+                                <div style={{ fontWeight: 800 }}>YouTube पर वीडियो देखें</div>
+                                <div style={{ fontSize: '0.72rem', opacity: 0.85, fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                    {article.videoUrl.replace(/^https?:\/\/(www\.)?/, '')}
+                                </div>
+                            </span>
+                            <span style={{ fontSize: '1rem', flexShrink: 0 }}>↗</span>
+                        </a>
+                    )}
 
                     {/* Video Embed */}
                     {article.videoUrl && (
