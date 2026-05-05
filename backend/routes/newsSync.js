@@ -106,8 +106,31 @@ router.get('/sync', async (req, res) => {
             return res.status(404).json({ message: 'Koi khabar nahi mili' });
         }
 
-        allItems.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
-        res.json(allItems.slice(0, 30));
+        // ─── Filter: only long-form articles ─────────────────────────────
+        // RSS often contains:
+        //   - Just the title (no description) → skip
+        //   - 1-2 line snippets ("Read more...") → skip
+        //   - Real articles with 200+ char content → KEEP
+        const MIN_CONTENT_LENGTH = 200; // characters of plain text
+        const wordCount = (s) => s.split(/\s+/).filter(Boolean).length;
+
+        const longFormItems = allItems.filter(item => {
+            const text = (item.fullContent || '').trim();
+            if (!text || text === item.title) return false; // no real content
+            if (text.length < MIN_CONTENT_LENGTH) return false; // too short
+            if (wordCount(text) < 30) return false; // less than 30 words = snippet
+            // Skip common "click here / read more" placeholder content
+            const lower = text.toLowerCase();
+            if (lower.includes('click here to read') && text.length < 300) return false;
+            return true;
+        });
+
+        // If filter removed too much, fall back to original list with warning
+        // so admin still gets results. But sort longform first.
+        const finalList = longFormItems.length >= 5 ? longFormItems : allItems;
+
+        finalList.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
+        res.json(finalList.slice(0, 30));
     } catch (error) {
         console.error('RSS Sync Error:', error);
         res.status(500).json({ message: 'News fetch karne mein problem aayi' });
