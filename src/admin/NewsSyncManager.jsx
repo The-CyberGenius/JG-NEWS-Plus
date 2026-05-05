@@ -22,6 +22,59 @@ const detectLocation = (title, content) => {
     return 'अन्य';
 };
 
+// Strip duplicate hero image from content + remove leading empty paragraphs.
+// If `heroUrl` is provided, all <img> tags pointing to that URL (or visually
+// the first image) are removed so they don't render twice next to the hero.
+const cleanContentHTML = (html, heroUrl) => {
+    if (!html) return '';
+    let cleaned = String(html);
+
+    // Remove the FIRST <img> if it matches the hero URL (or any near-duplicate)
+    // Also drop any <img> whose src equals heroUrl exactly.
+    if (heroUrl) {
+        const escaped = heroUrl.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        // Remove img tags matching hero URL
+        cleaned = cleaned.replace(new RegExp(`<img[^>]*src=["']${escaped}["'][^>]*>`, 'gi'), '');
+        // Remove figure wrappers if they became empty
+        cleaned = cleaned.replace(/<figure[^>]*>\s*<\/figure>/gi, '');
+    }
+
+    // Always strip the FIRST <img> if it's the same image source as hero (URL-based)
+    // OR if first child is an image (likely duplicate), so admins don't see double pics
+    const firstImgMatch = cleaned.match(/^\s*(<p[^>]*>\s*)?<img[^>]*>(\s*<\/p>)?/i);
+    if (firstImgMatch) {
+        cleaned = cleaned.replace(firstImgMatch[0], '');
+    }
+
+    // Remove empty leading <p>s
+    cleaned = cleaned.replace(/^(\s*<p[^>]*>\s*<\/p>)+/gi, '').trim();
+
+    return cleaned;
+};
+
+// Strip ALL HTML tags & decode common entities for a clean text excerpt
+const stripHTML = (html) => {
+    if (!html) return '';
+    return String(html)
+        .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
+        .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
+        .replace(/<[^>]+>/g, ' ')
+        .replace(/&nbsp;/g, ' ')
+        .replace(/&amp;/g, '&')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'")
+        .replace(/\s+/g, ' ')
+        .trim();
+};
+
+const makeExcerpt = (html, max = 180) => {
+    const txt = stripHTML(html);
+    if (txt.length <= max) return txt;
+    return txt.slice(0, max).replace(/\s+\S*$/, '') + '...';
+};
+
 export default function NewsSyncManager() {
     const { addArticle, categories } = useNews();
     const [fetchedNews, setFetchedNews] = useState([]);
@@ -105,13 +158,15 @@ export default function NewsSyncManager() {
         if (!previewItem) return;
         setPosting(true);
         try {
+            const heroImg = previewItem.image || getRandomFallbackImage();
+            const cleanedContent = cleanContentHTML(previewItem.fullContent, heroImg);
             const data = {
                 title: previewItem.title,
-                excerpt: previewItem.fullContent.slice(0, 150) + '...',
-                content: `${previewItem.fullContent}<p><br/>Source: <a href="${previewItem.link}" target="_blank">${previewItem.source}</a></p>`,
+                excerpt: makeExcerpt(previewItem.fullContent, 180),
+                content: `${cleanedContent}<p><br/>Source: <a href="${previewItem.link}" target="_blank">${previewItem.source}</a></p>`,
                 category: previewItem.assignedCat,
                 location: previewItem.location,
-                image: previewItem.image || getRandomFallbackImage(),
+                image: heroImg,
                 author: 'AI Sync',
                 isBreaking: false,
                 isFeatured: false,
@@ -142,13 +197,15 @@ export default function NewsSyncManager() {
                 const location = activeTab === 'rajasthan' ? detectLocation(item.title, item.fullContent) : 'अन्य';
                 const assignedCat = activeTab === 'rajasthan' ? 'राजस्थान' : categories[0] || 'अन्य';
 
+                const heroImg = item.image || getRandomFallbackImage();
+                const cleanedContent = cleanContentHTML(item.fullContent, heroImg);
                 const data = {
                     title: item.title,
-                    excerpt: item.fullContent.slice(0, 150) + '...',
-                    content: `${item.fullContent}<p><br/>Source: <a href="${item.link}" target="_blank">${item.source}</a></p>`,
+                    excerpt: makeExcerpt(item.fullContent, 180),
+                    content: `${cleanedContent}<p><br/>Source: <a href="${item.link}" target="_blank">${item.source}</a></p>`,
                     category: assignedCat,
                     location: location,
-                    image: item.image || getRandomFallbackImage(),
+                    image: heroImg,
                     author: 'AI Sync',
                     isBreaking: false,
                     isFeatured: false,
@@ -302,7 +359,7 @@ export default function NewsSyncManager() {
                                     <span style={{ fontSize: '0.8rem', color: 'var(--gray-500)', fontWeight: 600, display: 'flex', alignItems: 'center' }}>{timeAgo(readingItem.pubDate)}</span>
                                 </div>
 
-                                <div className="article-content" style={{ fontSize: '1.05rem', color: 'var(--gray-800)', lineHeight: 1.8 }} dangerouslySetInnerHTML={{ __html: readingItem.fullContent }} />
+                                <div className="article-content" style={{ fontSize: '1.05rem', color: 'var(--gray-800)', lineHeight: 1.8 }} dangerouslySetInnerHTML={{ __html: cleanContentHTML(readingItem.fullContent, readingItem.image) }} />
                             </div>
 
                             <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', borderTop: '1px solid var(--gray-100)', paddingTop: '20px', marginTop: '20px' }}>
@@ -331,9 +388,14 @@ export default function NewsSyncManager() {
                                 <img src={previewItem.image || getRandomFallbackImage()} alt="" style={{ width: '100%', maxHeight: '250px', objectFit: 'cover', borderRadius: '16px', marginBottom: '20px' }} />
                                 <h3 style={{ fontWeight: 900, color: 'var(--navy)', marginBottom: '15px', lineHeight: 1.4 }}>{previewItem.title}</h3>
 
-                                <div style={{ background: 'var(--gray-50)', padding: '15px', borderRadius: '12px', marginBottom: '20px', maxHeight: '200px', overflowY: 'auto', fontSize: '0.9rem', color: 'var(--gray-700)', lineHeight: 1.6 }}>
-                                    <strong>Description:</strong><br />
-                                    <div dangerouslySetInnerHTML={{ __html: previewItem.fullContent }} />
+                                <div style={{ background: 'var(--gray-50)', padding: '15px', borderRadius: '12px', marginBottom: '12px', fontSize: '0.85rem', color: 'var(--gray-700)', lineHeight: 1.6 }}>
+                                    <strong>📝 सारांश (Excerpt):</strong>
+                                    <p style={{ marginTop: '6px' }}>{makeExcerpt(previewItem.fullContent, 220)}</p>
+                                </div>
+
+                                <div style={{ background: 'var(--gray-50)', padding: '15px', borderRadius: '12px', marginBottom: '20px', maxHeight: '260px', overflowY: 'auto', fontSize: '0.9rem', color: 'var(--gray-700)', lineHeight: 1.6 }}>
+                                    <strong>📄 Full Content Preview:</strong>
+                                    <div style={{ marginTop: '8px' }} dangerouslySetInnerHTML={{ __html: cleanContentHTML(previewItem.fullContent, previewItem.image) }} />
                                 </div>
 
                                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '20px' }}>
