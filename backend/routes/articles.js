@@ -6,7 +6,10 @@ const router = express.Router();
 // Get articles with optional pagination & field projection
 router.get('/', async (req, res) => {
     try {
-        const { page, limit, fields } = req.query;
+        const { page, limit, fields, includeHidden } = req.query;
+
+        // Public site: filter out hidden. Admin passes ?includeHidden=true to see all.
+        const filter = includeHidden === 'true' ? {} : { isHidden: { $ne: true } };
 
         // If page/limit provided, paginate; otherwise return all (backward compat)
         if (page && limit) {
@@ -16,12 +19,12 @@ router.get('/', async (req, res) => {
 
             // Lightweight projection for list views (exclude heavy content field)
             const projection = fields === 'summary'
-                ? { title: 1, excerpt: 1, category: 1, location: 1, image: 1, videoUrl: 1, isBreaking: 1, isFeatured: 1, author: 1, tags: 1, date: 1, createdAt: 1 }
+                ? { title: 1, excerpt: 1, category: 1, location: 1, image: 1, videoUrl: 1, isBreaking: 1, isFeatured: 1, author: 1, tags: 1, date: 1, createdAt: 1, isHidden: 1 }
                 : {};
 
             const [articles, total] = await Promise.all([
-                Article.find({}, projection).sort({ date: -1 }).skip(skip).limit(l).lean(),
-                Article.countDocuments(),
+                Article.find(filter, projection).sort({ date: -1 }).skip(skip).limit(l).lean(),
+                Article.countDocuments(filter),
             ]);
 
             res.set('Cache-Control', 'public, max-age=30, stale-while-revalidate=60');
@@ -29,7 +32,7 @@ router.get('/', async (req, res) => {
         }
 
         // Default: return all (for admin panel backward compatibility)
-        const articles = await Article.find().sort({ date: -1 }).lean();
+        const articles = await Article.find(filter).sort({ date: -1 }).lean();
         res.set('Cache-Control', 'public, max-age=30, stale-while-revalidate=60');
         res.json(articles);
     } catch (error) {
@@ -67,6 +70,49 @@ router.put('/:id', async (req, res) => {
         res.json(updatedArticle);
     } catch (error) {
         res.status(400).json({ message: error.message });
+    }
+});
+
+// Bulk operations: delete / hide / unhide / breaking / featured
+// POST /api/articles/bulk { ids: [...], action: 'delete' | 'hide' | 'unhide' | 'breaking-on' | 'breaking-off' | 'featured-on' | 'featured-off' }
+router.post('/bulk', async (req, res) => {
+    try {
+        const { ids, action } = req.body;
+        if (!Array.isArray(ids) || ids.length === 0) {
+            return res.status(400).json({ message: 'ids array required' });
+        }
+        if (ids.length > 200) {
+            return res.status(400).json({ message: 'Max 200 ids per call' });
+        }
+
+        let result;
+        switch (action) {
+            case 'delete':
+                result = await Article.deleteMany({ _id: { $in: ids } });
+                return res.json({ ok: true, count: result.deletedCount });
+            case 'hide':
+                result = await Article.updateMany({ _id: { $in: ids } }, { $set: { isHidden: true } });
+                return res.json({ ok: true, count: result.modifiedCount });
+            case 'unhide':
+                result = await Article.updateMany({ _id: { $in: ids } }, { $set: { isHidden: false } });
+                return res.json({ ok: true, count: result.modifiedCount });
+            case 'breaking-on':
+                result = await Article.updateMany({ _id: { $in: ids } }, { $set: { isBreaking: true } });
+                return res.json({ ok: true, count: result.modifiedCount });
+            case 'breaking-off':
+                result = await Article.updateMany({ _id: { $in: ids } }, { $set: { isBreaking: false } });
+                return res.json({ ok: true, count: result.modifiedCount });
+            case 'featured-on':
+                result = await Article.updateMany({ _id: { $in: ids } }, { $set: { isFeatured: true } });
+                return res.json({ ok: true, count: result.modifiedCount });
+            case 'featured-off':
+                result = await Article.updateMany({ _id: { $in: ids } }, { $set: { isFeatured: false } });
+                return res.json({ ok: true, count: result.modifiedCount });
+            default:
+                return res.status(400).json({ message: 'Invalid action' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: error.message });
     }
 });
 
@@ -143,10 +189,9 @@ router.get('/trending/now', async (req, res) => {
             hourKeys.push(d.toISOString().slice(0, 13));
         }
 
-        // Pull articles with any view in last N hours
-        // We do a simple in-memory rank since the dataset is small
+        // Pull articles with any view in last N hours (exclude hidden)
         const candidates = await Article.find(
-            { views: { $gt: 0 } },
+            { views: { $gt: 0 }, isHidden: { $ne: true } },
             { title: 1, image: 1, category: 1, location: 1, date: 1, views: 1, viewsByHour: 1 }
         ).sort({ views: -1 }).limit(200).lean();
 

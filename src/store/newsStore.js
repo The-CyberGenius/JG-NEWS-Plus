@@ -17,12 +17,13 @@ const KEYS = {
 };
 
 // ─── Articles CRUD ────────────────────────────────────────────────────────────
-export const getArticles = async ({ page, limit, fields } = {}) => {
+export const getArticles = async ({ page, limit, fields, includeHidden } = {}) => {
     try {
         const params = {};
         if (page) params.page = page;
         if (limit) params.limit = limit;
         if (fields) params.fields = fields;
+        if (includeHidden) params.includeHidden = 'true';
 
         const response = await api.get('/articles', { params });
 
@@ -69,6 +70,17 @@ export const deleteArticle = async (id) => {
         await api.delete(`/articles/${id}`);
     } catch (error) {
         console.error("Error deleting article", error);
+        throw error;
+    }
+};
+
+// Bulk: action = 'delete' | 'hide' | 'unhide' | 'breaking-on' | 'breaking-off' | 'featured-on' | 'featured-off'
+export const bulkArticleAction = async (ids, action) => {
+    try {
+        const res = await api.post('/articles/bulk', { ids, action });
+        return res.data;
+    } catch (error) {
+        console.error("Error bulk action", error);
         throw error;
     }
 };

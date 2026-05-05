@@ -10,6 +10,7 @@ const articleSchema = new mongoose.Schema({
     videoUrl: { type: String, default: '' },
     isBreaking: { type: Boolean, default: false },
     isFeatured: { type: Boolean, default: false },
+    isHidden: { type: Boolean, default: false }, // hidden articles don't appear on public site
     author: { type: String, required: true },
     tags: [{ type: String }],
     date: { type: Date, default: Date.now },
