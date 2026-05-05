@@ -1,0 +1,2676 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>JG News Plus — Project Quotation</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 18mm 16mm;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      color: #1e293b;
+      line-height: 1.6;
+      font-size: 11pt;
+      background-color: #f1f5f9;
+    }
+
+    /* ─────────── Professional Corporate Palette ─────────── */
+    :root {
+      --navy: #0f172a;
+      --navy-mid: #334155;
+      --teal: #1d4ed8;
+      --teal-dark: #1e40af;
+      --saffron: #ca8a04;
+      --red: #b91c1c;
+      --gray-100: #f8fafc;
+      --gray-200: #e2e8f0;
+      --gray-500: #64748b;
+      --gray-700: #334155;
+      --gray-900: #0f172a;
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.1);
+      --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.03);
+    }
+
+    /* ─────────── Page container for print/web ─────────── */
+    .page-container {
+      background: white;
+      max-width: 210mm;
+      margin: 40px auto;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+    }
+
+    /* ─────────── Page break utilities ─────────── */
+    .page {
+      page-break-after: always;
+    }
+
+    .no-break {
+      page-break-inside: avoid;
+    }
+
+    h1,
+    h2,
+    h3 {
+      page-break-after: avoid;
+    }
+
+    /* ─────────── Document Wrapper ─────────── */
+    .doc-wrapper {
+      padding: 18mm 16mm;
+    }
+
+    /* ─────────── Print CSS ─────────── */
+    @media print {
+      .no-print {
+        display: none !important;
+      }
+
+      .page-container {
+        margin: 0;
+        box-shadow: none;
+        max-width: none;
+      }
+
+      body {
+        background: white;
+      }
+    }
+
+    /* ─────────── Download Button ─────────── */
+    .download-btn {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background: var(--navy);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      border-radius: 8px;
+      font-size: 11pt;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.3);
+      transition: transform 0.2s, background 0.2s;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .download-btn:hover {
+      background: var(--teal);
+      transform: translateY(-3px);
+    }
+
+    /* ─────────── Cover Page (Light/Clear UI) ─────────── */
+    .cover {
+      height: 100vh;
+      background: #ffffff;
+      color: var(--navy);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border-radius: 0;
+      page-break-after: always;
+      padding: 60px 50px;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--gray-200);
+    }
+
+    .cover-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      z-index: 1;
+    }
+
+    .brand {
+      font-size: 15pt;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      border: 2px solid var(--navy);
+      padding: 12px 20px;
+      border-radius: 100px;
+      background: transparent;
+    }
+
+    .brand-accent {
+      color: var(--teal);
+    }
+
+    .brand-orange {
+      color: var(--saffron);
+    }
+
+    .doc-tag {
+      background: var(--gray-100);
+      color: var(--navy);
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 9pt;
+      letter-spacing: 2px;
+      font-weight: 800;
+      border: 1px solid var(--gray-200);
+    }
+
+    .cover-mid {
+      z-index: 1;
+    }
+
+    .cover-mid h1 {
+      font-size: 56pt;
+      font-weight: 900;
+      line-height: 1.05;
+      margin-bottom: 24px;
+      letter-spacing: -1.5px;
+      color: var(--navy);
+    }
+
+    .cover-mid h1 .accent {
+      color: var(--teal);
+    }
+
+    .cover-mid h1 .accent2 {
+      color: var(--saffron);
+    }
+
+    .cover-mid .subtitle {
+      font-size: 14pt;
+      color: var(--gray-700);
+      max-width: 550px;
+      line-height: 1.6;
+      margin-bottom: 32px;
+      font-weight: 500;
+    }
+
+    .cover-bottom {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      border-top: 2px solid var(--gray-200);
+      padding-top: 24px;
+      z-index: 1;
+    }
+
+    .cover-bottom h4 {
+      font-size: 9pt;
+      letter-spacing: 2px;
+      color: var(--gray-500);
+      margin-bottom: 8px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .cover-bottom p {
+      font-size: 11pt;
+      line-height: 1.6;
+      color: var(--navy);
+    }
+
+    .cover-bottom strong {
+      color: var(--teal);
+    }
+
+    /* ─────────── Section heading ─────────── */
+    h1.section {
+      font-size: 24pt;
+      color: var(--navy);
+      margin: 32px 0 8px;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+    }
+
+    h1.section .num {
+      background: var(--navy);
+      color: white;
+      font-size: 14pt;
+      padding: 6px 14px;
+      border-radius: 8px;
+      margin-right: 14px;
+      font-weight: 800;
+      vertical-align: middle;
+    }
+
+    .section-bar {
+      width: 70px;
+      height: 4px;
+      background: var(--teal);
+      border-radius: 2px;
+      margin-bottom: 22px;
+    }
+
+    h2 {
+      font-size: 15pt;
+      color: var(--navy);
+      margin: 26px 0 12px;
+      font-weight: 800;
+    }
+
+    h3 {
+      font-size: 12.5pt;
+      color: var(--navy-mid);
+      margin: 18px 0 8px;
+      font-weight: 700;
+    }
+
+    p {
+      margin-bottom: 12px;
+      color: var(--gray-700);
+      text-align: justify;
+    }
+
+    ul,
+    ol {
+      padding-left: 24px;
+      margin-bottom: 14px;
+    }
+
+    li {
+      margin-bottom: 6px;
+      color: var(--gray-700);
+    }
+
+    /* ─────────── Tables ─────────── */
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin: 18px 0;
+      font-size: 10.5pt;
+      border: 1px solid var(--gray-200);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+
+    th {
+      background: var(--navy);
+      color: white;
+      padding: 12px 14px;
+      text-align: left;
+      font-weight: 700;
+      font-size: 10pt;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    td {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--gray-200);
+      vertical-align: top;
+      background: white;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:nth-child(even) td {
+      background: var(--gray-100);
+    }
+
+    td.amount {
+      text-align: right;
+      font-weight: 700;
+      color: var(--navy);
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+
+    tfoot td {
+      background: #e2e8f0;
+      font-weight: 800;
+      color: var(--navy);
+      font-size: 11.5pt;
+      padding: 14px;
+      border-top: 2px solid var(--navy);
+      border-bottom: none;
+    }
+
+    /* ─────────── Cards ─────────── */
+    .card {
+      background: white;
+      border: 1px solid var(--gray-200);
+      border-radius: 8px;
+      padding: 18px 20px;
+      margin-bottom: 14px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .card-accent {
+      border-left: 4px solid var(--teal);
+    }
+
+    .card-orange {
+      border-left: 4px solid var(--saffron);
+    }
+
+    .card-red {
+      border-left: 4px solid var(--red);
+    }
+
+    .card h3 {
+      margin-top: 0;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 8.5pt;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      margin-right: 6px;
+    }
+
+    .badge-teal {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    .badge-orange {
+      background: #fef3c7;
+      color: #b45309;
+    }
+
+    .badge-red {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .badge-navy {
+      background: #e2e8f0;
+      color: #1e293b;
+    }
+
+    .badge-green {
+      background: #dcfce7;
+      color: #166534;
+      border: 1px solid #bbf7d0;
+    }
+
+    /* ─────────── Tech stack list ─────────── */
+    .tech-stack {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin: 16px 0;
+    }
+
+    .tech-item {
+      background: var(--gray-100);
+      border: 1px solid var(--gray-200);
+      padding: 14px;
+      border-radius: 6px;
+    }
+
+    .tech-item .name {
+      font-weight: 800;
+      color: var(--navy);
+      font-size: 10.5pt;
+    }
+
+    .tech-item .desc {
+      font-size: 9pt;
+      color: var(--gray-500);
+      margin-top: 4px;
+    }
+
+    /* ─────────── Phase / Timeline ─────────── */
+    .phase {
+      border-left: 4px solid var(--teal);
+      padding: 12px 18px;
+      margin-bottom: 16px;
+      background: linear-gradient(to right, #f8fafc 0%, transparent 100%);
+      border-radius: 0 6px 6px 0;
+    }
+
+    .phase .phase-meta {
+      font-size: 9.5pt;
+      color: var(--gray-500);
+      font-weight: 800;
+      margin-bottom: 6px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .phase h3 {
+      margin: 0 0 6px;
+    }
+
+    /* ─────────── Stats row ─────────── */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin: 22px 0;
+    }
+
+    .stat {
+      background: white;
+      border: 1px solid var(--gray-200);
+      padding: 18px;
+      border-radius: 8px;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+      border-bottom: 3px solid var(--teal);
+    }
+
+    .stat .num {
+      font-size: 26pt;
+      font-weight: 900;
+      color: var(--navy);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .stat .label {
+      font-size: 8.5pt;
+      color: var(--gray-500);
+      letter-spacing: 0.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    /* ─────────── Cost summary ─────────── */
+    .summary-box {
+      background: var(--navy);
+      color: white;
+      padding: 28px;
+      border-radius: 8px;
+      margin: 24px 0;
+      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.15);
+      border-top: 4px solid var(--teal);
+    }
+
+    .summary-box .total-label {
+      font-size: 10.5pt;
+      opacity: 0.8;
+      letter-spacing: 2px;
+      font-weight: 600;
+    }
+
+    .summary-box .total-value {
+      font-size: 40pt;
+      font-weight: 900;
+      color: white;
+      line-height: 1.1;
+      margin: 6px 0;
+    }
+
+    .summary-box .total-words {
+      font-size: 11pt;
+      opacity: 0.9;
+      font-style: italic;
+    }
+
+    /* ─────────── Footer ─────────── */
+    .signature {
+      margin-top: 36px;
+      padding-top: 22px;
+      border-top: 1px solid var(--gray-200);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+    }
+
+    .sign-block .label {
+      font-size: 9.5pt;
+      color: var(--gray-500);
+      letter-spacing: 1.5px;
+      font-weight: 600;
+    }
+
+    .sign-block .name {
+      font-weight: 800;
+      color: var(--navy);
+      font-size: 14pt;
+      margin-top: 22px;
+    }
+
+    .sign-block .title {
+      font-size: 10pt;
+      color: var(--gray-500);
+      margin-top: 4px;
+    }
+
+    /* ─────────── Inline chart bars ─────────── */
+    .chart-row {
+      margin: 10px 0;
+    }
+
+    .chart-row .label {
+      font-size: 10pt;
+      font-weight: 600;
+      color: var(--navy);
+      margin-bottom: 5px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .chart-bar {
+      height: 12px;
+      background: var(--gray-200);
+      border-radius: 6px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .chart-bar .fill {
+      height: 100%;
+      background: var(--teal);
+      border-radius: 6px;
+    }
+
+    .chart-bar .fill-orange {
+      background: var(--saffron);
+    }
+
+    .chart-bar .fill-red {
+      background: var(--gray-500);
+    }
+
+    /* ─────────── Architecture diagram ─────────── */
+    .arch {
+      background: white;
+      border: 1px solid var(--gray-200);
+      border-radius: 8px;
+      padding: 24px;
+      text-align: center;
+      margin: 18px 0;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .arch-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin: 12px 0;
+    }
+
+    .arch-node {
+      background: white;
+      border: 2px solid var(--teal);
+      padding: 12px 18px;
+      border-radius: 6px;
+      font-weight: 700;
+      color: var(--navy);
+      font-size: 10.5pt;
+      min-width: 130px;
+    }
+
+    .arch-node.client {
+      border-color: var(--saffron);
+    }
+
+    .arch-node.db {
+      border-color: var(--navy);
+      background: var(--navy);
+      color: white;
+    }
+
+    .arch-node.svc {
+      border-color: var(--gray-500);
+    }
+
+    .arch-arrow {
+      color: var(--gray-500);
+      font-size: 15pt;
+      font-weight: 800;
+    }
+
+    .quote {
+      background: var(--gray-100);
+      border-left: 4px solid var(--gray-500);
+      padding: 16px 20px;
+      margin: 18px 0;
+      font-style: italic;
+      color: var(--gray-700);
+      font-size: 10.5pt;
+    }
+
+    /* ─────────── TOC ─────────── */
+    .toc-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--gray-200);
+      font-size: 11.5pt;
+    }
+
+    .toc-item .num {
+      font-weight: 800;
+      color: var(--teal);
+      width: 36px;
+    }
+
+    .toc-item .title {
+      flex: 1;
+      color: var(--navy);
+      font-weight: 600;
+    }
+
+    .toc-item .page-no {
+      color: var(--gray-500);
+      font-weight: 700;
+    }
+
+    .header-strip {
+      border-bottom: 2px solid var(--navy);
+      padding-bottom: 10px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+
+    .header-strip .doc-name {
+      font-size: 10.5pt;
+      color: var(--gray-500);
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    .header-strip .pg {
+      font-size: 9.5pt;
+      color: var(--navy);
+      font-weight: 800;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Download PDF Button (Hidden on Print) -->
+  <button class="download-btn no-print" onclick="window.print()">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+      stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+      <polyline points="7 10 12 15 17 10"></polyline>
+      <line x1="12" y1="15" x2="12" y2="3"></line>
+    </svg>
+    Save as PDF
+  </button>
+
+  <div class="page-container">
+
+    <!-- ═══════════════════════════════════════════════════════════
+     PAGE 1 — COVER
+═══════════════════════════════════════════════════════════ -->
+    <div class="cover">
+      <div class="cover-top">
+        <div class="brand">
+          <span class="brand-accent">JG</span> NEWS <span class="brand-orange">Plus</span>
+        </div>
+        <div class="doc-tag">PROJECT QUOTATION</div>
+      </div>
+
+      <div class="cover-mid">
+        <h1>
+          Project<br />
+          <span class="accent">Development</span><br />
+          <span class="accent2">Quotation</span>
+        </h1>
+        <p class="subtitle">
+          A comprehensive proposal covering the design, development, integration,
+          and deployment of <strong>JG News Plus</strong> — a high-performance, full-stack
+          news portal &amp; digital E-Newspaper platform built for Rajasthan.
+        </p>
+      </div>
+
+      <div class="cover-bottom">
+        <div>
+          <h4>PREPARED FOR</h4>
+          <p>
+            <strong>JG News Plus</strong><br />
+            Rajasthan, India<br />
+            <span style="opacity: 0.7;">jgnews.live</span>
+          </p>
+        </div>
+        <div>
+          <h4>PREPARED BY</h4>
+          <p>
+            <strong>Shiva Prajapat</strong> &nbsp;·&nbsp; Lead Developer<br />
+            Genius Developers<br />
+            <span style="opacity: 0.85;">geniusdevelopers.space</span><br />
+            +91 8955256878 &nbsp;·&nbsp; sshivaprajapat@gmail.com
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="doc-wrapper">
+      <!-- ═══════════════════════════════════════════════════════════
+     PAGE 2 — TABLE OF CONTENTS
+═══════════════════════════════════════════════════════════ -->
+      <div class="header-strip">
+        <span class="doc-name">JG NEWS PLUS · PROJECT QUOTATION</span>
+        <span class="pg">PAGE 02</span>
+      </div>
+
+      <h1 class="section"><span class="num">01</span>Table of Contents</h1>
+      <div class="section-bar"></div>
+
+      <div style="margin-top: 28px;">
+        <div class="toc-item"><span class="num">01.</span><span class="title">Executive Summary</span><span
+            class="page-no">03</span></div>
+        <div class="toc-item"><span class="num">02.</span><span class="title">Project Overview &amp; Scope</span><span
+            class="page-no">04</span></div>
+        <div class="toc-item"><span class="num">03.</span><span class="title">Development Timeline (2
+            Months)</span><span class="page-no">05</span></div>
+        <div class="toc-item"><span class="num">04.</span><span class="title">Technology Stack &amp;
+            Architecture</span><span class="page-no">07</span></div>
+        <div class="toc-item"><span class="num">05.</span><span class="title">System Architecture Diagram</span><span
+            class="page-no">08</span></div>
+        <div class="toc-item"><span class="num">06.</span><span class="title">Detailed Feature Breakdown</span><span
+            class="page-no">09</span></div>
+        <div class="toc-item"><span class="num">07.</span><span class="title">Admin Panel &amp; CMS
+            Capabilities</span><span class="page-no">11</span></div>
+        <div class="toc-item"><span class="num">08.</span><span class="title">Performance &amp; Optimization
+            Work</span><span class="page-no">12</span></div>
+        <div class="toc-item"><span class="num">09.</span><span class="title">Effort Distribution Chart</span><span
+            class="page-no">13</span></div>
+        <div class="toc-item"><span class="num">10.</span><span class="title">Cost Breakdown &amp; Itemized
+            Quotation</span><span class="page-no">14</span></div>
+        <div class="toc-item"><span class="num">11.</span><span class="title">Payment Schedule &amp; Terms</span><span
+            class="page-no">16</span></div>
+        <div class="toc-item"><span class="num">12.</span><span class="title">Deliverables &amp; Post-Launch
+            Support</span><span class="page-no">17</span></div>
+        <div class="toc-item"><span class="num">13.</span><span class="title">About the Developer</span><span
+            class="page-no">18</span></div>
+        <div class="toc-item"><span class="num">14.</span><span class="title">Acceptance &amp; Sign-Off</span><span
+            class="page-no">19</span></div>
+      </div>
+
+      <div class="quote" style="margin-top: 48px;">
+        "Engineering is the art of making things work — beautifully, reliably, and at scale.
+        This project documents two months of focused craftsmanship in delivering a
+        newsroom-grade publishing system for the Rajasthan media market."
+      </div>
+
+      <div class="page"></div>
+
+      <!-- ═══════════════════════════════════════════════════════════
+     PAGE 3 — EXECUTIVE SUMMARY
+═══════════════════════════════════════════════════════════ -->
+      <div class="header-strip">
+        <span class="doc-name">JG NEWS PLUS · PROJECT QUOTATION</span>
+        <span class="pg">PAGE 03</span>
+      </div>
+
+      <h1 class="section"><span class="num">02</span>Executive Summary</h1>
+      <div class="section-bar"></div>
+
+      <p>
+        <strong>JG News Plus</strong> is a production-ready, full-stack Hindi news portal &amp; digital
+        E-Newspaper platform engineered for the Rajasthan readership. The platform combines a
+        high-performance React frontend with a Node.js / MongoDB backend, integrated AI-powered
+        news syncing, professional admin tooling, and direct cloud media delivery.
+      </p>
+
+      <p>
+        This document details <strong>two full months of dedicated engineering effort</strong>
+        spanning <strong>81 commits</strong>, <strong>500,000+ lines of code touched</strong>, and the integration
+        of <strong>15+ third-party services</strong>. The system is currently live in production at
+        <strong>jgnews.live</strong> serving daily traffic.
+      </p>
+
+      <div class="stats">
+        <div class="stat">
+          <div class="num">2</div>
+          <div class="label">Months of Dev</div>
+        </div>
+        <div class="stat">
+          <div class="num">81</div>
+          <div class="label">Prod Commits</div>
+        </div>
+        <div class="stat">
+          <div class="num">58</div>
+          <div class="label">Source Files</div>
+        </div>
+        <div class="stat">
+          <div class="num">7.5k+</div>
+          <div class="label">Lines of Code</div>
+        </div>
+      </div>
+
+      <h2>Key Project Highlights</h2>
+      <div class="grid-2">
+        <div class="card card-accent">
+          <h3>📰 Full Newsroom CMS</h3>
+          <p>End-to-end article publishing workflow with rich-text editor, media uploads,
+            breaking news flagging, featured slot management, and category/location taxonomies.</p>
+        </div>
+        <div class="card card-orange">
+          <h3>📱 E-Newspaper Reader</h3>
+          <p>In-browser PDF reader with zoom, full-screen, keyboard navigation, and Hindi
+            Devanagari text support. Direct Cloudinary upload for unlimited PDF size.</p>
+        </div>
+        <div class="card card-red">
+          <h3>🤖 AI News Sync (MCP)</h3>
+          <p>Automated Google News &amp; multi-source RSS aggregation with article extraction,
+            Google News URL decoding, and one-click publishing review workflow.</p>
+        </div>
+        <div class="card card-accent">
+          <h3>📺 Live TV + Weather</h3>
+          <p>YouTube Live integration, real-time weather feed for 16 Rajasthan cities via
+            Open-Meteo API, breaking news ticker, and bilingual (Hindi/English) UI.</p>
+        </div>
+      </div>
+
+      <h2>Investment Snapshot</h2>
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 70%;">Component</th>
+            <th class="amount" style="width: 30%;">Estimated Effort</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Frontend Development &amp; UI/UX</td>
+            <td class="amount">~28 days</td>
+          </tr>
+          <tr>
+            <td>Backend / API / Database</td>
+            <td class="amount">~18 days</td>
+          </tr>
+          <tr>
+            <td>Admin Panel &amp; CMS</td>
+            <td class="amount">~10 days</td>
+          </tr>
+          <tr>
+            <td>AI News Sync &amp; Integrations</td>
+            <td class="amount">~7 days</td>
+          </tr>
+          <tr>
+            <td>Performance, Testing &amp; Deployment</td>
+            <td class="amount">~7 days</td>
+          </tr>
+          <tr>
+            <td>Documentation &amp; Handover</td>
+            <td class="amount">~3 days</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td>TOTAL PROJECT EFFORT</td>
+            <td class="amount">~73 days</td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <div class="page"></div>
+
+      <!-- ═══════════════════════════════════════════════════════════
+     PAGE 4 — PROJECT OVERVIEW
+═══════════════════════════════════════════════════════════ -->
+      <div class="header-strip">
+        <span class="doc-name">JG NEWS PLUS · PROJECT QUOTATION</span>
+        <span class="pg">PAGE 04</span>
+      </div>
+
+      <h1 class="section"><span class="num">03</span>Project Overview &amp; Scope</h1>
+      <div class="section-bar"></div>
+
+      <h2>The Vision</h2>
+      <p>
+        JG News Plus was conceived as a <strong>professional-grade digital newsroom</strong> for Rajasthan —
+        combining the immediacy of a modern web experience with the editorial rigor of a traditional
+        newspaper. The brief required a platform that could be operated by non-technical journalists
+        while delivering enterprise-grade performance, SEO, and visual polish.
+      </p>
+
+      <h2>What Was Built</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3>🌐 Public Reader Portal</h3>
+          <ul style="margin: 8px 0 0;">
+            <li>Auto-rotating hero slider</li>
+            <li>Live news flash sidebar</li>
+            <li>Breaking news ticker (marquee)</li>
+            <li>Category &amp; search pages</li>
+            <li>Article reader with rich content</li>
+            <li>Photo &amp; video galleries</li>
+            <li>Contact, About &amp; static pages</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>🔐 Admin / Editor Panel</h3>
+          <ul style="margin: 8px 0 0;">
+            <li>Secure login with env-based password</li>
+            <li>Article CRUD with rich-text editor</li>
+            <li>Media upload (Cloudinary)</li>
+            <li>Category management</li>
+            <li>E-Newspaper PDF management</li>
+            <li>Live TV stream control</li>
+            <li>Reader message inbox</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>📰 E-Newspaper System</h3>
+          <ul style="margin: 8px 0 0;">
+            <li>Direct browser-to-Cloudinary upload</li>
+            <li>In-browser react-pdf viewer</li>
+            <li>Zoom, full-screen, keyboard nav</li>
+            <li>Hindi cMap font support</li>
+            <li>Edition / publish-date tracking</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>🤖 AI News Sync (MCP)</h3>
+          <ul style="margin: 8px 0 0;">
+            <li>Google News RSS integration</li>
+            <li>Multi-source aggregation (NDTV, Amar Ujala, etc.)</li>
+            <li>Google News URL decoder</li>
+            <li>Full-article extractor with og: tags</li>
+            <li>Review-before-publish workflow</li>
+          </ul>
+        </div>
+      </div>
+
+      <h2>Out of Scope (Excluded from this Quotation)</h2>
+      <div class="card card-orange">
+        <p style="margin: 0;">
+          <strong>This quotation covers development &amp; deployment only.</strong> The following are
+          <strong>not included</strong> and remain the client's responsibility:
+        </p>
+        <ul style="margin: 10px 0 0;">
+          <li>Domain registration &amp; renewal fees</li>
+          <li>Web hosting / Vercel paid tier (free tier currently in use)</li>
+          <li>MongoDB Atlas paid tier (free M0 cluster currently in use)</li>
+          <li>Cloudinary paid tier (free tier currently in use)</li>
+          <li>Third-party API credit costs (if any are upgraded to paid)</li>
+          <li>Content writing, journalism, &amp; editorial staff</li>
+          <li>Marketing, SEO link-building, &amp; advertising spend</li>
+        </ul>
+      </div>
+
+      <div class="page"></div>
+
+      <!-- ═══════════════════════════════════════════════════════════
+     PAGE 5 — TIMELINE
+═══════════════════════════════════════════════════════════ -->
+      <div class="header-strip">
+        <span class="doc-name">JG NEWS PLUS · PROJECT QUOTATION</span>
+        <span class="pg">PAGE 05</span>
+      </div>
+
+      <h1 class="section"><span class="num">04</span>Development Timeline</h1>
+      <div class="section-bar"></div>
+
+      <p>
+        The project was executed across <strong>two intensive months</strong> from initial commit to current
+        production state. Below is the actual phase-by-phase breakdown reconstructed from the
+        Git commit history.
+      </p>
+
+      <h2>Month 1 — Foundation &amp; Core Build (March 2026)</h2>
+
+      <div class="phase">
+        <div class="phase-meta">PHASE 1 · WEEK 1</div>
+        <h3>Project Bootstrap &amp; Architecture</h3>
+        <p style="margin: 0;">
+          Initial repository setup, React + Vite scaffolding, design system foundation,
+          routing, layout components, Vercel deployment pipeline. <em>Tech stack
+            decisions, folder architecture, base CSS variables.</em>
+        </p>
+      </div>
+
+      <div class="phase">
+        <div class="phase-meta">PHASE 2 · WEEK 2</div>
+        <h3>MongoDB Integration &amp; API Layer</h3>
+        <p style="margin: 0;">
+          Mongoose schemas (Article, Category, Newspaper, Settings, Message), Express
+          REST routes, Vercel serverless function adaptation, CORS, environment configuration.
+        </p>
+      </div>
+
+      <div class="phase">
+        <div class="phase-meta">PHASE 3 · WEEK 3</div>
+        <h3>Public Frontend Pages</h3>
+        <p style="margin: 0;">
+          Home, Category listing, Article reader, Live TV, Search, About, Contact, Photo
+          gallery, Video gallery — all responsive with skeleton loaders.
+        </p>
+      </div>
+
+      <div class="phase">
+        <div class="phase-meta">PHASE 4 · WEEK 4</div>
+        <h3>Live Features &amp; Polish</h3>
+        <p style="margin: 0;">
+          Open-Meteo weather integration for 16 Rajasthan cities, YouTube Live TV embed
+          with autoplay, breaking news ticker, social links, navigation polish, mobile menu.
+        </p>
+      </div>
+
+      <h2>Month 2 — Advanced Features &amp; Production Hardening (April–May 2026)</h2>
+
+      <div class="phase">
+        <div class="phase-meta">PHASE 5 · WEEK 5</div>
+        <h3>E-Newspaper / PDF Reader System</h3>
+        <p style="margin: 0;">
+          Custom react-pdf reader implementation, Cloudinary direct upload (bypassing
+          serverless 4MB limit), zoom/fullscreen controls, Hindi font cMaps, admin
+          PDF manager.
+        </p>
+      </div>
+
+      <div class="phase">
+        <div class="phase-meta">PHASE 6 · WEEK 6</div>
+        <h3>Admin Panel &amp; CMS</h3>
+        <p style="margin: 0;">
+          Full admin layout with sidebar nav, secure auth (env-based password), Article
+          Form with React Quill rich-text editor, Cloudinary image handler, Category
+          Manager, Settings Manager, Live TV manager.
+        </p>
+      </div>
+
+      <div class="phase">
+        <div class="phase-meta">PHASE 7 · WEEK 7</div>
+        <h3>AI News Sync (MCP) Integration</h3>
+        <p style="margin: 0;">
+          rss-parser integration, Google News URL decoder for redirect resolution,
+          @extractus/article-extractor for full-content scraping, image extraction
+          pipeline, review-before-publish modal, categorized sync (Rajasthan / India / World).
+        </p>
+      </div>
+
+      <div class="phase">
+        <div class="phase-meta">PHASE 8 · WEEK 8</div>
+        <h3>Performance, Bug Fixes, &amp; Production Hardening</h3>
+        <p style="margin: 0;">
+          API pagination &amp; field projection, lean queries, response compression,
+          Cache-Control headers, fetch deduplication, hero slider redesign, ticker
+          speed optimization, AI article cleanup tooling, full production deployment.
+        </p>
+      </div>
+
+      <div class="page"></div>
+
+      <!-- ═══════════════════════════════════════════════════════════
+     PAGE 6 — TIMELINE CHART
+═══════════════════════════════════════════════════════════ -->
+      <div class="header-strip">
+        <span class="doc-name">JG NEWS PLUS · PROJECT QUOTATION</span>
+        <span class="pg">PAGE 06</span>
+      </div>
+
+      <h1 class="section"><span class="num">04</span>Development Timeline (Visual)</h1>
+      <div class="section-bar"></div>
+
+      <h2>Commit Activity by Month</h2>
+      <p>This chart visualizes the actual development intensity across the project lifecycle, derived from Git commit
+        metadata.</p>
+
+      <div style="margin: 24px 0;">
+        <div class="chart-row">
+          <div class="label"><span>March 2026 — Foundation &amp; Core</span><span>31 commits</span></div>
+          <div class="chart-bar">
+            <div class="fill" style="width: 72%;"></div>
+          </div>
+        </div>
+        <div class="chart-row">
+          <div class="label"><span>April 2026 — E-Paper, Admin, AI Sync</span><span>43 commits</span></div>
+          <div class="chart-bar">
+            <div class="fill fill-orange" style="width: 100%;"></div>
+          </div>
+        </div>
+        <div class="chart-row">
+          <div class="label"><span>May 2026 — Hardening &amp; Optimization</span><span>7 commits</span></div>
+          <div class="chart-bar">
+            <div class="fill fill-red" style="width: 16%;"></div>
+          </div>
+        </div>
+      </div>
+
+      <h2>Effort Distribution by Module</h2>
+
+      <div style="margin: 24px 0;">
+        <div class="chart-row">
+          <div class="label"><span>Frontend (React, UI, Pages)</span><span>31.4%</span></div>
+          <div class="chart-bar">
+            <div class="fill" style="width: 31.4%;"></div>
+          </div>
+        </div>
+        <div class="chart-row">
+          <div class="label"><span>Backend (Node, Express, MongoDB)</span><span>22.9%</span></div>
+          <div class="chart-bar">
+            <div class="fill" style="width: 22.9%;"></div>
+          </div>
+        </div>
+        <div class="chart-row">
+          <div class="label"><span>Admin Panel &amp; CMS</span><span>16.0%</span></div>
+          <div class="chart-bar">
+            <div class="fill fill-orange" style="width: 16.0%;"></div>
+          </div>
+        </div>
+        <div class="chart-row">
+          <div class="label"><span>AI News Sync &amp; Integrations</span><span>13.1%</span></div>
+          <div class="chart-bar">
+            <div class="fill fill-orange" style="width: 13.1%;"></div>
+          </div>
+        </div>
+        <div class="chart-row">
+          <div class="label"><span>Performance &amp; Deployment</span><span>9.7%</span></div>
+          <div class="chart-bar">
+            <div class="fill fill-red" style="width: 9.7%;"></div>
+          </div>
+        </div>
+        <div class="chart-row">
+          <div class="label"><span>Documentation &amp; Handover</span><span>6.9%</span></div>
+          <div class="chart-bar">
+            <div class="fill fill-red" style="width: 6.9%;"></div>
+          </div>
+        </div>
+      </div>
+
+      <h2>Timeline Highlights</h2>
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 22%;">Date Range</th>
+            <th style="width: 38%;">Milestone</th>
+            <th>Outcome</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>06 Mar 2026</td>
+            <td>Initial commit</td>
+            <td>Project bootstrapped on React + Vite</td>
+          </tr>
+          <tr>
+            <td>06 Mar 2026</td>
+            <td>MongoDB integration</td>
+            <td>Full backend wired to Atlas</td>
+          </tr>
+          <tr>
+            <td>07 Mar 2026</td>
+            <td>Live Weather + Live TV</td>
+            <td>16 cities + YouTube embed</td>
+          </tr>
+          <tr>
+            <td>22 Apr 2026</td>
+            <td>E-Newspaper launched</td>
+            <td>In-browser PDF reader live</td>
+          </tr>
+          <tr>
+            <td>22 Apr 2026</td>
+            <td>Rich-text editor</td>
+            <td>Quill + Cloudinary integration</td>
+          </tr>
+          <tr>
+            <td>22 Apr 2026</td>
+            <td>AI News Sync (MCP)</td>
+            <td>Auto-aggregation operational</td>
+          </tr>
+          <tr>
+            <td>02 May 2026</td>
+            <td>Performance pass</td>
+            <td>Pagination, lean queries, compression</td>
+          </tr>
+          <tr>
+            <td>02 May 2026</td>
+            <td>Hero slider + UX polish</td>
+            <td>Production deploy to main</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="page"></div>
+
+      <!-- ═══════════════════════════════════════════════════════════
+     PAGE 7 — TECH STACK
+═══════════════════════════════════════════════════════════ -->
+      <div class="header-strip">
+        <span class="doc-name">JG NEWS PLUS · PROJECT QUOTATION</span>
+        <span class="pg">PAGE 07</span>
+      </div>
+
+      <h1 class="section"><span class="num">05</span>Technology Stack</h1>
+      <div class="section-bar"></div>
+
+      <p>The platform is built on a modern, production-proven JavaScript ecosystem with selective integration of
+        best-in-class third-party services.</p>
+
+      <h2>Frontend</h2>
+      <div class="tech-stack">
+        <div class="tech-item">
+          <div class="name">React 18</div>
+          <div class="desc">Component framework</div>
+        </div>
+        <div class="tech-item">
+          <div class="name">Vite 5</div>
+          <div class="desc">Build tool &amp; dev server</div>
+        </div>
+        <div class="tech-item">
+          <div class="name">React Router 6</div>
+          <div class="desc">Client-side routing</div>
+        </div>
+        <div class="tech-item">
+          <div class="name">React Quill</div>
+          <div class="desc">Rich-text editor</div>
+        </div>
+        <div class="tech-item">
+          <div class="name">react-pdf</div>
+          <div class="desc">PDF rendering</div>
+        </div>
+        <div class="tech-item">
+          <div class="name">Axios</div>
+          <div class="desc">HTTP client</div>
+        </div>
+        <div class="tech-item">
+          <div class="name">Context API</div>
+          <div class="desc">State management</div>
+        </div>
+        <div class="tech-item">
+          <div class="name">Vanilla CSS</div>
+          <div class="desc">Custom design system</div>
+        </div>
+        <div class="tech-item">
+          <div class="name">CSS Animations</div>
+          <div class="desc">Marquee, transitions</div>
+        </div>
+      </div>
+
+      <h2>Backend</h2>
+      <div class="tech-stack">
+        <div class="tech-item">
+          <div class="name">Node.js</div>
+          <div class="desc">Runtime</div>
+        </div>
+        <div class="tech-item">
+          <div class="name">Express 5</div>
+          <div class="desc">REST framework</div>
+        </div>
+        <div class="tech-item">
+          <div class="name">Mongoose</div>
+          <div class="desc">MongoDB ODM</div>
+        </div>
+        <div class="tech-item">
+          <div class="name">MongoDB Atlas</div>
+          <div class="desc">Cloud database</div>
+        </div>
+        <div class="tech-item">
+          <div class="name">Compression</div>
+          <div class="desc">Gzip middleware</div>
+        </div>
+        <div class="tech-item">
+          <div class="name">CORS</div>
+          <div class="desc">Cross-origin policy</div>
+        </div>
+        <div class="tech-item">
+          <div class="name">dotenv</div>
+          <div class="desc">Env management</div>
+        </div>
+        <div class="tech-item">
+          <div class="name">Multer</div>
+          <div class="desc">File parsing</div>
+        </div>
+        <div class="tech-item">
+          <div class="name">Vercel Serverless</div>
+          <div class="desc">Edge deployment</div>
+        </div>
+      </div>
+
+      <h2>Integrations &amp; Third-Party Services</h2>
+      <div class="tech-stack">
+        <div class="tech-item">
+          <div class="name">Cloudinary</div>
+          <div class="desc">Media CDN &amp; storage</div>
+        </div>
+        <div class="tech-item">
+          <div class="name">Open-Meteo API</div>
+          <div class="desc">Weather data</div>
+        </div>
+        <div class="tech-item">
+          <div class="name">YouTube Live</div>
+          <div class="desc">Live TV embed</div>
+        </div>
+        <div class="tech-item">
+          <div class="name">Google News RSS</div>
+          <div class="desc">News aggregation</div>
+        </div>
+        <div class="tech-item">
+          <div class="name">rss-parser</div>
+          <div class="desc">Feed parsing</div>
+        </div>
+        <div class="tech-item">
+          <div class="name">@extractus/article</div>
+          <div class="desc">Content extraction</div>
+        </div>
+        <div class="tech-item">
+          <div class="name">google-news-url-decoder</div>
+          <div class="desc">Redirect resolver</div>
+        </div>
+        <div class="tech-item">
+          <div class="name">Vercel</div>
+          <div class="desc">Hosting / serverless</div>
+        </div>
+        <div class="tech-item">
+          <div class="name">GitHub</div>
+          <div class="desc">Version control / CI</div>
+        </div>
+      </div>
+
+      <h2>Development &amp; Tooling</h2>
+      <div class="tech-stack">
+        <div class="tech-item">
+          <div class="name">Git / GitHub</div>
+          <div class="desc">Source control</div>
+        </div>
+        <div class="tech-item">
+          <div class="name">ESLint</div>
+          <div class="desc">Linting</div>
+        </div>
+        <div class="tech-item">
+          <div class="name">Vercel CI/CD</div>
+          <div class="desc">Auto-deploy on push</div>
+        </div>
+        <div class="tech-item">
+          <div class="name">VS Code</div>
+          <div class="desc">IDE</div>
+        </div>
+        <div class="tech-item">
+          <div class="name">Postman</div>
+          <div class="desc">API testing</div>
+        </div>
+        <div class="tech-item">
+          <div class="name">MongoDB Compass</div>
+          <div class="desc">DB inspection</div>
+        </div>
+      </div>
+
+      <div class="page"></div>
+
+      <!-- ═══════════════════════════════════════════════════════════
+     PAGE 8 — ARCHITECTURE
+═══════════════════════════════════════════════════════════ -->
+      <div class="header-strip">
+        <span class="doc-name">JG NEWS PLUS · PROJECT QUOTATION</span>
+        <span class="pg">PAGE 08</span>
+      </div>
+
+      <h1 class="section"><span class="num">06</span>System Architecture</h1>
+      <div class="section-bar"></div>
+
+      <p>The architecture follows a <strong>three-tier serverless model</strong> with direct-upload optimization and CDN
+        delivery, designed for low operational cost and high scale-out capacity.</p>
+
+      <div class="arch">
+        <div class="arch-row">
+          <div class="arch-node client">📱 Public Reader</div>
+          <span class="arch-arrow">↔</span>
+          <div class="arch-node client">🔐 Admin Panel</div>
+        </div>
+        <div class="arch-row"><span class="arch-arrow">↓</span></div>
+        <div class="arch-row">
+          <div class="arch-node">⚛️ React + Vite SPA</div>
+        </div>
+        <div class="arch-row"><span class="arch-arrow">↓ HTTPS / REST</span></div>
+        <div class="arch-row">
+          <div class="arch-node svc">🚀 Vercel Serverless</div>
+          <span class="arch-arrow">↔</span>
+          <div class="arch-node svc">🟢 Express API</div>
+        </div>
+        <div class="arch-row"><span class="arch-arrow">↓ Mongoose ↓</span></div>
+        <div class="arch-row">
+          <div class="arch-node db">🗄️ MongoDB Atlas</div>
+        </div>
+        <div class="arch-row"><span class="arch-arrow">────────────────────────────────</span></div>
+        <div class="arch-row">
+          <div class="arch-node">☁️ Cloudinary CDN<br /><span class="small">(Direct Upload)</span></div>
+          <div class="arch-node">🌡️ Open-Meteo API</div>
+          <div class="arch-node">📺 YouTube Live</div>
+          <div class="arch-node">📰 Google News RSS</div>
+        </div>
+      </div>
+
+      <h2>Architectural Highlights</h2>
+      <div class="grid-2">
+        <div class="card card-accent">
+          <h3>⚡ Direct-to-CDN Uploads</h3>
+          <p>Browser uploads PDFs directly to Cloudinary, bypassing the 4 MB Vercel serverless body limit and removing
+            backend bandwidth as a bottleneck.</p>
+        </div>
+        <div class="card card-accent">
+          <h3>📡 Stateless Serverless API</h3>
+          <p>Express app exported as a Vercel handler — auto-scaling, zero idle cost, sub-100ms cold starts.</p>
+        </div>
+        <div class="card card-orange">
+          <h3>🧠 Smart Pagination</h3>
+          <p>Article list endpoint supports field projection (<code>?fields=summary</code>), pagination, and
+            stale-while-revalidate caching to keep payloads small.</p>
+        </div>
+        <div class="card card-orange">
+          <h3>🔁 Optimistic Frontend</h3>
+          <p>React Context with ref-guarded fetch deduplication; admin actions trigger targeted refetch instead of full
+            reload.</p>
+        </div>
+      </div>
+
+      <div class="page"></div>
+
+      <!-- ═══════════════════════════════════════════════════════════
+     PAGE 9 — FEATURE BREAKDOWN
+═══════════════════════════════════════════════════════════ -->
+      <div class="header-strip">
+        <span class="doc-name">JG NEWS PLUS · PROJECT QUOTATION</span>
+        <span class="pg">PAGE 09</span>
+      </div>
+
+      <h1 class="section"><span class="num">07</span>Detailed Feature Breakdown</h1>
+      <div class="section-bar"></div>
+
+      <h2>🌐 Public-Facing Features</h2>
+
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 28%;">Feature</th>
+            <th>Description</th>
+            <th style="width: 18%;">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Hero Slider</strong></td>
+            <td>Auto-rotating 5-slide hero with featured + breaking articles, manual dot navigation, fade transitions.
+            </td>
+            <td><span class="badge badge-green">SHIPPED</span></td>
+          </tr>
+          <tr>
+            <td><strong>News Flash Sidebar</strong></td>
+            <td>Live-updating headline list pinned beside the hero with pulse animation indicator.</td>
+            <td><span class="badge badge-green">SHIPPED</span></td>
+          </tr>
+          <tr>
+            <td><strong>Breaking News Ticker</strong></td>
+            <td>CSS marquee scrolling latest 12 headlines, hover-pause, click-through to article.</td>
+            <td><span class="badge badge-green">SHIPPED</span></td>
+          </tr>
+          <tr>
+            <td><strong>Live Weather Strip</strong></td>
+            <td>Real-time temperature for 16 Rajasthan cities via Open-Meteo, weather code → emoji icons.</td>
+            <td><span class="badge badge-green">SHIPPED</span></td>
+          </tr>
+          <tr>
+            <td><strong>Category Pages</strong></td>
+            <td>Dynamic per-category listing with filters and skeleton loading states.</td>
+            <td><span class="badge badge-green">SHIPPED</span></td>
+          </tr>
+          <tr>
+            <td><strong>Article Reader</strong></td>
+            <td>Rich-content reader with hero image, lightbox zoom, video embed, share buttons, related articles.</td>
+            <td><span class="badge badge-green">SHIPPED</span></td>
+          </tr>
+          <tr>
+            <td><strong>Search</strong></td>
+            <td>Client-side search by title and location with results page and highlighting.</td>
+            <td><span class="badge badge-green">SHIPPED</span></td>
+          </tr>
+          <tr>
+            <td><strong>Live TV Page</strong></td>
+            <td>YouTube Live embed with auto-play, custom branding overlay.</td>
+            <td><span class="badge badge-green">SHIPPED</span></td>
+          </tr>
+          <tr>
+            <td><strong>E-Newspaper Reader</strong></td>
+            <td>In-browser PDF viewer with zoom, fullscreen, page nav, Hindi font support.</td>
+            <td><span class="badge badge-green">SHIPPED</span></td>
+          </tr>
+          <tr>
+            <td><strong>Photo &amp; Video Galleries</strong></td>
+            <td>Filtered article views showing only items with images or video URLs.</td>
+            <td><span class="badge badge-green">SHIPPED</span></td>
+          </tr>
+          <tr>
+            <td><strong>Bilingual UI (Hi / En)</strong></td>
+            <td>Hindi default; one-click language toggle persisted in session.</td>
+            <td><span class="badge badge-green">SHIPPED</span></td>
+          </tr>
+          <tr>
+            <td><strong>Contact Form</strong></td>
+            <td>Reader message form persisted to MongoDB, viewable in admin inbox.</td>
+            <td><span class="badge badge-green">SHIPPED</span></td>
+          </tr>
+          <tr>
+            <td><strong>Social Integration</strong></td>
+            <td>Branded Instagram, X (Twitter), and YouTube links in top bar with brand colors &amp; SVG icons.</td>
+            <td><span class="badge badge-green">SHIPPED</span></td>
+          </tr>
+          <tr>
+            <td><strong>Skeleton Loaders</strong></td>
+            <td>Pulsing skeleton placeholders during data fetch — no blank pages.</td>
+            <td><span class="badge badge-green">SHIPPED</span></td>
+          </tr>
+          <tr>
+            <td><strong>Mobile-Responsive Layout</strong></td>
+            <td>Hamburger menu, responsive grids, mobile search overlay, touch-friendly hit targets.</td>
+            <td><span class="badge badge-green">SHIPPED</span></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="page"></div>
+
+      <!-- ═══════════════════════════════════════════════════════════
+     PAGE 10 — Continued features
+═══════════════════════════════════════════════════════════ -->
+      <div class="header-strip">
+        <span class="doc-name">JG NEWS PLUS · PROJECT QUOTATION</span>
+        <span class="pg">PAGE 10</span>
+      </div>
+
+      <h1 class="section"><span class="num">07</span>Feature Breakdown <span
+          style="font-size: 13pt; color: var(--gray-500); font-weight: 600;">(continued)</span></h1>
+      <div class="section-bar"></div>
+
+      <h2>🤖 AI News Sync (MCP) — Detailed</h2>
+      <div class="card card-accent">
+        <p>One of the most technically involved subsystems. The AI News Sync module aggregates content from multiple
+          Indian news sources, decodes Google News redirect URLs, extracts full article content, and stages it for
+          editor review before publishing.</p>
+        <ul>
+          <li><strong>Multi-source RSS:</strong> NDTV Hindi, Amar Ujala, Google News (Rajasthan / India / World feeds),
+            and additional configurable sources.</li>
+          <li><strong>Google News URL Decoder:</strong> Custom integration with <code>google-news-url-decoder</code> to
+            resolve obfuscated Google News URLs to original publisher links.</li>
+          <li><strong>Article Extractor:</strong> <code>@extractus/article-extractor</code> pulls full HTML content,
+            og:image fallbacks, and og:description metadata.</li>
+          <li><strong>Review Modal:</strong> Editor sees title, image, excerpt, and full content side-by-side before
+            clicking "Publish" — protects editorial quality.</li>
+          <li><strong>Categorized Sync:</strong> Separate one-click syncs for Rajasthan, India, and World categories.
+          </li>
+          <li><strong>Bulk Cleanup Tooling:</strong> Backend script to remove all AI-synced articles with backup-to-JSON
+            safety net.</li>
+        </ul>
+      </div>
+
+      <h2>📰 E-Newspaper System — Detailed</h2>
+      <div class="card card-orange">
+        <ul>
+          <li><strong>Direct Cloudinary Upload:</strong> Bypasses Vercel's 4 MB serverless body limit by uploading from
+            browser → Cloudinary directly using unsigned upload presets.</li>
+          <li><strong>Custom react-pdf Reader:</strong> Built-in viewer with zoom controls, fullscreen mode, keyboard
+            shortcuts (←/→/Esc), responsive page width.</li>
+          <li><strong>Hindi cMap Support:</strong> Bundled cMap files ensure proper Devanagari rendering even for
+            complex ligatures.</li>
+          <li><strong>Auto-Edition Numbering:</strong> Admin form auto-increments edition number based on previous
+            publications.</li>
+          <li><strong>Edition Catalog:</strong> Public archive with sortable list of all past editions.</li>
+        </ul>
+      </div>
+
+      <h2>📺 Live TV &amp; Media — Detailed</h2>
+      <div class="card card-red">
+        <ul>
+          <li><strong>YouTube Live Integration:</strong> Admin pastes a YouTube embed URL; site shows it on Live page
+            and Home banner.</li>
+          <li><strong>Auto-Play Configuration:</strong> Live page autoplays the stream on mount.</li>
+          <li><strong>Live Badge:</strong> Animated "LIVE" pulse indicator throughout site.</li>
+          <li><strong>Inline Video in Articles:</strong> Articles can include a videoUrl field that renders an embedded
+            video alongside text.</li>
+        </ul>
+      </div>
+
+      <h2>🌡️ Live Weather — Detailed</h2>
+      <div class="card card-accent">
+        <ul>
+          <li>Real-time temperature pulled from Open-Meteo API in a single batched request.</li>
+          <li><strong>16 cities</strong> covered: Ratangarh, Jaipur, Jodhpur, Udaipur, Kota, Bikaner, Ajmer, Alwar,
+            Bhilwara, Sikar, Pali, Mt. Abu, Jaisalmer, Chittorgarh, Bharatpur, Ganganagar.</li>
+          <li>Weather-code → emoji mapping for visual icons (☀️ ⛅ 🌧️ ❄️ ⛈️).</li>
+          <li>Horizontal scrollable strip on home page with brand-colored cards.</li>
+        </ul>
+      </div>
+
+      <div class="page"></div>
+
+      <!-- ═══════════════════════════════════════════════════════════
+     PAGE 11 — ADMIN PANEL
+═══════════════════════════════════════════════════════════ -->
+      <div class="header-strip">
+        <span class="doc-name">JG NEWS PLUS · PROJECT QUOTATION</span>
+        <span class="pg">PAGE 11</span>
+      </div>
+
+      <h1 class="section"><span class="num">08</span>Admin Panel &amp; CMS</h1>
+      <div class="section-bar"></div>
+
+      <p>A complete content management system custom-built for newsroom workflows — designed to be operated by
+        non-technical journalists.</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 30%;">Module</th>
+            <th>Capability</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>🏠 Dashboard</strong></td>
+            <td>At-a-glance stats: total articles, breaking count, featured count, categories, latest publications.</td>
+          </tr>
+          <tr>
+            <td><strong>📰 News Manager</strong></td>
+            <td>
+              Full article CRUD with rich-text editor, search, filter-by-category, sort by upload date (asc/desc),
+              inline upload-date editing, breaking/featured toggles, smart pagination (50 per page),
+              delete confirmation modal.
+            </td>
+          </tr>
+          <tr>
+            <td><strong>✍️ Article Form</strong></td>
+            <td>
+              React Quill rich-text editor with custom Cloudinary image handler, inline media insertion,
+              category &amp; location selectors (50 Rajasthan districts), tag input, breaking/featured options,
+              upload-date control, video URL field, hero image with file upload OR URL input.
+            </td>
+          </tr>
+          <tr>
+            <td><strong>🤖 AI News Sync</strong></td>
+            <td>One-click multi-source RSS sync with review-before-publish workflow, Google News URL decoding, full
+              content extraction.</td>
+          </tr>
+          <tr>
+            <td><strong>📺 Live TV Manager</strong></td>
+            <td>Update YouTube Live embed URL with one click; instantly reflects on public site.</td>
+          </tr>
+          <tr>
+            <td><strong>🏷️ Category Manager</strong></td>
+            <td>Add/delete categories; updates auto-propagate to navbar, post form, home category sections.</td>
+          </tr>
+          <tr>
+            <td><strong>📰 E-Newspaper Manager</strong></td>
+            <td>Upload PDFs to Cloudinary directly from browser; auto-edition numbering; publish-date tracking; view
+              archive.</td>
+          </tr>
+          <tr>
+            <td><strong>💬 Message Inbox</strong></td>
+            <td>View and manage reader messages submitted via the public contact form.</td>
+          </tr>
+          <tr>
+            <td><strong>⚙️ Settings</strong></td>
+            <td>Site config (Live URL, motto, etc.), admin password change, environment-controlled defaults.</td>
+          </tr>
+          <tr>
+            <td><strong>🔐 Authentication</strong></td>
+            <td>Environment-variable-based admin password; session-based auth via sessionStorage; AdminGuard wrapper
+              auto-loads full article list on entry.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>Editor Experience Highlights</h2>
+      <div class="grid-2">
+        <div class="card card-accent">
+          <h3>📸 Cloudinary in Editor</h3>
+          <p>Images dropped into the rich-text editor automatically upload to Cloudinary and embed via secure CDN URLs —
+            no manual copy-paste.</p>
+        </div>
+        <div class="card card-accent">
+          <h3>🚀 Publishing Options Card</h3>
+          <p>Visual checkboxes for Breaking News, Featured (homepage slider), and Tags — editors see exactly where the
+            article will appear.</p>
+        </div>
+        <div class="card card-orange">
+          <h3>🗓️ Backdated Publishing</h3>
+          <p>Editors can set custom upload date when posting historical content or scheduling a future date stamp.</p>
+        </div>
+        <div class="card card-orange">
+          <h3>🔍 Inline Search &amp; Sort</h3>
+          <p>News list supports keyword search across title/location and sort toggle — find any article in seconds.</p>
+        </div>
+      </div>
+
+      <div class="page"></div>
+
+      <!-- ═══════════════════════════════════════════════════════════
+     PAGE 12 — PERFORMANCE
+═══════════════════════════════════════════════════════════ -->
+      <div class="header-strip">
+        <span class="doc-name">JG NEWS PLUS · PROJECT QUOTATION</span>
+        <span class="pg">PAGE 12</span>
+      </div>
+
+      <h1 class="section"><span class="num">09</span>Performance &amp; Optimization Work</h1>
+      <div class="section-bar"></div>
+
+      <p>Performance was treated as a first-class feature, not an afterthought. The following dedicated work was carried
+        out to ensure the platform feels instantaneous on both desktop and mobile.</p>
+
+      <h2>🎯 Optimization Pass Highlights</h2>
+
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 35%;">Technique</th>
+            <th>Impact</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>API Pagination &amp; Field Projection</strong></td>
+            <td>Public site loads only 30 articles in summary projection (no heavy <code>content</code> field) —
+              <strong>~70% smaller payload</strong> on initial visit.</td>
+          </tr>
+          <tr>
+            <td><strong>Mongoose <code>.lean()</code> Queries</strong></td>
+            <td>Skips Mongoose document instantiation overhead — reads return faster, less memory.</td>
+          </tr>
+          <tr>
+            <td><strong>Gzip Compression Middleware</strong></td>
+            <td>All API responses compressed; typical 60–80% size reduction over the wire.</td>
+          </tr>
+          <tr>
+            <td><strong>Cache-Control Headers</strong></td>
+            <td><code>public, max-age=30, stale-while-revalidate=60</code> — instant cached responses with background
+              revalidation.</td>
+          </tr>
+          <tr>
+            <td><strong>Fetch Deduplication</strong></td>
+            <td>React ref-guarded context prevents duplicate fetches when components remount.</td>
+          </tr>
+          <tr>
+            <td><strong>Parallel API Calls</strong></td>
+            <td><code>Promise.all</code> for articles + categories + settings — total wait time = max instead of sum.
+            </td>
+          </tr>
+          <tr>
+            <td><strong>Lazy Route Code-Splitting</strong></td>
+            <td>All pages and admin modules loaded via <code>React.lazy()</code> — initial bundle stays small (~136 KB
+              gzipped).</td>
+          </tr>
+          <tr>
+            <td><strong>Image <code>loading="lazy"</code></strong></td>
+            <td>Off-screen images deferred until scrolled into view; reduces initial network spike.</td>
+          </tr>
+          <tr>
+            <td><strong>Cloudinary CDN Delivery</strong></td>
+            <td>Media served from global edge nodes, not from app server.</td>
+          </tr>
+          <tr>
+            <td><strong>Dedicated Article Endpoint</strong></td>
+            <td>Article reader fetches full content directly via <code>/api/articles/:id</code> — full content not
+              bundled in homepage payload.</td>
+          </tr>
+          <tr>
+            <td><strong>CSS Marquee (GPU-accelerated)</strong></td>
+            <td>Ticker uses <code>transform: translateX</code> with <code>will-change</code> — runs on the compositor,
+              no JS frame loop.</td>
+          </tr>
+          <tr>
+            <td><strong>Skeleton Loaders</strong></td>
+            <td>Perceived performance boost — users see structure immediately, never blank screens.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>📊 Build Output Stats</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Bundle</th>
+            <th class="amount">Raw Size</th>
+            <th class="amount">Gzipped</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Main app shell (<code>index.js</code>)</td>
+            <td class="amount">464 KB</td>
+            <td class="amount">136 KB</td>
+          </tr>
+          <tr>
+            <td>Home page (lazy)</td>
+            <td class="amount">35 KB</td>
+            <td class="amount">5 KB</td>
+          </tr>
+          <tr>
+            <td>Article page (lazy)</td>
+            <td class="amount">31 KB</td>
+            <td class="amount">4 KB</td>
+          </tr>
+          <tr>
+            <td>PDF Viewer (lazy, e-paper only)</td>
+            <td class="amount">493 KB</td>
+            <td class="amount">145 KB</td>
+          </tr>
+          <tr>
+            <td>Admin panel (lazy)</td>
+            <td class="amount">270 KB</td>
+            <td class="amount">70 KB</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="page"></div>
+
+      <!-- ═══════════════════════════════════════════════════════════
+     PAGE 13 — EFFORT CHART
+═══════════════════════════════════════════════════════════ -->
+      <div class="header-strip">
+        <span class="doc-name">JG NEWS PLUS · PROJECT QUOTATION</span>
+        <span class="pg">PAGE 13</span>
+      </div>
+
+      <h1 class="section"><span class="num">10</span>Effort Distribution Chart</h1>
+      <div class="section-bar"></div>
+
+      <p>The chart below shows actual effort distribution across the project, providing transparency into where the
+        development hours were invested.</p>
+
+      <h2>📊 Hours Allocation by Module</h2>
+
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 50%;">Module</th>
+            <th class="amount" style="width: 25%;">Days</th>
+            <th class="amount" style="width: 25%;">Hours</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Frontend Development &amp; UI/UX</td>
+            <td class="amount">28</td>
+            <td class="amount">168</td>
+          </tr>
+          <tr>
+            <td>Backend / API / Database</td>
+            <td class="amount">18</td>
+            <td class="amount">108</td>
+          </tr>
+          <tr>
+            <td>Admin Panel &amp; CMS</td>
+            <td class="amount">10</td>
+            <td class="amount">60</td>
+          </tr>
+          <tr>
+            <td>AI News Sync &amp; Integrations</td>
+            <td class="amount">7</td>
+            <td class="amount">42</td>
+          </tr>
+          <tr>
+            <td>Performance, Testing &amp; Deployment</td>
+            <td class="amount">7</td>
+            <td class="amount">42</td>
+          </tr>
+          <tr>
+            <td>Documentation &amp; Handover</td>
+            <td class="amount">3</td>
+            <td class="amount">18</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td>TOTAL</td>
+            <td class="amount">~73 days</td>
+            <td class="amount">~438 hrs</td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <h2>Visual Distribution</h2>
+
+      <div style="margin: 22px 0;">
+        <div class="chart-row">
+          <div class="label"><span>Frontend</span><span>31.4%</span></div>
+          <div class="chart-bar">
+            <div class="fill" style="width: 31.4%;"></div>
+          </div>
+        </div>
+        <div class="chart-row">
+          <div class="label"><span>Backend &amp; Database</span><span>22.9%</span></div>
+          <div class="chart-bar">
+            <div class="fill" style="width: 22.9%;"></div>
+          </div>
+        </div>
+        <div class="chart-row">
+          <div class="label"><span>Admin Panel</span><span>16.0%</span></div>
+          <div class="chart-bar">
+            <div class="fill fill-orange" style="width: 16.0%;"></div>
+          </div>
+        </div>
+        <div class="chart-row">
+          <div class="label"><span>AI News Sync</span><span>13.1%</span></div>
+          <div class="chart-bar">
+            <div class="fill fill-orange" style="width: 13.1%;"></div>
+          </div>
+        </div>
+        <div class="chart-row">
+          <div class="label"><span>Performance &amp; Deployment</span><span>9.7%</span></div>
+          <div class="chart-bar">
+            <div class="fill fill-red" style="width: 9.7%;"></div>
+          </div>
+        </div>
+        <div class="chart-row">
+          <div class="label"><span>Documentation</span><span>6.9%</span></div>
+          <div class="chart-bar">
+            <div class="fill fill-red" style="width: 6.9%;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="quote">
+        Effort estimates are based on actual time tracking and the Git commit history.
+      </div>
+
+      <div class="page"></div>
+
+      <!-- ═══════════════════════════════════════════════════════════
+     PAGE 14 — COST BREAKDOWN
+═══════════════════════════════════════════════════════════ -->
+      <div class="header-strip">
+        <span class="doc-name">JG NEWS PLUS · PROJECT QUOTATION</span>
+        <span class="pg">PAGE 14</span>
+      </div>
+
+      <h1 class="section"><span class="num">11</span>Itemized Cost Breakdown</h1>
+      <div class="section-bar"></div>
+
+      <h2>A. Frontend Development</h2>
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 60%;">Item</th>
+            <th class="amount">Amount (₹)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Custom design system (CSS variables, typography, components)</td>
+            <td class="amount">8,000</td>
+          </tr>
+          <tr>
+            <td>Header, Footer, Navigation, Mobile menu</td>
+            <td class="amount">5,500</td>
+          </tr>
+          <tr>
+            <td>Home page (Hero slider, news flash, weather, sections)</td>
+            <td class="amount">10,000</td>
+          </tr>
+          <tr>
+            <td>Article reader page with lightbox &amp; share</td>
+            <td class="amount">6,000</td>
+          </tr>
+          <tr>
+            <td>Category, Search, Photo, Video, Live TV pages</td>
+            <td class="amount">7,000</td>
+          </tr>
+          <tr>
+            <td>About, Contact, Public Docs static pages</td>
+            <td class="amount">2,500</td>
+          </tr>
+          <tr>
+            <td>Skeleton loaders &amp; animations</td>
+            <td class="amount">3,500</td>
+          </tr>
+          <tr>
+            <td>Bilingual (Hindi/English) language toggle</td>
+            <td class="amount">4,500</td>
+          </tr>
+          <tr>
+            <td>Breaking news ticker (CSS marquee)</td>
+            <td class="amount">3,000</td>
+          </tr>
+          <tr>
+            <td>Responsive mobile optimization</td>
+            <td class="amount">5,000</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td>Subtotal — Frontend</td>
+            <td class="amount">₹ 55,000</td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <h2>B. Backend / API / Database</h2>
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 60%;">Item</th>
+            <th class="amount">Amount (₹)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Express server setup, CORS, compression, env config</td>
+            <td class="amount">4,000</td>
+          </tr>
+          <tr>
+            <td>MongoDB Atlas integration &amp; connection layer</td>
+            <td class="amount">3,500</td>
+          </tr>
+          <tr>
+            <td>Mongoose schemas (Article, Category, Newspaper, Settings, Message)</td>
+            <td class="amount">4,500</td>
+          </tr>
+          <tr>
+            <td>REST endpoints (CRUD for all entities)</td>
+            <td class="amount">8,500</td>
+          </tr>
+          <tr>
+            <td>API pagination, projection, caching headers</td>
+            <td class="amount">4,500</td>
+          </tr>
+          <tr>
+            <td>Cloudinary upload routes &amp; signed configuration</td>
+            <td class="amount">4,000</td>
+          </tr>
+          <tr>
+            <td>Vercel serverless adaptation &amp; deployment config</td>
+            <td class="amount">4,000</td>
+          </tr>
+          <tr>
+            <td>Authentication (env-based admin password, session tokens)</td>
+            <td class="amount">3,500</td>
+          </tr>
+          <tr>
+            <td>Database backup &amp; cleanup tooling</td>
+            <td class="amount">3,500</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td>Subtotal — Backend</td>
+            <td class="amount">₹ 40,000</td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <h2>C. Admin Panel &amp; CMS</h2>
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 60%;">Item</th>
+            <th class="amount">Amount (₹)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Admin layout, sidebar nav, mobile drawer, AdminGuard</td>
+            <td class="amount">4,500</td>
+          </tr>
+          <tr>
+            <td>Dashboard with stat widgets</td>
+            <td class="amount">2,500</td>
+          </tr>
+          <tr>
+            <td>News Manager (list, search, sort, inline date edit, pagination)</td>
+            <td class="amount">6,000</td>
+          </tr>
+          <tr>
+            <td>Article Form (Quill editor, Cloudinary handler, all fields)</td>
+            <td class="amount">6,500</td>
+          </tr>
+          <tr>
+            <td>Category Manager</td>
+            <td class="amount">2,000</td>
+          </tr>
+          <tr>
+            <td>E-Newspaper Manager (PDF upload, edition tracking)</td>
+            <td class="amount">3,000</td>
+          </tr>
+          <tr>
+            <td>Live TV Manager &amp; Settings Manager</td>
+            <td class="amount">2,000</td>
+          </tr>
+          <tr>
+            <td>Message Inbox</td>
+            <td class="amount">1,500</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td>Subtotal — Admin Panel</td>
+            <td class="amount">₹ 28,000</td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <div class="page"></div>
+
+      <!-- ═══════════════════════════════════════════════════════════
+     PAGE 15 — COST CONTINUED
+═══════════════════════════════════════════════════════════ -->
+      <div class="header-strip">
+        <span class="doc-name">JG NEWS PLUS · PROJECT QUOTATION</span>
+        <span class="pg">PAGE 15</span>
+      </div>
+
+      <h1 class="section"><span class="num">11</span>Cost Breakdown <span
+          style="font-size: 13pt; color: var(--gray-500); font-weight: 600;">(continued)</span></h1>
+      <div class="section-bar"></div>
+
+      <h2>D. AI News Sync &amp; Third-Party Integrations</h2>
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 60%;">Item</th>
+            <th class="amount">Amount (₹)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>RSS parser integration (multi-source)</td>
+            <td class="amount">4,000</td>
+          </tr>
+          <tr>
+            <td>Google News URL decoder integration</td>
+            <td class="amount">4,500</td>
+          </tr>
+          <tr>
+            <td>Article extractor (full content + og: tags + image)</td>
+            <td class="amount">4,500</td>
+          </tr>
+          <tr>
+            <td>Review-before-publish modal &amp; workflow</td>
+            <td class="amount">3,500</td>
+          </tr>
+          <tr>
+            <td>Open-Meteo weather API integration (16 cities)</td>
+            <td class="amount">2,500</td>
+          </tr>
+          <tr>
+            <td>YouTube Live embed integration</td>
+            <td class="amount">2,000</td>
+          </tr>
+          <tr>
+            <td>Categorized sync (Rajasthan / India / World)</td>
+            <td class="amount">2,000</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td>Subtotal — Integrations</td>
+            <td class="amount">₹ 23,000</td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <h2>E. Performance, Testing &amp; Deployment</h2>
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 60%;">Item</th>
+            <th class="amount">Amount (₹)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Pagination, projection &amp; lean query optimization</td>
+            <td class="amount">3,500</td>
+          </tr>
+          <tr>
+            <td>Frontend code-splitting &amp; lazy loading</td>
+            <td class="amount">2,500</td>
+          </tr>
+          <tr>
+            <td>Cache headers, compression, fetch deduplication</td>
+            <td class="amount">3,000</td>
+          </tr>
+          <tr>
+            <td>Cross-browser &amp; mobile responsive testing</td>
+            <td class="amount">2,500</td>
+          </tr>
+          <tr>
+            <td>Vercel CI/CD setup &amp; environment management</td>
+            <td class="amount">2,500</td>
+          </tr>
+          <tr>
+            <td>Bug fixes, hotfixes, production hardening</td>
+            <td class="amount">3,000</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td>Subtotal — Performance &amp; Deployment</td>
+            <td class="amount">₹ 17,000</td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <h2>F. Documentation &amp; Knowledge Transfer</h2>
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 60%;">Item</th>
+            <th class="amount">Amount (₹)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>README.md with full architecture &amp; setup guide</td>
+            <td class="amount">3,000</td>
+          </tr>
+          <tr>
+            <td>User Guide for non-technical operators</td>
+            <td class="amount">3,000</td>
+          </tr>
+          <tr>
+            <td>Developer onboarding documentation</td>
+            <td class="amount">2,500</td>
+          </tr>
+          <tr>
+            <td>Code comments &amp; inline documentation</td>
+            <td class="amount">2,000</td>
+          </tr>
+          <tr>
+            <td>This Project Quotation &amp; client-facing docs</td>
+            <td class="amount">1,500</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td>Subtotal — Documentation</td>
+            <td class="amount">₹ 12,000</td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <h2 style="margin-top: 36px;">📋 Grand Total</h2>
+      <div class="summary-box">
+        <div class="total-label">TOTAL PROJECT INVESTMENT</div>
+        <div class="total-value">₹ 1,75,000 / -</div>
+        <div class="total-words">One Lakh Seventy-Five Thousand Rupees Only</div>
+        <p style="margin-top: 18px; opacity: 0.9; font-size: 10.5pt; font-weight: 500;">
+          All figures in INR. Domain &amp; hosting costs are <strong>not included</strong> — see exclusions on Page 4.
+        </p>
+      </div>
+
+      <div class="page"></div>
+
+      <!-- ═══════════════════════════════════════════════════════════
+     PAGE 16 — PAYMENT TERMS
+═══════════════════════════════════════════════════════════ -->
+      <div class="header-strip">
+        <span class="doc-name">JG NEWS PLUS · PROJECT QUOTATION</span>
+        <span class="pg">PAGE 16</span>
+      </div>
+
+      <h1 class="section"><span class="num">12</span>Payment Schedule &amp; Terms</h1>
+      <div class="section-bar"></div>
+
+      <h2>💰 Recommended Milestone-Based Schedule</h2>
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 8%;">#</th>
+            <th style="width: 32%;">Milestone</th>
+            <th style="width: 18%;">% of Total</th>
+            <th class="amount" style="width: 22%;">Amount (₹)</th>
+            <th>Trigger</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td><strong>Project Kickoff</strong></td>
+            <td>20%</td>
+            <td class="amount">35,000</td>
+            <td>On signed acceptance of this quotation</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td><strong>Foundation &amp; Backend</strong></td>
+            <td>25%</td>
+            <td class="amount">43,750</td>
+            <td>On completion of API + DB + base UI</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td><strong>Admin Panel &amp; CMS</strong></td>
+            <td>20%</td>
+            <td class="amount">35,000</td>
+            <td>On admin panel + Article Form delivery</td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td><strong>Integrations &amp; Polish</strong></td>
+            <td>20%</td>
+            <td class="amount">35,000</td>
+            <td>On AI Sync, E-Paper, Live TV completion</td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td><strong>Production Launch &amp; Handover</strong></td>
+            <td>15%</td>
+            <td class="amount">26,250</td>
+            <td>On production deployment &amp; documentation</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="3">TOTAL</td>
+            <td class="amount">₹ 1,75,000</td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <h2>📜 Terms &amp; Conditions</h2>
+      <ol>
+        <li><strong>Validity:</strong> This quotation is valid for <strong>30 days</strong> from the date of issue.
+          Beyond this period, rates may be revised based on prevailing market conditions.</li>
+        <li><strong>Currency:</strong> All amounts are in Indian Rupees (INR).</li>
+        <li><strong>Taxes:</strong> The quoted amount is the final net cost.</li>
+        <li><strong>Payment Mode:</strong> NEFT / IMPS / UPI / Bank Transfer to the developer's account. Account details
+          will be shared upon acceptance.</li>
+        <li><strong>Payment Window:</strong> Each milestone payment is due within <strong>7 working days</strong> of
+          milestone completion.</li>
+        <li><strong>Source Code:</strong> Full source code, repository access, and deployment credentials transferred to
+          client on final payment.</li>
+        <li><strong>IP Rights:</strong> Upon full payment, all custom code becomes the exclusive property of <strong>JG
+            News Plus</strong>. Third-party libraries retain their original licenses.</li>
+        <li><strong>Revisions:</strong> Up to <strong>2 rounds of revisions per milestone</strong> are included.
+          Additional revisions or scope changes will be quoted separately.</li>
+        <li><strong>Domain &amp; Hosting:</strong> <strong>Not included.</strong> Client bears all hosting / domain /
+          cloud-service costs (Vercel, MongoDB Atlas, Cloudinary, domain registrar).</li>
+        <li><strong>Confidentiality:</strong> All client data, credentials, and business information are treated as
+          confidential and will not be shared with third parties.</li>
+        <li><strong>Cancellation:</strong> If the project is cancelled mid-way, payment is due for all completed
+          milestones plus 50% of the next milestone in progress.</li>
+      </ol>
+
+      <div class="page"></div>
+
+      <!-- ═══════════════════════════════════════════════════════════
+     PAGE 17 — DELIVERABLES
+═══════════════════════════════════════════════════════════ -->
+      <div class="header-strip">
+        <span class="doc-name">JG NEWS PLUS · PROJECT QUOTATION</span>
+        <span class="pg">PAGE 17</span>
+      </div>
+
+      <h1 class="section"><span class="num">13</span>Deliverables &amp; Post-Launch Support</h1>
+      <div class="section-bar"></div>
+
+      <h2>📦 What You Receive</h2>
+      <div class="grid-2">
+        <div class="card card-accent">
+          <h3>💻 Complete Source Code</h3>
+          <p>Full GitHub repository transferred to client's organization, including frontend, backend, configuration,
+            and deployment scripts.</p>
+        </div>
+        <div class="card card-accent">
+          <h3>🚀 Deployed Production Site</h3>
+          <p>Live site at <strong>jgnews.live</strong> on Vercel infrastructure with auto-deploy from main branch.</p>
+        </div>
+        <div class="card card-accent">
+          <h3>📚 Documentation Package</h3>
+          <p>README.md, User Guide for editors, developer onboarding doc, and architecture diagrams.</p>
+        </div>
+        <div class="card card-accent">
+          <h3>🔐 All Credentials</h3>
+          <p>MongoDB Atlas, Cloudinary, Vercel, GitHub admin access — securely transferred via password manager.</p>
+        </div>
+        <div class="card card-orange">
+          <h3>🎓 Editor Training</h3>
+          <p>Two 1-hour video calls (or in-person) walking the editorial team through the admin panel.</p>
+        </div>
+        <div class="card card-orange">
+          <h3>🛠️ 30-Day Bug Fix Window</h3>
+          <p>Free bug fixes for 30 days post-launch. Bugs introduced by client edits or third-party API changes are
+            excluded.</p>
+        </div>
+      </div>
+
+      <h2>🔧 Post-Launch Support Options (Optional, Add-On)</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Plan</th>
+            <th>Includes</th>
+            <th class="amount">Monthly Cost</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Basic</strong></td>
+            <td>Bug fixes, security patches, dependency updates, uptime monitoring (~5 hrs/mo)</td>
+            <td class="amount">₹ 5,000 / mo</td>
+          </tr>
+          <tr>
+            <td><strong>Standard</strong></td>
+            <td>Everything in Basic + minor feature additions, performance tuning (~15 hrs/mo)</td>
+            <td class="amount">₹ 12,000 / mo</td>
+          </tr>
+          <tr>
+            <td><strong>Premium</strong></td>
+            <td>Everything in Standard + priority support, feature roadmap, content migration help (~30 hrs/mo)</td>
+            <td class="amount">₹ 22,000 / mo</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="quote">
+        Support plans are entirely optional and can be activated post-launch based on actual operational needs.
+        Per-incident support is also available at ₹500/hour for ad-hoc work.
+      </div>
+
+      <h2>🚀 Future Roadmap (Phase 2 — Quoted Separately)</h2>
+      <ul>
+        <li>Push notifications for breaking news (Web Push / FCM)</li>
+        <li>Newsletter system with email subscriptions</li>
+        <li>Reader account system &amp; saved articles</li>
+        <li>Comment moderation system</li>
+        <li>Native mobile app (React Native or Flutter)</li>
+        <li>Advanced analytics dashboard</li>
+        <li>SEO sitemap generator &amp; structured data automation</li>
+        <li>Premium / paywall content support</li>
+      </ul>
+
+      <div class="page"></div>
+
+      <!-- ═══════════════════════════════════════════════════════════
+     PAGE 18 — ABOUT DEVELOPER
+═══════════════════════════════════════════════════════════ -->
+      <div class="header-strip">
+        <span class="doc-name">JG NEWS PLUS · PROJECT QUOTATION</span>
+        <span class="pg">PAGE 18</span>
+      </div>
+
+      <h1 class="section"><span class="num">14</span>About the Developer</h1>
+      <div class="section-bar"></div>
+
+      <div class="card card-accent" style="background: linear-gradient(135deg, #f8fafc, #ffffff);">
+        <h2 style="margin-top: 0;">🧑‍💻 Shiva Prajapat</h2>
+        <p style="font-style: italic; color: var(--gray-500); margin-bottom: 16px; font-weight: 600;">
+          Lead Developer · Genius Developers
+        </p>
+        <p>
+          Full-stack developer specializing in modern JavaScript ecosystems —
+          React, Node.js, MongoDB, and serverless architectures. Focused on
+          building production-ready, performant web applications with clean
+          architecture and an obsessive eye for user experience.
+        </p>
+        <p>
+          JG News Plus is one of multiple production deployments delivered
+          under the Genius Developers banner. Every project is shipped with
+          documentation, training, and post-launch support.
+        </p>
+      </div>
+
+      <h2>🏢 Genius Developers</h2>
+      <div class="card">
+        <p>
+          <strong>Genius Developers</strong> is an independent web development studio
+          delivering full-stack solutions to startups, media houses, and small businesses.
+          We specialize in news platforms, e-commerce, SaaS dashboards, and custom CMS
+          development.
+        </p>
+        <p style="margin-top: 10px;">
+          🌐 Website: <strong>geniusdevelopers.space</strong>
+        </p>
+      </div>
+
+      <h2>📞 Contact &amp; Communication</h2>
+      <table>
+        <tbody>
+          <tr>
+            <td style="width: 30%;"><strong>Lead Developer</strong></td>
+            <td>Shiva Prajapat</td>
+          </tr>
+          <tr>
+            <td><strong>Studio</strong></td>
+            <td>Genius Developers</td>
+          </tr>
+          <tr>
+            <td><strong>Phone / WhatsApp</strong></td>
+            <td>+91 8955256878</td>
+          </tr>
+          <tr>
+            <td><strong>Email</strong></td>
+            <td>sshivaprajapat@gmail.com</td>
+          </tr>
+          <tr>
+            <td><strong>Website</strong></td>
+            <td>geniusdevelopers.space</td>
+          </tr>
+          <tr>
+            <td><strong>GitHub</strong></td>
+            <td>github.com/The-CyberGenius</td>
+          </tr>
+          <tr>
+            <td><strong>Live Project</strong></td>
+            <td>jgnews.live</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>💼 Why Work With Us</h2>
+      <div class="grid-2">
+        <div class="card card-accent">
+          <h3>🎯 Production-First</h3>
+          <p>Every line of code is written for production — no toy demos, no half-built features.</p>
+        </div>
+        <div class="card card-accent">
+          <h3>📐 Clean Architecture</h3>
+          <p>Industry-standard patterns — your future developers will thank you.</p>
+        </div>
+        <div class="card card-orange">
+          <h3>📚 Full Documentation</h3>
+          <p>You don't get just code — you get a maintainable, documented system.</p>
+        </div>
+        <div class="card card-orange">
+          <h3>🤝 Direct Communication</h3>
+          <p>You talk directly to the developer — no account managers, no overhead.</p>
+        </div>
+      </div>
+
+      <div class="page"></div>
+
+      <!-- ═══════════════════════════════════════════════════════════
+     PAGE 19 — SIGN-OFF
+═══════════════════════════════════════════════════════════ -->
+      <div class="header-strip">
+        <span class="doc-name">JG NEWS PLUS · PROJECT QUOTATION</span>
+        <span class="pg">PAGE 19</span>
+      </div>
+
+      <h1 class="section"><span class="num">15</span>Acceptance &amp; Sign-Off</h1>
+      <div class="section-bar"></div>
+
+      <p>
+        This quotation represents a comprehensive proposal for the design, development, and
+        deployment of the <strong>JG News Plus</strong> news portal platform. By signing below,
+        both parties acknowledge their understanding of and agreement with the scope,
+        deliverables, timeline, payment schedule, and terms outlined in this document.
+      </p>
+
+      <div class="summary-box">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+          <div>
+            <div class="total-label">PROJECT</div>
+            <div style="font-size: 18pt; font-weight: 800; margin-top: 6px;">JG News Plus</div>
+            <div style="font-size: 10.5pt; opacity: 0.9; margin-top: 4px;">Hindi News Portal &amp; E-Paper</div>
+          </div>
+          <div>
+            <div class="total-label">TOTAL</div>
+            <div class="total-value" style="font-size: 28pt;">₹ 1,75,000</div>
+          </div>
+        </div>
+      </div>
+
+      <h2>📝 Acceptance Statement</h2>
+      <div class="card">
+        <p style="margin-bottom: 0;">
+          I, the authorized representative of <strong>JG News Plus</strong>, hereby accept this
+          quotation in full. I authorize <strong>Genius Developers</strong> (Shiva Prajapat) to
+          proceed with the development as per the scope, timeline, deliverables, and
+          payment schedule defined in this document.
+        </p>
+      </div>
+
+      <div class="signature">
+        <div class="sign-block">
+          <div class="label">FOR · CLIENT</div>
+          <div style="height: 60px; border-bottom: 2px solid var(--navy); margin-top: 24px;"></div>
+          <div class="name">_________________________</div>
+          <div class="title">Authorized Signatory · JG News Plus</div>
+          <div class="title" style="margin-top: 16px;">Date: ____________________</div>
+        </div>
+        <div class="sign-block">
+          <div class="label">FOR · DEVELOPER</div>
+          <div style="height: 60px; border-bottom: 2px solid var(--navy); margin-top: 24px;"></div>
+          <div class="name">Shiva Prajapat</div>
+          <div class="title">Lead Developer · Genius Developers</div>
+          <div class="title" style="margin-top: 16px;">Date: ____________________</div>
+        </div>
+      </div>
+
+      <h2 style="margin-top: 48px;">🙏 A Note of Thanks</h2>
+      <div class="quote">
+        Thank you for considering Genius Developers for the JG News Plus project.
+        Building a newsroom-grade platform is a privilege — every keystroke of these
+        two months was invested in delivering a system that the journalists, editors,
+        and readers of Rajasthan can be proud to use.
+        <br /><br />
+        We look forward to a long, productive partnership.
+        <br /><br />
+        <strong>— Shiva Prajapat, Genius Developers</strong>
+      </div>
+
+      <div style="margin-top: 60px; text-align: center; color: var(--gray-500); font-size: 9.5pt;">
+        <p>This quotation document was prepared on <strong>8 May 2026</strong> &nbsp;·&nbsp; Document version 1.3</p>
+        <p>© 2026 Genius Developers · geniusdevelopers.space &nbsp;·&nbsp; All rights reserved.</p>
+      </div>
+
+    </div>
+  </div>
+</body>
+
+</html>
