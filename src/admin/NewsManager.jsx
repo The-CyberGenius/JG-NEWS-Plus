@@ -2,17 +2,21 @@ import React, { useState, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useNews } from '../context/NewsContext';
 import { timeAgo, formatDate } from '../utils/helpers';
+import { bulkArticleAction } from '../store/newsStore';
 
 const PER_PAGE = 50;
 
 export default function NewsManager() {
-    const { articles, deleteArticle, updateArticle } = useNews();
+    const { articles, deleteArticle, updateArticle, refresh } = useNews();
     const [page, setPage] = useState(1);
     const [confirm, setConfirm] = useState(null);
+    const [bulkConfirm, setBulkConfirm] = useState(null); // { action, ids, label }
     const [toast, setToast] = useState('');
     const [filterCat, setFilterCat] = useState('');
     const [sortDir, setSortDir] = useState('desc'); // 'desc' = newest first
     const [searchQ, setSearchQ] = useState('');
+    const [selected, setSelected] = useState(new Set()); // article ids selected
+    const [bulkLoading, setBulkLoading] = useState(false);
     const [dateFrom, setDateFrom] = useState('');
     const [dateTo, setDateTo] = useState('');
     const navigate = useNavigate();
@@ -81,6 +85,46 @@ export default function NewsManager() {
             const tz = dt.getTimezoneOffset() * 60000;
             return new Date(dt - tz).toISOString().slice(0, 16);
         } catch { return ''; }
+    };
+
+    // ─── Multi-select handlers ───────────────────────────────────────
+    const toggleSelect = (id) => {
+        setSelected(prev => {
+            const next = new Set(prev);
+            if (next.has(id)) next.delete(id); else next.add(id);
+            return next;
+        });
+    };
+    const toggleSelectAllVisible = () => {
+        const allVisibleIds = paginated.map(a => a.id);
+        const allSelected = allVisibleIds.every(id => selected.has(id));
+        setSelected(prev => {
+            const next = new Set(prev);
+            if (allSelected) {
+                allVisibleIds.forEach(id => next.delete(id));
+            } else {
+                allVisibleIds.forEach(id => next.add(id));
+            }
+            return next;
+        });
+    };
+    const clearSelection = () => setSelected(new Set());
+
+    const runBulkAction = async (action, label) => {
+        if (selected.size === 0) return;
+        setBulkLoading(true);
+        try {
+            const ids = Array.from(selected);
+            const result = await bulkArticleAction(ids, action);
+            showToast(`✅ ${label}: ${result.count} खबरें`);
+            clearSelection();
+            await refresh();
+        } catch (err) {
+            showToast('❌ Bulk action विफल: ' + (err.response?.data?.message || err.message));
+        } finally {
+            setBulkLoading(false);
+            setBulkConfirm(null);
+        }
     };
 
     const categories = [...new Set(articles.map(a => a.category))];
@@ -169,27 +213,90 @@ export default function NewsManager() {
                 ))}
             </div>
 
+            {/* Bulk Action Bar — visible when any row is selected */}
+            {selected.size > 0 && (
+                <div style={{
+                    position: 'sticky', top: 0, zIndex: 10,
+                    background: 'var(--navy)', color: 'white',
+                    padding: '12px 16px', borderRadius: '12px',
+                    marginBottom: '12px',
+                    display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center',
+                    boxShadow: '0 4px 16px rgba(10,22,40,0.3)',
+                }}>
+                    <span style={{ fontWeight: 800, fontSize: '0.9rem' }}>
+                        ✅ {selected.size} selected
+                    </span>
+                    <button
+                        onClick={() => setBulkConfirm({ action: 'delete', label: 'Delete', count: selected.size })}
+                        disabled={bulkLoading}
+                        style={{ background: 'var(--red)', color: 'white', border: 'none', padding: '6px 14px', borderRadius: '6px', cursor: 'pointer', fontWeight: 700, fontSize: '0.8rem' }}
+                    >🗑️ Delete</button>
+                    <button
+                        onClick={() => runBulkAction('hide', '👁️ Hidden')}
+                        disabled={bulkLoading}
+                        style={{ background: 'var(--gray-600)', color: 'white', border: 'none', padding: '6px 14px', borderRadius: '6px', cursor: 'pointer', fontWeight: 700, fontSize: '0.8rem' }}
+                    >👁️‍🗨️ Hide</button>
+                    <button
+                        onClick={() => runBulkAction('unhide', '👁️ Unhidden')}
+                        disabled={bulkLoading}
+                        style={{ background: 'var(--teal)', color: 'white', border: 'none', padding: '6px 14px', borderRadius: '6px', cursor: 'pointer', fontWeight: 700, fontSize: '0.8rem' }}
+                    >👁️ Unhide</button>
+                    <button
+                        onClick={() => runBulkAction('breaking-on', '🔴 Breaking ON')}
+                        disabled={bulkLoading}
+                        style={{ background: 'rgba(229,57,53,0.85)', color: 'white', border: 'none', padding: '6px 14px', borderRadius: '6px', cursor: 'pointer', fontWeight: 700, fontSize: '0.8rem' }}
+                    >🔴 Breaking</button>
+                    <button
+                        onClick={() => runBulkAction('featured-on', '⭐ Featured ON')}
+                        disabled={bulkLoading}
+                        style={{ background: 'var(--saffron)', color: 'white', border: 'none', padding: '6px 14px', borderRadius: '6px', cursor: 'pointer', fontWeight: 700, fontSize: '0.8rem' }}
+                    >⭐ Featured</button>
+                    <button
+                        onClick={clearSelection}
+                        style={{ background: 'transparent', color: 'white', border: '1px solid rgba(255,255,255,0.3)', padding: '6px 14px', borderRadius: '6px', cursor: 'pointer', fontWeight: 700, fontSize: '0.8rem', marginLeft: 'auto' }}
+                    >✕ Clear</button>
+                </div>
+            )}
+
             {/* Table - Desktop */}
             <div style={{ overflowX: 'auto', background: 'white', borderRadius: '12px', boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}>
                 <table className="data-table">
                     <thead>
                         <tr>
+                            <th style={{ padding: '12px 8px 12px 16px', width: '40px' }}>
+                                <input
+                                    type="checkbox"
+                                    checked={paginated.length > 0 && paginated.every(a => selected.has(a.id))}
+                                    onChange={toggleSelectAllVisible}
+                                    title="Select all visible"
+                                    style={{ cursor: 'pointer', width: '16px', height: '16px' }}
+                                />
+                            </th>
                             <th style={{ padding: '12px 16px' }}>खबर</th>
                             <th style={{ padding: '12px 16px' }}>श्रेणी</th>
                             <th style={{ padding: '12px 16px' }}>स्थान</th>
                             <th style={{ padding: '12px 16px' }}>ब्रेकिंग</th>
                             <th style={{ padding: '12px 16px' }}>फीचर्ड</th>
+                            <th style={{ padding: '12px 16px' }}>स्थिति</th>
                             <th style={{ padding: '12px 16px' }}>तारीख</th>
                             <th style={{ padding: '12px 16px' }}>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {paginated.map(a => (
-                            <tr key={a.id}>
+                            <tr key={a.id} style={{ background: selected.has(a.id) ? 'rgba(0,188,212,0.08)' : (a.isHidden ? 'rgba(229,57,53,0.04)' : 'transparent') }}>
+                                <td style={{ padding: '8px 8px 8px 16px' }}>
+                                    <input
+                                        type="checkbox"
+                                        checked={selected.has(a.id)}
+                                        onChange={() => toggleSelect(a.id)}
+                                        style={{ cursor: 'pointer', width: '16px', height: '16px' }}
+                                    />
+                                </td>
                                 <td style={{ padding: '8px 16px' }}>
                                     <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                                        <img src={a.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=100&q=60'} alt="" style={{ width: '40px', height: '30px', objectFit: 'cover', borderRadius: '4px' }} />
-                                        <div style={{ fontWeight: 700, fontSize: '0.85rem', color: 'var(--navy)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '250px' }}>{a.title}</div>
+                                        <img src={a.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=100&q=60'} alt="" style={{ width: '40px', height: '30px', objectFit: 'cover', borderRadius: '4px', opacity: a.isHidden ? 0.5 : 1 }} />
+                                        <div style={{ fontWeight: 700, fontSize: '0.85rem', color: a.isHidden ? 'var(--gray-500)' : 'var(--navy)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '250px', textDecoration: a.isHidden ? 'line-through' : 'none' }}>{a.title}</div>
                                     </div>
                                 </td>
                                 <td style={{ padding: '8px 16px' }}><span className="badge badge-teal" style={{ fontSize: '0.7rem' }}>{a.category}</span></td>
@@ -208,6 +315,22 @@ export default function NewsManager() {
                                         style={{ background: a.isFeatured ? 'var(--saffron)' : 'var(--gray-100)', color: a.isFeatured ? 'white' : 'var(--gray-600)', padding: '3px 8px', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 800, border: 'none', cursor: 'pointer' }}
                                     >
                                         {a.isFeatured ? 'हाँ' : 'नहीं'}
+                                    </button>
+                                </td>
+                                <td style={{ padding: '8px 16px' }}>
+                                    <button
+                                        onClick={() => {
+                                            updateArticle(a.id, { isHidden: !a.isHidden });
+                                            showToast(a.isHidden ? '👁️ Visible अब' : '👁️‍🗨️ Hidden ho gayi');
+                                        }}
+                                        title={a.isHidden ? 'Click to show on site' : 'Click to hide from site'}
+                                        style={{
+                                            background: a.isHidden ? 'var(--gray-600)' : 'var(--teal)',
+                                            color: 'white', padding: '3px 8px', borderRadius: '4px',
+                                            fontSize: '0.7rem', fontWeight: 800, border: 'none', cursor: 'pointer',
+                                        }}
+                                    >
+                                        {a.isHidden ? '👁️‍🗨️ Hidden' : '👁️ Visible'}
                                     </button>
                                 </td>
                                 <td style={{ padding: '8px 16px', fontSize: '0.7rem', color: 'var(--gray-500)', whiteSpace: 'nowrap' }}>
@@ -264,6 +387,30 @@ export default function NewsManager() {
                         disabled={page === totalPages}
                     >अगला ›</button>
                 </div>
+            )}
+
+            {/* Bulk Delete Confirm Modal */}
+            {bulkConfirm && (
+                <>
+                    <div className="mobile-menu-overlay show" onClick={() => setBulkConfirm(null)} />
+                    <div className="modal-wrap">
+                        <div className="modal">
+                            <div className="modal-title">⚠️ {bulkConfirm.count} खबरें हटाएं?</div>
+                            <p style={{ color: 'var(--gray-600)', fontSize: '0.9rem', marginBottom: '20px' }}>
+                                क्या आप वाकई <strong>{bulkConfirm.count} selected खबरें</strong> permanently delete करना चाहते हैं? यह कार्य वापस नहीं होगा।
+                                <br /><br />
+                                💡 Tip: Hide करने से public site से छुप जायेगी, but data save रहेगा।
+                            </p>
+                            <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+                                <button className="btn btn-sm" style={{ background: 'var(--gray-200)', color: 'var(--navy)' }} onClick={() => setBulkConfirm(null)}>रद्द करें</button>
+                                <button className="btn btn-sm" style={{ background: 'var(--gray-600)', color: 'white' }} onClick={() => { runBulkAction('hide', '👁️ Hidden'); }}>👁️‍🗨️ Hide करें instead</button>
+                                <button className="btn btn-sm btn-danger" onClick={() => runBulkAction('delete', '🗑️ Deleted')} disabled={bulkLoading}>
+                                    {bulkLoading ? '⏳ Deleting...' : `🗑️ हाँ, ${bulkConfirm.count} delete करें`}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </>
             )}
 
             {/* Delete Confirm Modal */}

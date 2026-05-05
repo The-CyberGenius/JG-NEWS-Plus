@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useNews } from '../context/NewsContext';
 import { syncNews, extractArticle } from '../store/newsStore';
 import { timeAgo, getRandomFallbackImage } from '../utils/helpers';
@@ -76,6 +77,7 @@ const makeExcerpt = (html, max = 180) => {
 };
 
 export default function NewsSyncManager() {
+    const navigate = useNavigate();
     const { addArticle, categories } = useNews();
     const [fetchedNews, setFetchedNews] = useState([]);
     const [activeTab, setActiveTab] = useState('rajasthan');
@@ -236,6 +238,30 @@ export default function NewsSyncManager() {
         });
     };
 
+    // ─── Edit & Post: open full ArticleForm with prefilled data ─────
+    const editAndPost = (item) => {
+        const heroImg = item.image || getRandomFallbackImage();
+        const cleanedContent = cleanContentHTML(item.fullContent, heroImg);
+        const detectedLoc = activeTab === 'rajasthan' ? detectLocation(item.title, item.fullContent) : 'अन्य';
+        const prefill = {
+            title: item.title || '',
+            excerpt: makeExcerpt(item.fullContent, 180),
+            content: `${cleanedContent}<p><br/>Source: <a href="${item.link}" target="_blank">${item.source}</a></p>`,
+            category: activeTab === 'rajasthan' ? 'राजस्थान' : (categories[0] || ''),
+            location: detectedLoc,
+            image: heroImg,
+            videoUrl: '',
+            author: 'AI Sync',
+            tags: ['AI Sync', item.source, activeTab].join(', '),
+            isBreaking: false,
+            isFeatured: false,
+            // Track which AI sync link this came from so we can remove it after save
+            __aiSyncLink: item.link,
+        };
+        // Pass via React Router state — ArticleForm reads & prefills
+        navigate('/admin/news/add', { state: { prefill } });
+    };
+
     return (
         <div style={{ animation: 'fadeIn 0.5s ease', paddingBottom: '40px' }}>
             {toast && <div className="toast" style={{ background: 'var(--navy)', color: 'var(--teal)', zIndex: 10000, fontWeight: 800 }}>{toast}</div>}
@@ -320,7 +346,10 @@ export default function NewsSyncManager() {
                                             <button onClick={() => setReadingItem(item)} style={{ background: 'none', border: 'none', color: 'var(--teal)', fontWeight: 800, fontSize: '0.85rem', cursor: 'pointer', padding: 0 }}>
                                                 📖 पूरी खबर पढ़ें
                                             </button>
-                                            <button onClick={() => openPreview(item)} className="btn btn-sm" style={{ background: CATEGORIES.find(c => c.id === activeTab).color, color: 'white', padding: '6px 16px' }}>
+                                            <button onClick={() => editAndPost(item)} className="btn btn-sm" style={{ background: CATEGORIES.find(c => c.id === activeTab).color, color: 'white', padding: '6px 16px' }} title="Open in editor — edit before publishing">
+                                                ✏️ Edit & Post
+                                            </button>
+                                            <button onClick={() => openPreview(item)} className="btn btn-sm" style={{ background: 'transparent', color: 'var(--gray-600)', border: '1px solid var(--gray-300)', padding: '5px 12px', fontSize: '0.78rem' }} title="Quick publish without editing">
                                                 ⚡ Quick Post
                                             </button>
                                         </div>
@@ -364,8 +393,8 @@ export default function NewsSyncManager() {
 
                             <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', borderTop: '1px solid var(--gray-100)', paddingTop: '20px', marginTop: '20px' }}>
                                 <button className="btn btn-navy btn-sm" onClick={() => setReadingItem(null)} style={{ background: 'var(--gray-200)', color: 'var(--navy)' }}>बंद करें (Close)</button>
-                                <button className="btn" onClick={() => { setReadingItem(null); openPreview(readingItem); }} style={{ background: CATEGORIES.find(c => c.id === activeTab).color, color: 'white', padding: '10px 25px', borderRadius: '12px', fontWeight: 800 }}>
-                                    ⚡ Quick Post
+                                <button className="btn" onClick={() => { const ri = readingItem; setReadingItem(null); editAndPost(ri); }} style={{ background: CATEGORIES.find(c => c.id === activeTab).color, color: 'white', padding: '10px 25px', borderRadius: '12px', fontWeight: 800 }}>
+                                    ✏️ Edit & Post
                                 </button>
                             </div>
                         </div>

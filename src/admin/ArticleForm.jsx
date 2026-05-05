@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate, useLocation, Link } from 'react-router-dom';
 import { useNews } from '../context/NewsContext';
 import { uploadImage } from '../store/newsStore';
 import ReactQuill from 'react-quill';
@@ -35,10 +35,13 @@ const toLocalInput = (d) => {
 
 export default function ArticleForm() {
     const { id } = useParams();
+    const location = useLocation();
     const { articles, categories, addArticle, updateArticle } = useNews();
     const navigate = useNavigate();
     const isEdit = Boolean(id);
     const quillRef = useRef(null);
+    const aiPrefill = location.state?.prefill || null;
+    const fromAiSync = !!aiPrefill;
 
     const [form, setForm] = useState(EMPTY_FORM);
     const [saving, setSaving] = useState(false);
@@ -107,8 +110,25 @@ export default function ArticleForm() {
                 });
                 setImgPreview(art.image || '');
             }
+        } else if (!isEdit && aiPrefill) {
+            // AI Sync prefilled data — load it into form
+            setForm({
+                title: aiPrefill.title || '',
+                excerpt: aiPrefill.excerpt || '',
+                content: aiPrefill.content || '',
+                category: aiPrefill.category || '',
+                location: aiPrefill.location || '',
+                image: aiPrefill.image || '',
+                videoUrl: aiPrefill.videoUrl || '',
+                author: aiPrefill.author || '',
+                tags: aiPrefill.tags || '',
+                isBreaking: aiPrefill.isBreaking || false,
+                isFeatured: aiPrefill.isFeatured || false,
+                date: '',
+            });
+            setImgPreview(aiPrefill.image || '');
         }
-    }, [id, isEdit, articles]);
+    }, [id, isEdit, articles, aiPrefill]);
 
     const set = (key, val) => setForm(f => ({ ...f, [key]: val }));
 
@@ -188,7 +208,7 @@ export default function ArticleForm() {
                 }}>←</Link>
                 <div>
                     <h1 style={{ fontSize: '1.8rem', fontWeight: 900, color: 'var(--navy)', margin: 0 }}>
-                        {isEdit ? '✏️ खबर संपादित करें' : '➕ नई खबर जोड़ें'}
+                        {isEdit ? '✏️ खबर संपादित करें' : (fromAiSync ? '🤖 AI Sync Article — Edit & Publish' : '➕ नई खबर जोड़ें')}
                     </h1>
                     <p style={{ color: 'var(--gray-500)', fontSize: '0.85rem', fontWeight: 600, marginTop: '4px' }}>
                         Optimized Cloudinary uploads के साथ मीडिया मैनेज करें

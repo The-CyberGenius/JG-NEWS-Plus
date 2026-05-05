@@ -43,12 +43,12 @@ export const NewsProvider = ({ children }) => {
         }
     }, []);
 
-    // Full refresh for admin (loads all articles with content)
+    // Full refresh for admin (loads all articles with content, including hidden)
     const refreshAll = useCallback(async () => {
         setIsLoading(true);
         try {
             const [fetchedArticles, fetchedCategories, fetchedSettings] = await Promise.all([
-                getArticles(), // No pagination = all articles
+                getArticles({ includeHidden: true }), // admin sees all articles incl. hidden
                 getCategories(),
                 getSettings(),
             ]);
