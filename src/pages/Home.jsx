@@ -228,33 +228,38 @@ export default function Home() {
                     <div className="hero-section">
                         {/* Auto-sliding Hero */}
                         <div className="hero-slider">
-                            {heroSlides.map((a, i) => (
-                                <Link
-                                    key={a.id}
-                                    to={`/article/${a.id}`}
-                                    className={`hero-slide ${i === slideIdx ? 'active' : ''}`}
-                                >
-                                    <img
-                                        className="hero-slide__img"
-                                        src={optimizeImage(a.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=900&q=80', { width: 1200 })}
-                                        srcSet={srcSet(a.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=900&q=80', [600, 900, 1200, 1600])}
-                                        sizes="(max-width: 1024px) 100vw, 66vw"
-                                        alt={a.title}
-                                        loading={i === 0 ? 'eager' : 'lazy'}
-                                        decoding="async"
-                                    />
-                                    <div className="hero-slide__overlay" />
-                                    <div className="hero-slide__body">
-                                        <span className="hero-slide__category">
-                                            {a.isBreaking ? 'ब्रेकिंग' : a.category}
-                                        </span>
-                                        <div className="hero-slide__title">{a.title}</div>
-                                        <div className="hero-slide__meta">
-                                            📍 {a.location} • {timeAgo(a.date)}
+                            <div
+                                className="hero-slider__track"
+                                style={{ transform: `translateX(-${slideIdx * 100}%)` }}
+                            >
+                                {heroSlides.map((a, i) => (
+                                    <Link
+                                        key={a.id}
+                                        to={`/article/${a.id}`}
+                                        className="hero-slide"
+                                    >
+                                        <img
+                                            className="hero-slide__img"
+                                            src={optimizeImage(a.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=900&q=80', { width: 1200 })}
+                                            srcSet={srcSet(a.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=900&q=80', [600, 900, 1200, 1600])}
+                                            sizes="(max-width: 1024px) 100vw, 66vw"
+                                            alt={a.title}
+                                            loading={i === 0 ? 'eager' : 'lazy'}
+                                            decoding="async"
+                                        />
+                                        <div className="hero-slide__overlay" />
+                                        <div className="hero-slide__body">
+                                            <span className="hero-slide__category">
+                                                {a.isBreaking ? 'ब्रेकिंग' : a.category}
+                                            </span>
+                                            <div className="hero-slide__title">{a.title}</div>
+                                            <div className="hero-slide__meta">
+                                                📍 {a.location} • {timeAgo(a.date)}
+                                            </div>
                                         </div>
-                                    </div>
-                                </Link>
-                            ))}
+                                    </Link>
+                                ))}
+                            </div>
                             <div className="hero-dots">
                                 {heroSlides.map((_, i) => (
                                     <button
