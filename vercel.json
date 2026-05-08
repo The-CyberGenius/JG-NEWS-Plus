@@ -1,51 +1,29 @@
 {
-    "version": 2,
-    "builds": [
-        {
-            "src": "backend/server.js",
-            "use": "@vercel/node"
-        },
-        {
-            "src": "package.json",
-            "use": "@vercel/static-build",
-            "config": {
-                "distDir": "dist"
-            }
-        }
-    ],
-    "routes": [
-        {
-            "src": "/sitemap.xml",
-            "dest": "backend/server.js"
-        },
-        {
-            "src": "/api/(.*)",
-            "dest": "backend/server.js"
-        },
-        {
-            "handle": "filesystem"
-        },
-        {
-            "src": "/(.*)",
-            "dest": "/index.html"
-        }
+    "$schema": "https://openapi.vercel.sh/vercel.json",
+    "buildCommand": "npm run build",
+    "outputDirectory": "dist",
+    "framework": null,
+    "rewrites": [
+        { "source": "/sitemap.xml", "destination": "/api" },
+        { "source": "/api/:path*", "destination": "/api" }
     ],
     "headers": [
         {
-            "source": "/(.*)",
+            "source": "/sitemap.xml",
             "headers": [
-                {
-                    "key": "Cache-Control",
-                    "value": "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0"
-                },
-                {
-                    "key": "Pragma",
-                    "value": "no-cache"
-                },
-                {
-                    "key": "Expires",
-                    "value": "0"
-                }
+                { "key": "Content-Type", "value": "application/xml; charset=utf-8" }
+            ]
+        },
+        {
+            "source": "/(.*\\.(js|css|woff2?|ttf|otf|jpg|jpeg|png|webp|svg|ico|gif))",
+            "headers": [
+                { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+            ]
+        },
+        {
+            "source": "/manifest.webmanifest",
+            "headers": [
+                { "key": "Cache-Control", "value": "public, max-age=86400" }
             ]
         }
     ]
