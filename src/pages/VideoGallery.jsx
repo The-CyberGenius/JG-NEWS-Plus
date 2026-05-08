@@ -1,4 +1,5 @@
 import React from 'react';
+import { articleHref } from '../utils/articleHref';
 import { Link } from 'react-router-dom';
 import { useNews } from '../context/NewsContext';
 import { timeAgo } from '../utils/helpers';
@@ -23,7 +24,7 @@ export default function VideoGallery() {
             ) : (
                 <div className="news-grid-3" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '20px', marginBottom: '40px' }}>
                     {videoArticles.map(a => (
-                        <Link key={a.id} to={`/article/${a.id}`} className="news-card" style={{ textDecoration: 'none' }}>
+                        <Link key={a.id} to={articleHref(a)} className="news-card" style={{ textDecoration: 'none' }}>
                             <div style={{ position: 'relative', paddingTop: '56.25%', overflow: 'hidden', borderRadius: '12px 12px 0 0', background: 'var(--navy)' }}>
                                 <img src={a.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600&q=80'} alt={a.title} loading="lazy"
                                     style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.8 }} />
@@ -44,7 +45,7 @@ export default function VideoGallery() {
             <h2 className="section-title">सभी खबरें</h2>
             <div className="news-grid news-grid-4">
                 {allArticles.slice(0, 8).map(a => (
-                    <Link key={a.id} to={`/article/${a.id}`} className="news-card" style={{ textDecoration: 'none' }}>
+                    <Link key={a.id} to={articleHref(a)} className="news-card" style={{ textDecoration: 'none' }}>
                         <div className="news-card__img">
                             <img src={a.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=400&q=70'} alt={a.title} loading="lazy" />
                         </div>

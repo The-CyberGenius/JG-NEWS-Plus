@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { articleHref } from '../utils/articleHref';
 import { Link, useNavigate } from 'react-router-dom';
 import { useNews } from '../context/NewsContext';
 import { useLang } from '../context/LangContext';
@@ -178,7 +179,7 @@ export default function Header() {
                     <div className="ticker-content">
                         <div className="ticker-inner">
                             {[...breakingArticles, ...breakingArticles].map((a, i) => (
-                                <Link key={`${a.id}-${i}`} to={`/article/${a.id}`} className="ticker-item">
+                                <Link key={`${a.id}-${i}`} to={articleHref(a)} className="ticker-item">
                                     <span className="ticker-dot">●</span>{a.title}
                                 </Link>
                             ))}

@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { articleHref } from '../utils/articleHref';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useNews } from '../context/NewsContext';
 import { timeAgo } from '../utils/helpers';
@@ -39,7 +40,7 @@ export default function SearchResults() {
             ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                     {results.map(a => (
-                        <Link key={a.id} to={`/article/${a.id}`} style={{ textDecoration: 'none' }}>
+                        <Link key={a.id} to={articleHref(a)} style={{ textDecoration: 'none' }}>
                             <div style={{ background: 'white', borderRadius: 'var(--radius-md)', padding: '16px', boxShadow: 'var(--card-shadow)', display: 'flex', gap: '16px', transition: 'var(--transition)' }}
                                 onMouseEnter={e => e.currentTarget.style.boxShadow = 'var(--card-shadow-hover)'}
                                 onMouseLeave={e => e.currentTarget.style.boxShadow = 'var(--card-shadow)'}

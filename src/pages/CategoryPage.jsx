@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { articleHref } from '../utils/articleHref';
 import { useParams, Link } from 'react-router-dom';
 import { useNews } from '../context/NewsContext';
 import { timeAgo, formatDate } from '../utils/helpers';
@@ -7,7 +8,7 @@ import { SEO } from '../utils/seo';
 
 function NewsCard({ article }) {
     return (
-        <Link to={`/article/${article.id}`} className="news-card" style={{ textDecoration: 'none' }}>
+        <Link to={articleHref(article)} className="news-card" style={{ textDecoration: 'none' }}>
             <div className="news-card__img">
                 <img src={article.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600&q=80'} alt={article.title} loading="lazy" />
                 {article.isBreaking && <span className="badge badge-red">ब्रेकिंग</span>}

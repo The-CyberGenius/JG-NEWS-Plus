@@ -1,7 +1,17 @@
 import express from 'express';
 import Article from '../models/Article.js';
+import { slugify, uniqueSlug } from '../utils/slugify.js';
 
 const router = express.Router();
+
+// Helper: ensure article has a slug, generate if missing
+const ensureSlug = async (title, currentSlug, currentId) => {
+    if (currentSlug) return currentSlug;
+    return await uniqueSlug(title, async (s) => {
+        const existing = await Article.findOne({ slug: s, _id: { $ne: currentId } }).lean();
+        return !!existing;
+    });
+};
 
 // Get articles with optional pagination & field projection
 router.get('/', async (req, res) => {
@@ -19,7 +29,7 @@ router.get('/', async (req, res) => {
 
             // Lightweight projection for list views (exclude heavy content field)
             const projection = fields === 'summary'
-                ? { title: 1, excerpt: 1, category: 1, location: 1, image: 1, videoUrl: 1, isBreaking: 1, isFeatured: 1, author: 1, tags: 1, date: 1, createdAt: 1, isHidden: 1 }
+                ? { title: 1, slug: 1, excerpt: 1, category: 1, location: 1, image: 1, videoUrl: 1, isBreaking: 1, isFeatured: 1, author: 1, tags: 1, date: 1, createdAt: 1, isHidden: 1 }
                 : {};
 
             const [articles, total] = await Promise.all([
@@ -40,10 +50,19 @@ router.get('/', async (req, res) => {
     }
 });
 
-// Get a single article
-router.get('/:id', async (req, res) => {
+// Get a single article — accepts MongoDB _id OR slug
+router.get('/:idOrSlug', async (req, res) => {
     try {
-        const article = await Article.findById(req.params.id).lean();
+        const { idOrSlug } = req.params;
+        let article;
+        // Try as Mongo ObjectId first (24 hex chars)
+        if (/^[0-9a-fA-F]{24}$/.test(idOrSlug)) {
+            article = await Article.findById(idOrSlug).lean();
+        }
+        // If not found OR not an ObjectId pattern, try as slug
+        if (!article) {
+            article = await Article.findOne({ slug: idOrSlug }).lean();
+        }
         if (!article) return res.status(404).json({ message: 'Article not found' });
         res.set('Cache-Control', 'public, max-age=60');
         res.json(article);
@@ -54,8 +73,16 @@ router.get('/:id', async (req, res) => {
 
 // Create article
 router.post('/', async (req, res) => {
-    const article = new Article(req.body);
     try {
+        const data = { ...req.body };
+        // Auto-generate slug from title if not provided
+        if (!data.slug && data.title) {
+            data.slug = await uniqueSlug(data.title, async (s) => {
+                const existing = await Article.findOne({ slug: s }).lean();
+                return !!existing;
+            });
+        }
+        const article = new Article(data);
         const newArticle = await article.save();
         res.status(201).json(newArticle);
     } catch (error) {
@@ -66,10 +93,43 @@ router.post('/', async (req, res) => {
 // Update article
 router.put('/:id', async (req, res) => {
     try {
-        const updatedArticle = await Article.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        const data = { ...req.body };
+        // Regenerate slug if title changed and no explicit slug provided
+        if (data.title && !data.slug) {
+            const current = await Article.findById(req.params.id).lean();
+            if (current && current.title !== data.title) {
+                // Title changed → generate new slug (avoid clash with self)
+                data.slug = await uniqueSlug(data.title, async (s) => {
+                    const existing = await Article.findOne({ slug: s, _id: { $ne: req.params.id } }).lean();
+                    return !!existing;
+                });
+            }
+        }
+        const updatedArticle = await Article.findByIdAndUpdate(req.params.id, data, { new: true });
         res.json(updatedArticle);
     } catch (error) {
         res.status(400).json({ message: error.message });
+    }
+});
+
+// Backfill slugs for existing articles (one-time admin migration)
+// POST /api/articles/backfill-slugs
+router.post('/backfill-slugs', async (req, res) => {
+    try {
+        const articles = await Article.find({ $or: [{ slug: { $exists: false } }, { slug: null }, { slug: '' }] }, { _id: 1, title: 1 }).lean();
+        let count = 0;
+        for (const a of articles) {
+            const slug = await uniqueSlug(a.title, async (s) => {
+                const existing = await Article.findOne({ slug: s, _id: { $ne: a._id } }).lean();
+                return !!existing;
+            });
+            await Article.updateOne({ _id: a._id }, { $set: { slug } });
+            count++;
+        }
+        res.json({ ok: true, updated: count, total: articles.length });
+    } catch (error) {
+        console.error('Backfill error:', error);
+        res.status(500).json({ message: error.message });
     }
 });
 

@@ -18,7 +18,7 @@ const esc = (str) => String(str || '')
 router.get('/sitemap.xml', async (req, res) => {
     try {
         const [articles, categories] = await Promise.all([
-            Article.find({}, { _id: 1, date: 1, updatedAt: 1, image: 1, title: 1 })
+            Article.find({}, { _id: 1, slug: 1, date: 1, updatedAt: 1, image: 1, title: 1 })
                 .sort({ date: -1 }).limit(2000).lean(),
             Category.find().lean(),
         ]);
@@ -65,8 +65,9 @@ router.get('/sitemap.xml', async (req, res) => {
             const pubDate = (a.date || a.updatedAt || new Date()).toISOString();
             const isRecent = (Date.now() - new Date(pubDate).getTime()) < 2 * 24 * 60 * 60 * 1000; // 2 days
 
+            const articleUrl = a.slug ? `${SITE_URL}/article/${a.slug}` : `${SITE_URL}/article/${a._id}`;
             xml += `  <url>\n`;
-            xml += `    <loc>${SITE_URL}/article/${a._id}</loc>\n`;
+            xml += `    <loc>${articleUrl}</loc>\n`;
             xml += `    <lastmod>${lastmod}</lastmod>\n`;
             xml += `    <changefreq>weekly</changefreq>\n`;
             xml += `    <priority>0.7</priority>\n`;
