@@ -15,6 +15,7 @@ import newsSyncRoutes from './routes/newsSync.js';
 import messageRoutes from './routes/messages.js';
 import analyticsRoutes from './routes/analytics.js';
 import seoRoutes from './routes/seo.js';
+import subscriberRoutes from './routes/subscribers.js';
 import Article from './models/Article.js';
 import Category from './models/Category.js';
 
@@ -41,6 +42,7 @@ app.use('/api/news-sync', newsSyncRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/seo', seoRoutes);
+app.use('/api/subscribers', subscriberRoutes);
 
 // Root-level SEO endpoints (Google expects /sitemap.xml at root)
 const SITE_URL = process.env.SITE_URL || 'https://jgnews.live';
