@@ -555,6 +555,10 @@ ol {
   overflow: hidden;
   height: 320px;
   background: var(--navy);
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 @media (min-width: 768px) {
