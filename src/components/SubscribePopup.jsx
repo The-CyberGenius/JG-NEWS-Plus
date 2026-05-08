@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { api } from '../store/newsStore';
 
+const GOOGLE_CLIENT_ID = '604488011504-akubcgj9mgifq6gg97rt9d3pbbegsrle.apps.googleusercontent.com';
 const SUBSCRIBED_KEY = 'jgnews_subscribed';
 const DISMISSED_KEY = 'jgnews_subscribe_dismissed_at';
 const DISMISS_DURATION = 7 * 24 * 60 * 60 * 1000; // 7 days
@@ -43,6 +44,53 @@ export default function SubscribePopup() {
             localStorage.setItem(DISMISSED_KEY, String(Date.now()));
         }
     };
+
+    // ─── Google Sign-In ─────────────────────────────────────────────
+    const googleBtnRef = useRef(null);
+
+    const handleGoogleResponse = async (response) => {
+        if (!response?.credential) return;
+        setSubmitting(true);
+        setError('');
+        try {
+            const res = await api.post('/subscribers/google', { credential: response.credential });
+            setSuccess(true);
+            localStorage.setItem(SUBSCRIBED_KEY, '1');
+            setTimeout(() => setOpen(false), 3500);
+        } catch (err) {
+            setError(err.response?.data?.message || 'Google sign-in failed, try email instead');
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
+    // Initialize Google Sign-In button when popup opens
+    useEffect(() => {
+        if (!open || success) return;
+        if (!window.google?.accounts?.id) return;
+
+        try {
+            window.google.accounts.id.initialize({
+                client_id: GOOGLE_CLIENT_ID,
+                callback: handleGoogleResponse,
+                ux_mode: 'popup',
+            });
+            if (googleBtnRef.current) {
+                googleBtnRef.current.innerHTML = ''; // clear if re-rendering
+                window.google.accounts.id.renderButton(googleBtnRef.current, {
+                    theme: 'outline',
+                    size: 'large',
+                    shape: 'pill',
+                    text: 'continue_with',
+                    logo_alignment: 'left',
+                    width: 320,
+                });
+            }
+        } catch (err) {
+            console.warn('Google Sign-In init failed:', err);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [open, success]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -174,6 +222,22 @@ export default function SubscribePopup() {
                                 boxShadow: '0 8px 30px rgba(0,0,0,0.12)',
                             }}
                         >
+                            {/* Google Sign-In Button — recommended */}
+                            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '14px' }}>
+                                <div ref={googleBtnRef} />
+                            </div>
+
+                            {/* Divider */}
+                            <div style={{
+                                display: 'flex', alignItems: 'center', gap: '10px',
+                                margin: '14px 0 14px',
+                                color: 'var(--gray-400)', fontSize: '0.78rem', fontWeight: 600,
+                            }}>
+                                <span style={{ flex: 1, height: '1px', background: 'var(--gray-200)' }} />
+                                <span>या email से</span>
+                                <span style={{ flex: 1, height: '1px', background: 'var(--gray-200)' }} />
+                            </div>
+
                             <input
                                 type="text"
                                 placeholder="आपका नाम (optional)"
