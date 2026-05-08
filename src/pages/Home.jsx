@@ -198,6 +198,64 @@ export default function Home() {
         if (heroSlides.length > 1) startSlideTimer();
         return () => { if (slideTimer.current) clearInterval(slideTimer.current); };
     }, [heroSlides.length, startSlideTimer]);
+
+    // ─── Touch swipe support ───────────────────────────────────────
+    const touchStartX = useRef(null);
+    const touchStartY = useRef(null);
+    const touchMoved = useRef(false);
+    const SWIPE_THRESHOLD = 50; // pixels
+
+    const onSliderTouchStart = (e) => {
+        const t = e.touches[0];
+        touchStartX.current = t.clientX;
+        touchStartY.current = t.clientY;
+        touchMoved.current = false;
+        // Pause auto-slide while user interacts
+        if (slideTimer.current) clearInterval(slideTimer.current);
+    };
+
+    const onSliderTouchMove = (e) => {
+        if (touchStartX.current == null) return;
+        const t = e.touches[0];
+        const dx = t.clientX - touchStartX.current;
+        const dy = t.clientY - touchStartY.current;
+        // If horizontal swipe is dominant, mark moved (so click won't fire)
+        if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 10) {
+            touchMoved.current = true;
+        }
+    };
+
+    const onSliderTouchEnd = (e) => {
+        if (touchStartX.current == null) return;
+        const endX = e.changedTouches[0].clientX;
+        const endY = e.changedTouches[0].clientY;
+        const dx = endX - touchStartX.current;
+        const dy = endY - touchStartY.current;
+        // Only count as swipe if horizontal motion dominates and exceeds threshold
+        if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > SWIPE_THRESHOLD) {
+            const total = heroSlides.length;
+            if (total > 1) {
+                if (dx < 0) {
+                    setSlideIdx(prev => (prev + 1) % total);
+                } else {
+                    setSlideIdx(prev => (prev - 1 + total) % total);
+                }
+            }
+        }
+        touchStartX.current = null;
+        touchStartY.current = null;
+        // Resume auto-slide
+        startSlideTimer();
+    };
+
+    // Prevent accidental link click when user actually swiped
+    const onSliderClickCapture = (e) => {
+        if (touchMoved.current) {
+            e.preventDefault();
+            e.stopPropagation();
+            touchMoved.current = false;
+        }
+    };
     const byCategory = useMemo(() => {
         // Pick first 4 categories from DB
         const cats = categories.slice(0, 4);
@@ -227,7 +285,13 @@ export default function Home() {
                 ) : (
                     <div className="hero-section">
                         {/* Auto-sliding Hero */}
-                        <div className="hero-slider">
+                        <div
+                            className="hero-slider"
+                            onTouchStart={onSliderTouchStart}
+                            onTouchMove={onSliderTouchMove}
+                            onTouchEnd={onSliderTouchEnd}
+                            onClickCapture={onSliderClickCapture}
+                        >
                             <div
                                 className="hero-slider__track"
                                 style={{ transform: `translateX(-${slideIdx * 100}%)` }}
