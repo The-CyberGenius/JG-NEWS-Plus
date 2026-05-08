@@ -11,7 +11,10 @@ const subscriberSchema = new mongoose.Schema({
     },
     name: { type: String, trim: true, default: '' },
     phone: { type: String, trim: true, default: '' },
-    source: { type: String, default: 'popup' }, // popup | footer | inline
+    source: { type: String, default: 'popup' }, // popup | footer | inline | google
+    verified: { type: Boolean, default: false }, // true if signed up via Google (email auto-verified)
+    googleId: { type: String, default: '', index: true, sparse: true }, // Google sub claim
+    picture: { type: String, default: '' }, // Google profile picture URL
     isActive: { type: Boolean, default: true },
     unsubscribedAt: { type: Date, default: null },
     ipAddress: { type: String, default: '' },

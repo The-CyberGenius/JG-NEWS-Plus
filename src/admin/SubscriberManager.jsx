@@ -207,12 +207,23 @@ export default function SubscriberManager() {
                                     />
                                 </td>
                                 <td style={{ padding: '8px 16px' }}>
-                                    <a href={`mailto:${s.email}`} style={{ color: 'var(--navy)', fontWeight: 700, textDecoration: 'none', fontSize: '0.9rem' }}>{s.email}</a>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                        <a href={`mailto:${s.email}`} style={{ color: 'var(--navy)', fontWeight: 700, textDecoration: 'none', fontSize: '0.9rem' }}>{s.email}</a>
+                                        {s.verified && <span title="Verified via Google" style={{ fontSize: '0.85rem' }}>✅</span>}
+                                    </div>
                                 </td>
-                                <td style={{ padding: '8px 16px', fontSize: '0.85rem' }}>{s.name || <span style={{ color: 'var(--gray-400)' }}>—</span>}</td>
+                                <td style={{ padding: '8px 16px', fontSize: '0.85rem' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                        {s.picture && <img src={s.picture} alt="" style={{ width: '22px', height: '22px', borderRadius: '50%' }} />}
+                                        {s.name || <span style={{ color: 'var(--gray-400)' }}>—</span>}
+                                    </div>
+                                </td>
                                 <td style={{ padding: '8px 16px', fontSize: '0.85rem' }}>{s.phone || <span style={{ color: 'var(--gray-400)' }}>—</span>}</td>
                                 <td style={{ padding: '8px 16px' }}>
-                                    <span className="badge badge-teal" style={{ fontSize: '0.7rem' }}>{s.source}</span>
+                                    {s.source === 'google'
+                                        ? <span style={{ background: '#e8f5e9', color: '#2e7d32', padding: '2px 10px', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 800 }}>🔵 Google</span>
+                                        : <span className="badge badge-teal" style={{ fontSize: '0.7rem' }}>{s.source}</span>
+                                    }
                                 </td>
                                 <td style={{ padding: '8px 16px' }}>
                                     {s.isActive

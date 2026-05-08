@@ -38,6 +38,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://res.cloudinary.com" crossorigin />
+  <link rel="preconnect" href="https://accounts.google.com" />
   <link
     href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap"
     rel="stylesheet" />
@@ -63,6 +64,8 @@
 <body>
   <div id="root"></div>
   <script type="module" src="/src/main.jsx"></script>
+  <!-- Google Identity Services (loaded async, used by SubscribePopup) -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function () {

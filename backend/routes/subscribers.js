@@ -1,7 +1,11 @@
 import express from 'express';
+import { OAuth2Client } from 'google-auth-library';
 import Subscriber from '../models/Subscriber.js';
 
 const router = express.Router();
+
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || '604488011504-akubcgj9mgifq6gg97rt9d3pbbegsrle.apps.googleusercontent.com';
+const googleClient = new OAuth2Client(GOOGLE_CLIENT_ID);
 
 // Public: subscribe
 // POST /api/subscribers
@@ -53,6 +57,84 @@ router.post('/', async (req, res) => {
         }
         console.error('Subscribe error:', error);
         res.status(500).json({ message: error.message });
+    }
+});
+
+// Public: subscribe via Google Sign-In (1-click)
+// POST /api/subscribers/google
+// body: { credential } where credential is the JWT ID token from Google
+router.post('/google', async (req, res) => {
+    try {
+        const { credential } = req.body || {};
+        if (!credential || typeof credential !== 'string') {
+            return res.status(400).json({ message: 'Google credential required' });
+        }
+
+        // Verify the token with Google
+        const ticket = await googleClient.verifyIdToken({
+            idToken: credential,
+            audience: GOOGLE_CLIENT_ID,
+        });
+        const payload = ticket.getPayload();
+        if (!payload || !payload.email) {
+            return res.status(400).json({ message: 'Invalid Google token' });
+        }
+        if (!payload.email_verified) {
+            return res.status(400).json({ message: 'Email not verified by Google' });
+        }
+
+        const email = payload.email.toLowerCase().trim();
+        const name = payload.name || `${payload.given_name || ''} ${payload.family_name || ''}`.trim();
+        const picture = payload.picture || '';
+        const googleId = payload.sub; // unique stable Google user ID
+
+        const ipAddress = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || '';
+        const userAgent = (req.headers['user-agent'] || '').slice(0, 500);
+
+        // Check if already exists by googleId or email
+        let sub = await Subscriber.findOne({ $or: [{ googleId }, { email }] });
+
+        if (sub) {
+            // Update Google info / reactivate if needed
+            let changed = false;
+            if (!sub.verified) { sub.verified = true; changed = true; }
+            if (!sub.googleId) { sub.googleId = googleId; changed = true; }
+            if (name && !sub.name) { sub.name = name; changed = true; }
+            if (picture && !sub.picture) { sub.picture = picture; changed = true; }
+            if (!sub.isActive) {
+                sub.isActive = true;
+                sub.unsubscribedAt = null;
+                changed = true;
+            }
+            if (changed) await sub.save();
+            return res.json({
+                ok: true,
+                message: sub.isActive ? 'Welcome back!' : 'Reactivated',
+                alreadyExists: true,
+                subscriber: { email: sub.email, name: sub.name, picture: sub.picture },
+            });
+        }
+
+        sub = await Subscriber.create({
+            email,
+            name,
+            picture,
+            googleId,
+            verified: true,
+            source: 'google',
+            ipAddress,
+            userAgent,
+        });
+
+        res.status(201).json({
+            ok: true,
+            message: 'Subscribed successfully via Google',
+            id: sub._id,
+            subscriber: { email: sub.email, name: sub.name, picture: sub.picture },
+        });
+    } catch (error) {
+        console.error('Google subscribe error:', error);
+        res.status(500).json({ message: 'Google verification failed' });
     }
 });
 
