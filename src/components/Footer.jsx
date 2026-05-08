@@ -45,6 +45,37 @@ export default function Footer() {
                         <div style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--saffron)', letterSpacing: '1px' }}>
                             {t.motto}
                         </div>
+
+                        {/* Subscribe button — opens popup via global event */}
+                        <button
+                            onClick={() => window.dispatchEvent(new CustomEvent('jgnews:open-subscribe'))}
+                            style={{
+                                marginTop: '16px',
+                                background: 'linear-gradient(135deg, #00bcd4, #0097a7)',
+                                color: 'white',
+                                border: 'none',
+                                padding: '10px 20px',
+                                borderRadius: '100px',
+                                fontWeight: 700,
+                                fontSize: '0.85rem',
+                                cursor: 'pointer',
+                                boxShadow: '0 4px 14px rgba(0,188,212,0.3)',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '6px',
+                                transition: 'transform 0.2s, box-shadow 0.2s',
+                            }}
+                            onMouseEnter={e => {
+                                e.currentTarget.style.transform = 'translateY(-2px)';
+                                e.currentTarget.style.boxShadow = '0 8px 20px rgba(0,188,212,0.5)';
+                            }}
+                            onMouseLeave={e => {
+                                e.currentTarget.style.transform = 'translateY(0)';
+                                e.currentTarget.style.boxShadow = '0 4px 14px rgba(0,188,212,0.3)';
+                            }}
+                        >
+                            📬 {lang === 'hi' ? 'Newsletter Subscribe करें' : 'Subscribe to Newsletter'}
+                        </button>
                     </div>
 
                     {/* Categories */}

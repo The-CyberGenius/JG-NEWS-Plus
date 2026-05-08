@@ -6,6 +6,7 @@ import { NewsProvider } from './context/NewsContext';
 import { LangProvider } from './context/LangContext';
 import Header from './components/Header';
 import Footer from './components/Footer';
+import SubscribePopup from './components/SubscribePopup';
 
 // Lazy loading pages and admin components
 const Home = lazy(() => import('./pages/Home'));
@@ -32,6 +33,7 @@ const AdminGuard = lazy(() => import('./admin/AdminGuard'));
 const NewsSyncManager = lazy(() => import('./admin/NewsSyncManager'));
 const MessageManager = lazy(() => import('./admin/MessageManager'));
 const AnalyticsPage = lazy(() => import('./admin/AnalyticsPage'));
+const SubscriberManager = lazy(() => import('./admin/SubscriberManager'));
 
 function PublicLayout({ children }) {
     return (
@@ -39,6 +41,7 @@ function PublicLayout({ children }) {
             <Header />
             <main style={{ minHeight: '60vh' }}>{children}</main>
             <Footer />
+            <SubscribePopup />
         </>
     );
 }
@@ -86,6 +89,7 @@ export default function App() {
                                             <Route path="sync" element={<NewsSyncManager />} />
                                             <Route path="messages" element={<MessageManager />} />
                                             <Route path="analytics" element={<AnalyticsPage />} />
+                                            <Route path="subscribers" element={<SubscriberManager />} />
                                         </Routes>
                                     </AdminLayout>
                                 </AdminGuard>
