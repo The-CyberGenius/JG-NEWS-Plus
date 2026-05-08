@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { articleHref } from '../utils/articleHref';
 import { Link } from 'react-router-dom';
 import { useNews } from '../context/NewsContext';
 
@@ -35,7 +36,7 @@ export default function PhotoGallery() {
                                 <p style={{ fontWeight: 700, color: 'var(--navy)', fontSize: '0.95rem', marginTop: '4px' }}>{lightbox.title}</p>
                             </div>
                             <div style={{ display: 'flex', gap: '8px' }}>
-                                <Link to={`/article/${lightbox.id}`} className="btn btn-primary btn-sm">पूरी खबर</Link>
+                                <Link to={articleHref(lightbox)} className="btn btn-primary btn-sm">पूरी खबर</Link>
                                 <button onClick={() => setLightbox(null)} className="btn btn-sm" style={{ background: 'var(--gray-200)', color: 'var(--navy)' }}>✕ बंद</button>
                             </div>
                         </div>

@@ -6,6 +6,7 @@ import { timeAgo, formatDate } from '../utils/helpers';
 import { api } from '../store/newsStore';
 import { SEO, articleStructuredData } from '../utils/seo';
 import { optimizeImage } from '../utils/imageUrl';
+import { articleHref } from '../utils/articleHref';
 
 export default function ArticlePage() {
     const { id } = useParams();
@@ -124,7 +125,7 @@ export default function ArticlePage() {
                 title={article.title}
                 description={article.excerpt || article.title}
                 image={optimizeImage(article.image, { width: 1200 })}
-                url={`/article/${article.id}`}
+                url={articleHref(article)}
                 type="article"
                 publishedAt={article.date}
                 modifiedAt={article.updatedAt || article.date}
@@ -323,7 +324,7 @@ export default function ArticlePage() {
                             <h2 className="section-title">संबंधित खबरें</h2>
                             <div className="news-grid news-grid-4">
                                 {related.map(a => (
-                                    <Link key={a.id} to={`/article/${a.id}`} className="news-card" style={{ textDecoration: 'none' }}>
+                                    <Link key={a.id} to={articleHref(a)} className="news-card" style={{ textDecoration: 'none' }}>
                                         <div className="news-card__img">
                                             <img src={a.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=400&q=70'} alt={a.title} loading="lazy" />
                                         </div>

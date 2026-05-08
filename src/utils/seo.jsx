@@ -85,7 +85,7 @@ export function articleStructuredData(article) {
         inLanguage: 'hi',
         mainEntityOfPage: {
             '@type': 'WebPage',
-            '@id': `${SITE_URL}/article/${article.id || article._id}`,
+            '@id': `${SITE_URL}/article/${article.slug || article.id || article._id}`,
         },
     };
 }

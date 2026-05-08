@@ -6,6 +6,7 @@ import { NewsCardSkeleton, CategorySectionSkeleton, ListSkeleton } from '../comp
 import { SEO } from '../utils/seo';
 import { optimizeImage, srcSet } from '../utils/imageUrl';
 import { api } from '../store/newsStore';
+import { articleHref } from '../utils/articleHref';
 
 const INITIAL_WEATHER = [
     { city: 'रतनगढ़', temp: '34°C', icon: '☀️', desc: 'धूप' },
@@ -29,7 +30,7 @@ const INITIAL_WEATHER = [
 function NewsCard({ article }) {
     const imgUrl = article.image || `https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600&q=80`;
     return (
-        <Link to={`/article/${article.id}`} className="news-card" style={{ textDecoration: 'none' }}>
+        <Link to={articleHref(article)} className="news-card" style={{ textDecoration: 'none' }}>
             <div className="news-card__img">
                 <img
                     src={optimizeImage(imgUrl, { width: 600 })}
@@ -299,7 +300,7 @@ export default function Home() {
                                 {heroSlides.map((a, i) => (
                                     <Link
                                         key={a.id}
-                                        to={`/article/${a.id}`}
+                                        to={articleHref(a)}
                                         className="hero-slide"
                                     >
                                         <img
@@ -346,7 +347,7 @@ export default function Home() {
                                 </div>
                                 <div className="news-flash__list">
                                     {trending.map((a, i) => (
-                                        <Link key={a.id} to={`/article/${a.id}`} className="news-flash__item">
+                                        <Link key={a.id} to={articleHref(a)} className="news-flash__item">
                                             <span style={{
                                                 fontSize: '0.95rem',
                                                 fontWeight: 900,
@@ -371,7 +372,7 @@ export default function Home() {
                                 </div>
                                 <div className="news-flash__list">
                                     {newsFlash.map(a => (
-                                        <Link key={a.id} to={`/article/${a.id}`} className="news-flash__item">
+                                        <Link key={a.id} to={articleHref(a)} className="news-flash__item">
                                             <span className="news-flash__time">{timeAgo(a.date)}</span>
                                             <span className="news-flash__text">{a.title}</span>
                                         </Link>
@@ -507,7 +508,7 @@ export default function Home() {
                     <SectionHeader title="वीडियो न्यूज़" linkTo="/videos" />
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '20px' }}>
                         {articles.filter(a => a.videoUrl).slice(0, 3).map(a => (
-                            <Link key={a.id} to={`/article/${a.id}`} style={{ textDecoration: 'none' }} className="news-card">
+                            <Link key={a.id} to={articleHref(a)} style={{ textDecoration: 'none' }} className="news-card">
                                 <div style={{ position: 'relative', paddingTop: '56.25%', background: 'var(--navy)', borderRadius: '12px 12px 0 0', overflow: 'hidden' }}>
                                     <img src={a.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600&q=80&auto=format'} alt={a.title} loading="lazy"
                                         style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.8 }} />

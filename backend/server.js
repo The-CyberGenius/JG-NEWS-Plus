@@ -49,7 +49,7 @@ const xmlEsc = (s) => String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;
 app.get('/sitemap.xml', async (req, res) => {
     try {
         const [articles, categories] = await Promise.all([
-            Article.find({}, { _id: 1, date: 1, updatedAt: 1, image: 1, title: 1 })
+            Article.find({}, { _id: 1, slug: 1, date: 1, updatedAt: 1, image: 1, title: 1 })
                 .sort({ date: -1 }).limit(2000).lean(),
             Category.find().lean(),
         ]);
@@ -74,7 +74,8 @@ app.get('/sitemap.xml', async (req, res) => {
             const lastmod = (a.updatedAt || a.date || new Date()).toISOString();
             const pubDate = (a.date || a.updatedAt || new Date()).toISOString();
             const isRecent = (Date.now() - new Date(pubDate).getTime()) < 2 * 24 * 60 * 60 * 1000;
-            xml += `  <url>\n    <loc>${SITE_URL}/article/${a._id}</loc>\n    <lastmod>${lastmod}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.7</priority>\n`;
+            const articleUrl = a.slug ? `${SITE_URL}/article/${a.slug}` : `${SITE_URL}/article/${a._id}`;
+            xml += `  <url>\n    <loc>${articleUrl}</loc>\n    <lastmod>${lastmod}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.7</priority>\n`;
             if (isRecent) {
                 xml += `    <news:news>\n      <news:publication>\n        <news:name>JG News Plus</news:name>\n        <news:language>hi</news:language>\n      </news:publication>\n      <news:publication_date>${pubDate}</news:publication_date>\n      <news:title>${xmlEsc(a.title)}</news:title>\n    </news:news>\n`;
             }
