@@ -112,7 +112,7 @@ export default function Footer() {
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '0.85rem' }}>
                             <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}><span>📍</span><span>{lang === 'hi' ? 'जयपुर, राजस्थान — 302001' : 'Jaipur, Rajasthan — 302001'}</span></div>
                             <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}><span>📞</span><span>+91 7240116211</span></div>
-                            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}><span>✉️</span><span>news@jgnewsplus.in</span></div>
+                            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}><span>✉️</span><span>manoj@jgnews.live</span></div>
                         </div>
                         <div style={{ display: 'flex', gap: '10px', marginTop: '16px', flexWrap: 'wrap' }}>
                             {[
