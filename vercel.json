@@ -4,26 +4,41 @@
     "outputDirectory": "dist",
     "framework": null,
     "rewrites": [
-        { "source": "/sitemap.xml", "destination": "/api" },
-        { "source": "/api/:path*", "destination": "/api" }
+        {
+            "source": "/sitemap.xml",
+            "destination": "/api"
+        },
+        {
+            "source": "/api/:path*",
+            "destination": "/api"
+        }
     ],
     "headers": [
         {
             "source": "/sitemap.xml",
             "headers": [
-                { "key": "Content-Type", "value": "application/xml; charset=utf-8" }
+                {
+                    "key": "Content-Type",
+                    "value": "application/xml; charset=utf-8"
+                }
             ]
         },
         {
-            "source": "/(.*\\.(js|css|woff2?|ttf|otf|jpg|jpeg|png|webp|svg|ico|gif))",
+            "source": "/(.*)\\.(js|css|woff2|woff|ttf|otf|jpg|jpeg|png|webp|svg|ico|gif)",
             "headers": [
-                { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+                {
+                    "key": "Cache-Control",
+                    "value": "public, max-age=31536000, immutable"
+                }
             ]
         },
         {
             "source": "/manifest.webmanifest",
             "headers": [
-                { "key": "Cache-Control", "value": "public, max-age=86400" }
+                {
+                    "key": "Cache-Control",
+                    "value": "public, max-age=86400"
+                }
             ]
         }
     ]
