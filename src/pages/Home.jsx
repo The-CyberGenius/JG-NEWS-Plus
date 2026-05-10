@@ -571,8 +571,8 @@ export default function Home() {
                             ].map(f => (
                                 <div key={f.label} style={{ textAlign: 'center', background: 'rgba(255,255,255,0.08)', borderRadius: '12px', padding: '18px 20px', minWidth: '110px' }}>
                                     <div style={{ fontSize: '2rem', marginBottom: '6px' }}>{f.icon}</div>
-                                    <div style={{ fontWeight: 700, color: 'var(--teal)', fontSize: '0.82rem' }}>{f.label}</div>
-                                    <div style={{ fontSize: '0.72rem', opacity: 0.7, marginTop: '3px' }}>{f.desc}</div>
+                                    <div style={{ fontWeight: 700, color: '#ffffff', fontSize: '0.82rem' }}>{f.label}</div>
+                                    <div style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.85)', marginTop: '3px' }}>{f.desc}</div>
                                 </div>
                             ))}
                         </div>
