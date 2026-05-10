@@ -43,6 +43,55 @@ const extractImage = (html) => {
     return match ? match[1] : '';
 };
 
+// ── Content cleaner ────────────────────────────────────────────
+// Removes ad placeholders ("विज्ञापन", "Advertisement"), promotional
+// blurbs, "read more" CTAs, and inline links from publisher articles.
+const cleanArticleContent = (html) => {
+    if (!html) return '';
+    let out = html;
+
+    // Drop entire <script>, <style>, <iframe>, <ins> (ad slots), <aside> blocks
+    out = out.replace(/<(script|style|iframe|ins|aside|noscript)\b[^>]*>[\s\S]*?<\/\1>/gi, '');
+
+    // Drop self-closing / lone ad tags
+    out = out.replace(/<ins\b[^>]*\/?>/gi, '');
+
+    // Remove elements whose class/id signals an ad/promo block
+    out = out.replace(/<(div|section|p|span)\b[^>]*(class|id)\s*=\s*["'][^"']*(ad|advert|promo|sponsor|newsletter|subscribe|related|recommend|share|social|footer|disclaimer)[^"']*["'][^>]*>[\s\S]*?<\/\1>/gi, '');
+
+    // Strip <a> tags but keep inner text — user wants no inline links
+    out = out.replace(/<a\b[^>]*>([\s\S]*?)<\/a>/gi, '$1');
+
+    // Remove standalone "विज्ञापन" / "Advertisement" text inside any tag or alone
+    out = out.replace(/<(p|div|span|h[1-6])[^>]*>\s*(विज्ञापन|Advertisement|ADVERTISEMENT|Ad|प्रायोजित|Sponsored)\s*<\/\1>/gi, '');
+    out = out.replace(/(^|\n|>)\s*(विज्ञापन|Advertisement|ADVERTISEMENT|प्रायोजित|Sponsored)\s*(?=$|\n|<)/gi, '$1');
+
+    // Remove common "read more / यहां पढ़ें / पूरी खबर" CTA lines
+    out = out.replace(/<(p|div)[^>]*>\s*(यहां पढ़ें|यहाँ पढ़ें|पूरी खबर पढ़ें|और पढ़ें|Read more|Read More|Click here|यह भी पढ़ें|ये भी पढ़ें)[^<]*<\/\1>/gi, '');
+
+    // Collapse empty / whitespace-only paragraphs and divs
+    out = out.replace(/<(p|div|span)[^>]*>(\s|&nbsp;|<br\s*\/?>)*<\/\1>/gi, '');
+
+    // Collapse 3+ consecutive <br> into a single paragraph break
+    out = out.replace(/(<br\s*\/?>\s*){3,}/gi, '<br/><br/>');
+
+    // Final whitespace tidy
+    out = out.replace(/\n{3,}/g, '\n\n').trim();
+
+    return out;
+};
+
+// Plain-text cleaner for /sync previews (no HTML)
+const cleanPlainText = (text) => {
+    if (!text) return '';
+    return text
+        .replace(/\b(विज्ञापन|Advertisement|ADVERTISEMENT|प्रायोजित|Sponsored)\b/g, '')
+        .replace(/(यहां पढ़ें|यहाँ पढ़ें|पूरी खबर पढ़ें|और पढ़ें|यह भी पढ़ें|ये भी पढ़ें|Read more|Click here)[^.।\n]*/gi, '')
+        .replace(/https?:\/\/\S+/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+};
+
 // Resolve Google News redirect URLs to the original publisher URL
 const resolveGoogleNewsUrl = async (url) => {
     if (!url || !url.includes('news.google.com')) return url;
@@ -84,7 +133,8 @@ router.get('/sync', async (req, res) => {
                     if (!img) img = extractImage(item.content) || extractImage(item.contentEncoded);
 
                     const rawContent = item.contentEncoded || item.content || item.contentSnippet || item.summary || item.description || '';
-                    const cleanContent = rawContent.replace(/<[^>]*>?/gm, '').trim();
+                    const stripped = rawContent.replace(/<[^>]*>?/gm, '').trim();
+                    const cleanContent = cleanPlainText(stripped);
 
                     return {
                         title: item.title,
@@ -174,7 +224,9 @@ router.post('/extract', async (req, res) => {
             }
         }
 
-        const finalContent = article?.content || (fallbackDescription ? `<p>${fallbackDescription}</p>` : '');
+        const rawContent = article?.content || (fallbackDescription ? `<p>${fallbackDescription}</p>` : '');
+        const finalContent = cleanArticleContent(rawContent);
+        const finalText = cleanPlainText(article?.text || fallbackDescription || '');
         const finalImage = article?.image || fallbackImage || '';
 
         if (!finalContent && !finalImage) {
@@ -183,7 +235,7 @@ router.post('/extract', async (req, res) => {
 
         res.json({
             content: finalContent,
-            text: article?.text || fallbackDescription || '',
+            text: finalText,
             image: finalImage
         });
     } catch (error) {
