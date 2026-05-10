@@ -28,24 +28,42 @@ const INITIAL_WEATHER = [
 ];
 
 function NewsCard({ article }) {
-    const imgUrl = article.image || `https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600&q=80`;
+    const [imgFailed, setImgFailed] = useState(false);
+    const validImageUrl = (() => {
+        const u = (article.image || '').trim();
+        if (!u) return false;
+        // Require a real http(s) URL
+        if (!/^https?:\/\//i.test(u)) return false;
+        return true;
+    })();
+    const hasImage = validImageUrl && !imgFailed;
+
     return (
-        <Link to={articleHref(article)} className="news-card" style={{ textDecoration: 'none' }}>
-            <div className="news-card__img">
-                <img
-                    src={optimizeImage(imgUrl, { width: 600 })}
-                    srcSet={srcSet(imgUrl, [400, 600, 800])}
-                    sizes="(max-width: 768px) 100vw, 33vw"
-                    alt={article.title}
-                    loading="lazy"
-                    decoding="async"
-                />
-                {article.isBreaking && <span className="badge badge-red">ब्रेकिंग</span>}
-                {article.isFeatured && !article.isBreaking && <span className="badge badge-teal">मुख्य</span>}
-            </div>
+        <Link to={articleHref(article)} className={`news-card${hasImage ? '' : ' news-card--no-image'}`} style={{ textDecoration: 'none' }}>
+            {hasImage ? (
+                <div className="news-card__img">
+                    <img
+                        src={optimizeImage(article.image, { width: 600 })}
+                        srcSet={srcSet(article.image, [400, 600, 800])}
+                        sizes="(max-width: 768px) 100vw, 33vw"
+                        alt={article.title}
+                        loading="lazy"
+                        decoding="async"
+                        onError={() => setImgFailed(true)}
+                    />
+                    {article.isBreaking && <span className="badge badge-red">ब्रेकिंग</span>}
+                    {article.isFeatured && !article.isBreaking && <span className="badge badge-teal">मुख्य</span>}
+                </div>
+            ) : (
+                <div className="news-card__placeholder">
+                    <span className="news-card__placeholder-cat">{article.category}</span>
+                    <h3 className="news-card__placeholder-title">{article.title}</h3>
+                    {article.isBreaking && <span className="badge badge-red news-card__placeholder-badge">ब्रेकिंग</span>}
+                </div>
+            )}
             <div className="news-card__body">
-                <div className="news-card__category">{article.category}</div>
-                <div className="news-card__title">{article.title}</div>
+                {hasImage && <div className="news-card__category">{article.category}</div>}
+                {hasImage && <div className="news-card__title">{article.title}</div>}
                 <div className="news-card__meta">
                     <span className="news-card__location">📍 {article.location}</span>
                     <span>•</span>

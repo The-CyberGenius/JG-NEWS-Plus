@@ -300,6 +300,103 @@ ol {
   z-index: 2;
 }
 
+/* ── No-image variant: text-forward editorial card ── */
+.news-card--no-image {
+  background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 100%);
+  color: var(--white);
+  position: relative;
+  overflow: hidden;
+}
+
+.news-card--no-image::before {
+  content: '';
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(8, 145, 178, 0.25), transparent 70%);
+  pointer-events: none;
+}
+
+.news-card--no-image::after {
+  content: '';
+  position: absolute;
+  bottom: -50px;
+  left: -50px;
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.15), transparent 70%);
+  pointer-events: none;
+}
+
+.news-card__placeholder {
+  position: relative;
+  z-index: 1;
+  padding: 22px 18px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+  min-height: 160px;
+}
+
+.news-card__placeholder-cat {
+  display: inline-block;
+  align-self: flex-start;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--saffron-light);
+  padding: 4px 10px;
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  border-radius: 3px;
+  background: rgba(245, 158, 11, 0.08);
+}
+
+.news-card__placeholder-title {
+  font-size: 1.02rem;
+  font-weight: 800;
+  line-height: 1.4;
+  color: var(--white);
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  letter-spacing: -0.2px;
+}
+
+.news-card__placeholder-badge {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 2;
+}
+
+.news-card--no-image .news-card__body {
+  background: rgba(0, 0, 0, 0.2);
+  padding: 10px 16px;
+}
+
+.news-card--no-image .news-card__meta {
+  color: rgba(255, 255, 255, 0.7);
+  border-top-color: rgba(255, 255, 255, 0.08);
+  padding-top: 8px;
+}
+
+.news-card--no-image:hover {
+  transform: translateY(-4px);
+}
+
+.news-card--no-image:hover .news-card__placeholder-cat {
+  background: rgba(245, 158, 11, 0.18);
+  border-color: var(--saffron-light);
+}
+
 .news-card__body {
   padding: 14px 16px;
   flex: 1;
