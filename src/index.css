@@ -335,39 +335,42 @@ ol {
 .news-card__placeholder {
   position: relative;
   z-index: 1;
-  padding: 22px 18px 16px;
+  padding: 32px 24px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  gap: 14px;
   flex: 1;
-  min-height: 160px;
+  min-height: 220px;
 }
 
 .news-card__placeholder-cat {
   display: inline-block;
-  align-self: flex-start;
   font-size: 0.65rem;
   font-weight: 800;
   letter-spacing: 1px;
   text-transform: uppercase;
   color: var(--saffron-light);
-  padding: 4px 10px;
-  border: 1px solid rgba(245, 158, 11, 0.4);
+  padding: 4px 12px;
+  border: 1px solid rgba(245, 158, 11, 0.5);
   border-radius: 3px;
-  background: rgba(245, 158, 11, 0.08);
+  background: rgba(245, 158, 11, 0.1);
 }
 
 .news-card__placeholder-title {
-  font-size: 1.02rem;
+  font-size: 1rem;
   font-weight: 800;
-  line-height: 1.4;
+  line-height: 1.5;
   color: var(--white);
   margin: 0;
   display: -webkit-box;
   -webkit-line-clamp: 4;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  letter-spacing: -0.2px;
+  letter-spacing: -0.1px;
+  max-width: 92%;
 }
 
 .news-card__placeholder-badge {
