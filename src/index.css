@@ -1,29 +1,40 @@
 /* ═══════════════════════════════════════════════════════════
    JG NEWS PLUS — Global Design System
-   Colors: Navy Blue, Teal, Saffron, Red, White
+   Professional news palette: Deep Navy, Signal Red,
+   Gold accent, Teal secondary, refined neutrals
 ═══════════════════════════════════════════════════════════ */
 
 :root {
-  --navy: #0a1628;
-  --navy-light: #152035;
-  --navy-mid: #1e3a5f;
-  --teal: #00bcd4;
-  --teal-dark: #0097a7;
-  --saffron: #ff6f00;
-  --saffron-light: #ff8f00;
-  --red: #e53935;
-  --red-dark: #c62828;
+  /* Primary brand — deep navy (trust, authority) */
+  --navy: #0b1e3f;
+  --navy-light: #16294f;
+  --navy-mid: #25406b;
+
+  /* Signal red — breaking news, live, alerts */
+  --red: #d32f2f;
+  --red-dark: #b71c1c;
+
+  /* Secondary action — teal (links, focus, hover) */
+  --teal: #0891b2;
+  --teal-dark: #0e7490;
+
+  /* Accent — refined gold (highlights, premium) */
+  --saffron: #f59e0b;
+  --saffron-light: #fbbf24;
+
+  /* Neutrals — cleaner, higher-contrast scale */
   --white: #ffffff;
-  --off-white: #f5f7fa;
-  --gray-100: #f0f4f8;
+  --off-white: #f8fafc;
+  --gray-100: #f1f5f9;
   --gray-200: #e2e8f0;
   --gray-400: #94a3b8;
-  --gray-600: #64748b;
+  --gray-600: #475569;
   --gray-800: #1e293b;
   --text-primary: #0f172a;
-  --text-secondary: #475569;
-  --card-shadow: 0 4px 24px rgba(10, 22, 40, 0.12);
-  --card-shadow-hover: 0 12px 40px rgba(10, 22, 40, 0.22);
+  --text-secondary: #334155;
+
+  --card-shadow: 0 2px 8px rgba(11, 30, 63, 0.06), 0 4px 16px rgba(11, 30, 63, 0.08);
+  --card-shadow-hover: 0 8px 24px rgba(11, 30, 63, 0.14), 0 16px 40px rgba(11, 30, 63, 0.16);
   --radius-sm: 6px;
   --radius-md: 12px;
   --radius-lg: 20px;
@@ -176,7 +187,7 @@ ol {
 .btn-primary:hover {
   background: var(--teal-dark);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 188, 212, 0.4);
+  box-shadow: 0 4px 12px rgba(8, 145, 178, 0.4);
 }
 
 .btn-red {
@@ -803,7 +814,7 @@ ol {
 
 .form-control:focus {
   border-color: var(--teal);
-  box-shadow: 0 0 0 3px rgba(0, 188, 212, 0.15);
+  box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.18);
 }
 
 textarea.form-control {
@@ -1496,7 +1507,7 @@ textarea.form-control {
 
 .search-bar:focus-within {
   border-color: var(--teal);
-  box-shadow: 0 0 0 3px rgba(0, 188, 212, 0.15);
+  box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.18);
 }
 
 .search-bar input {
