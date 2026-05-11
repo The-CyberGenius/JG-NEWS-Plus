@@ -27,10 +27,29 @@ export default function Footer() {
 
     return (
         <footer style={{ background: 'var(--navy)', color: 'rgba(255,255,255,0.8)', marginTop: '48px' }}>
+            {/* Responsive grid:
+                - Mobile: 2 cols → Brand spans full, Cats|Links side-by-side, Contact spans full
+                - Desktop (≥1024px): 4 cols, each block its own column */}
+            <style>{`
+                .jg-footer-grid {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 28px 18px;
+                    margin-bottom: 32px;
+                }
+                .jg-footer-grid > .jg-span-2 { grid-column: 1 / -1; }
+                @media (min-width: 1024px) {
+                    .jg-footer-grid {
+                        grid-template-columns: 2fr 1fr 1fr 1.5fr;
+                        gap: 32px;
+                    }
+                    .jg-footer-grid > .jg-span-2 { grid-column: auto; }
+                }
+            `}</style>
             <div className="container" style={{ padding: '48px 16px 0' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '32px', marginBottom: '32px' }}>
+                <div className="jg-footer-grid">
                     {/* Brand */}
-                    <div>
+                    <div className="jg-span-2">
                         <div style={{ fontWeight: 900, fontSize: '1.4rem', color: 'white', marginBottom: '4px' }}>
                             JG <span style={{ color: 'var(--teal)' }}>NEWS</span> <span style={{ color: 'var(--saffron)' }}>Plus</span>
                         </div>
@@ -107,7 +126,7 @@ export default function Footer() {
                     </div>
 
                     {/* Contact */}
-                    <div>
+                    <div className="jg-span-2">
                         <h3 style={{ color: 'white', fontWeight: 800, marginBottom: '16px', fontSize: '1rem' }}>{t.contact}</h3>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '0.85rem' }}>
                             <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}><span>📍</span><span>{lang === 'hi' ? 'जयपुर, राजस्थान — 302001' : 'Jaipur, Rajasthan — 302001'}</span></div>
