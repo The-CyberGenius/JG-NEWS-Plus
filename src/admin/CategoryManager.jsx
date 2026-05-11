@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
 import { useNews } from '../context/NewsContext';
 import { recategorizeArticles } from '../store/newsStore';
-import { SUGGESTED_DEFAULT_CATEGORIES } from '../utils/autoCategorize';
+
+// Standard professional news categories (preset names — no auto-classification)
+const SUGGESTED_DEFAULT_CATEGORIES = [
+    'अपराध', 'राजनीति', 'खेल', 'मनोरंजन', 'व्यापार', 'शिक्षा', 'स्वास्थ्य', 'तकनीक', 'भारत', 'दुनिया'
+];
 
 export default function CategoryManager() {
     const { categories, addCategory, deleteCategory, refreshAll } = useNews();

@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { useNews } from '../context/NewsContext';
 import { syncNews, extractArticle } from '../store/newsStore';
 import { timeAgo, getRandomFallbackImage } from '../utils/helpers';
-import { autoCategorize } from '../utils/autoCategorize';
 
 const CATEGORIES = [
     { id: 'rajasthan', label: '🚩 राजस्थान', color: 'var(--saffron)' },
@@ -198,10 +197,7 @@ export default function NewsSyncManager() {
             const item = fetchedNews[i];
             try {
                 const location = activeTab === 'rajasthan' ? detectLocation(item.title, item.fullContent) : 'अन्य';
-                // Smart category: keyword-match against title+content
-                const text = `${item.title} ${item.fullContent || ''}`;
-                const tabFallback = activeTab === 'rajasthan' ? null : (activeTab === 'india' ? 'भारत' : 'दुनिया');
-                const assignedCat = autoCategorize(text, categories, { fallback: tabFallback }) || categories[0] || 'अन्य';
+                const assignedCat = activeTab === 'rajasthan' ? 'राजस्थान' : categories[0] || 'अन्य';
 
                 const heroImg = item.image || getRandomFallbackImage();
                 const cleanedContent = cleanContentHTML(item.fullContent, heroImg);
@@ -235,13 +231,10 @@ export default function NewsSyncManager() {
 
     const openPreview = (item) => {
         const detected = activeTab === 'rajasthan' ? detectLocation(item.title, item.fullContent) : 'अन्य';
-        const text = `${item.title} ${item.fullContent || ''}`;
-        const tabFallback = activeTab === 'rajasthan' ? null : (activeTab === 'india' ? 'भारत' : 'दुनिया');
-        const suggested = autoCategorize(text, categories, { fallback: tabFallback }) || categories[0] || 'अन्य';
         setPreviewItem({
             ...item,
             location: detected,
-            assignedCat: suggested,
+            assignedCat: activeTab === 'rajasthan' ? 'राजस्थान' : categories[0] || 'अन्य'
         });
     };
 
@@ -250,14 +243,11 @@ export default function NewsSyncManager() {
         const heroImg = item.image || getRandomFallbackImage();
         const cleanedContent = cleanContentHTML(item.fullContent, heroImg);
         const detectedLoc = activeTab === 'rajasthan' ? detectLocation(item.title, item.fullContent) : 'अन्य';
-        const text = `${item.title} ${item.fullContent || ''}`;
-        const tabFallback = activeTab === 'rajasthan' ? null : (activeTab === 'india' ? 'भारत' : 'दुनिया');
-        const smartCat = autoCategorize(text, categories, { fallback: tabFallback }) || categories[0] || '';
         const prefill = {
             title: item.title || '',
             excerpt: makeExcerpt(item.fullContent, 180),
             content: `${cleanedContent}<p><br/>Source: <a href="${item.link}" target="_blank">${item.source}</a></p>`,
-            category: smartCat,
+            category: activeTab === 'rajasthan' ? 'राजस्थान' : (categories[0] || ''),
             location: detectedLoc,
             image: heroImg,
             videoUrl: '',

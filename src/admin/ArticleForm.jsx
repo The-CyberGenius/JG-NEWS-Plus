@@ -2,7 +2,6 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useParams, useNavigate, useLocation, Link } from 'react-router-dom';
 import { useNews } from '../context/NewsContext';
 import { uploadImage } from '../store/newsStore';
-import { autoCategorize } from '../utils/autoCategorize';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 
@@ -327,32 +326,10 @@ export default function ArticleForm() {
                         <div style={{ background: 'white', borderRadius: '24px', padding: '24px', boxShadow: '0 4px 25px rgba(0,0,0,0.05)', border: '1px solid var(--gray-100)' }}>
                             <h3 style={{ fontWeight: 900, color: 'var(--navy)', marginBottom: '20px', fontSize: '1rem' }}>📌 वर्गीकरण</h3>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                                <div style={{ display: 'flex', gap: '8px' }}>
-                                    <select className="form-control" value={form.category} onChange={e => set('category', e.target.value)} required style={{ flex: 1 }}>
-                                        <option value="">-- श्रेणी --</option>
-                                        {categories.map(c => <option key={c} value={c}>{c}</option>)}
-                                    </select>
-                                    <button
-                                        type="button"
-                                        title="Title aur content se category suggest karega"
-                                        onClick={() => {
-                                            const plain = (form.content || '').replace(/<[^>]*>/g, ' ');
-                                            const text = `${form.title} ${plain}`;
-                                            const guess = autoCategorize(text, categories);
-                                            if (guess) {
-                                                set('category', guess);
-                                                setToast(`✨ Category set: ${guess}`);
-                                            } else {
-                                                setToast('🤔 Content me clear category nahi mili — manually choose karo');
-                                            }
-                                            setTimeout(() => setToast(''), 2500);
-                                        }}
-                                        className="btn btn-outline btn-sm"
-                                        style={{ whiteSpace: 'nowrap', flexShrink: 0 }}
-                                    >
-                                        ✨ Suggest
-                                    </button>
-                                </div>
+                                <select className="form-control" value={form.category} onChange={e => set('category', e.target.value)} required>
+                                    <option value="">-- श्रेणी --</option>
+                                    {categories.map(c => <option key={c} value={c}>{c}</option>)}
+                                </select>
                                 <div>
                                     <input
                                         className="form-control"
