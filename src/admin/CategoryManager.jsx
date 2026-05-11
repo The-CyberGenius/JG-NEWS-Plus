@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNews } from '../context/NewsContext';
 import { recategorizeArticles } from '../store/newsStore';
+import { SUGGESTED_DEFAULT_CATEGORIES } from '../utils/autoCategorize';
 
 export default function CategoryManager() {
     const { categories, addCategory, deleteCategory, refreshAll } = useNews();
@@ -32,6 +33,19 @@ export default function CategoryManager() {
         deleteCategory(cat);
         setConfirmDel(null);
         showToast(`🗑️ श्रेणी "${cat}" हटाई गई`);
+    };
+
+    const handleSeedDefaults = async () => {
+        const missing = SUGGESTED_DEFAULT_CATEGORIES.filter(c => !categories.includes(c));
+        if (missing.length === 0) {
+            showToast('✅ सभी default categories पहले से मौजूद हैं');
+            return;
+        }
+        if (!window.confirm(`${missing.length} default categories add karein?\n\n${missing.join(', ')}`)) return;
+        for (const cat of missing) {
+            try { await addCategory(cat); } catch { /* ignore individual failures */ }
+        }
+        showToast(`✅ ${missing.length} categories add ho gayi`);
     };
 
     const handleRecategorize = async () => {
@@ -67,7 +81,17 @@ export default function CategoryManager() {
 
             {/* Add New */}
             <div style={{ background: 'white', borderRadius: 'var(--radius-md)', padding: '24px', boxShadow: 'var(--card-shadow)', marginBottom: '24px' }}>
-                <h3 style={{ fontWeight: 800, color: 'var(--navy)', marginBottom: '16px' }}>➕ नई श्रेणी जोड़ें</h3>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', flexWrap: 'wrap', gap: '8px' }}>
+                    <h3 style={{ fontWeight: 800, color: 'var(--navy)' }}>➕ नई श्रेणी जोड़ें</h3>
+                    <button
+                        type="button"
+                        onClick={handleSeedDefaults}
+                        className="btn btn-outline btn-sm"
+                        title={`Default professional news categories: ${SUGGESTED_DEFAULT_CATEGORIES.join(', ')}`}
+                    >
+                        ✨ Seed Default Categories
+                    </button>
+                </div>
                 <form onSubmit={handleAdd} style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
                     <input
                         className="form-control"
