@@ -17,13 +17,14 @@ const KEYS = {
 };
 
 // ─── Articles CRUD ────────────────────────────────────────────────────────────
-export const getArticles = async ({ page, limit, fields, includeHidden } = {}) => {
+export const getArticles = async ({ page, limit, fields, includeHidden, category } = {}) => {
     try {
         const params = {};
         if (page) params.page = page;
         if (limit) params.limit = limit;
         if (fields) params.fields = fields;
         if (includeHidden) params.includeHidden = 'true';
+        if (category) params.category = category;
 
         const response = await api.get('/articles', { params });
 

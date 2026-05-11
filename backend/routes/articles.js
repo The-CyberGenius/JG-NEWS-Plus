@@ -13,13 +13,26 @@ const ensureSlug = async (title, currentSlug, currentId) => {
     });
 };
 
-// Get articles with optional pagination & field projection
+// Helper: sanitize date — reject empty/invalid/pre-2000 values and use current time instead
+const sanitizeDate = (raw) => {
+    if (!raw) return new Date();
+    const d = new Date(raw);
+    if (isNaN(d.getTime()) || d.getFullYear() < 2000) return new Date();
+    return d;
+};
+
+// Get articles with optional pagination, category filter & field projection
 router.get('/', async (req, res) => {
     try {
-        const { page, limit, fields, includeHidden } = req.query;
+        const { page, limit, fields, includeHidden, category } = req.query;
 
         // Public site: filter out hidden. Admin passes ?includeHidden=true to see all.
         const filter = includeHidden === 'true' ? {} : { isHidden: { $ne: true } };
+        if (category) filter.category = category;
+
+        // Sort: createdAt desc as fallback for any rows with bad date (1970 epoch),
+        // so missing-date articles still surface near the top of their bucket
+        const sort = { date: -1, createdAt: -1 };
 
         // If page/limit provided, paginate; otherwise return all (backward compat)
         if (page && limit) {
@@ -33,7 +46,7 @@ router.get('/', async (req, res) => {
                 : {};
 
             const [articles, total] = await Promise.all([
-                Article.find(filter, projection).sort({ date: -1 }).skip(skip).limit(l).lean(),
+                Article.find(filter, projection).sort(sort).skip(skip).limit(l).lean(),
                 Article.countDocuments(filter),
             ]);
 
@@ -42,7 +55,7 @@ router.get('/', async (req, res) => {
         }
 
         // Default: return all (for admin panel backward compatibility)
-        const articles = await Article.find(filter).sort({ date: -1 }).lean();
+        const articles = await Article.find(filter).sort(sort).lean();
         res.set('Cache-Control', 'public, max-age=30, stale-while-revalidate=60');
         res.json(articles);
     } catch (error) {
@@ -75,6 +88,8 @@ router.get('/:idOrSlug', async (req, res) => {
 router.post('/', async (req, res) => {
     try {
         const data = { ...req.body };
+        // Always sanitize date — empty/invalid/<2000 becomes Date.now
+        data.date = sanitizeDate(data.date);
         // Auto-generate slug from title if not provided
         if (!data.slug && data.title) {
             data.slug = await uniqueSlug(data.title, async (s) => {
@@ -94,6 +109,8 @@ router.post('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
     try {
         const data = { ...req.body };
+        // Sanitize date only if caller explicitly sent one (don't overwrite existing good date)
+        if ('date' in data) data.date = sanitizeDate(data.date);
         // Regenerate slug if title changed and no explicit slug provided
         if (data.title && !data.slug) {
             const current = await Article.findById(req.params.id).lean();
@@ -109,6 +126,24 @@ router.put('/:id', async (req, res) => {
         res.json(updatedArticle);
     } catch (error) {
         res.status(400).json({ message: error.message });
+    }
+});
+
+// Backfill: fix articles with bad dates (pre-2000 / 1970 epoch) — use createdAt instead
+// POST /api/articles/fix-dates
+router.post('/fix-dates', async (req, res) => {
+    try {
+        const cutoff = new Date('2000-01-01');
+        const bad = await Article.find({ date: { $lt: cutoff } }, { _id: 1, createdAt: 1 }).lean();
+        let fixed = 0;
+        for (const a of bad) {
+            const newDate = a.createdAt && new Date(a.createdAt).getFullYear() >= 2000 ? a.createdAt : new Date();
+            await Article.updateOne({ _id: a._id }, { $set: { date: newDate } });
+            fixed++;
+        }
+        res.json({ scanned: bad.length, fixed });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
     }
 });
 
