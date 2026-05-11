@@ -3,8 +3,12 @@ import Parser from 'rss-parser';
 import { extract } from '@extractus/article-extractor';
 import axios from 'axios';
 import { GoogleDecoder } from 'google-news-url-decoder';
+import { requireAdmin } from '../middleware/requireAdmin.js';
 
 const router = express.Router();
+
+// Lock all RSS sync endpoints to admin — they cost time and 3rd-party requests
+router.use(requireAdmin);
 
 // Adding User-Agent to prevent getting blocked by RSS sources
 const parser = new Parser({

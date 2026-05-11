@@ -1,6 +1,7 @@
 import express from 'express';
 import { v2 as cloudinary } from 'cloudinary';
 import dotenv from 'dotenv';
+import { requireAdmin } from '../middleware/requireAdmin.js';
 
 dotenv.config();
 
@@ -15,7 +16,7 @@ const router = express.Router();
 // GET /api/upload/signature
 // Frontend direct Cloudinary upload ke liye signature generate karta hai
 // File NEVER backend se guzarti — seedha Cloudinary pe jaati hai
-router.get('/signature', (req, res) => {
+router.get('/signature', requireAdmin, (req, res) => {
     try {
         const timestamp = Math.round(Date.now() / 1000);
         const folder = req.query.folder || 'jgnews_epaper';

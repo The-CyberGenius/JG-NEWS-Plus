@@ -1,6 +1,7 @@
 import express from 'express';
 import Article from '../models/Article.js';
 import { slugify, uniqueSlug } from '../utils/slugify.js';
+import { requireAdmin } from '../middleware/requireAdmin.js';
 
 const router = express.Router();
 
@@ -85,7 +86,7 @@ router.get('/:idOrSlug', async (req, res) => {
 });
 
 // Create article
-router.post('/', async (req, res) => {
+router.post('/', requireAdmin, async (req, res) => {
     try {
         const data = { ...req.body };
         // Always sanitize date — empty/invalid/<2000 becomes Date.now
@@ -106,7 +107,7 @@ router.post('/', async (req, res) => {
 });
 
 // Update article
-router.put('/:id', async (req, res) => {
+router.put('/:id', requireAdmin, async (req, res) => {
     try {
         const data = { ...req.body };
         // Sanitize date only if caller explicitly sent one (don't overwrite existing good date)
@@ -131,7 +132,7 @@ router.put('/:id', async (req, res) => {
 
 // Backfill: fix articles with bad dates (pre-2000 / 1970 epoch) — use createdAt instead
 // POST /api/articles/fix-dates
-router.post('/fix-dates', async (req, res) => {
+router.post('/fix-dates', requireAdmin, async (req, res) => {
     try {
         const cutoff = new Date('2000-01-01');
         const bad = await Article.find({ date: { $lt: cutoff } }, { _id: 1, createdAt: 1 }).lean();
@@ -149,7 +150,7 @@ router.post('/fix-dates', async (req, res) => {
 
 // Backfill slugs for existing articles (one-time admin migration)
 // POST /api/articles/backfill-slugs
-router.post('/backfill-slugs', async (req, res) => {
+router.post('/backfill-slugs', requireAdmin, async (req, res) => {
     try {
         const articles = await Article.find({ $or: [{ slug: { $exists: false } }, { slug: null }, { slug: '' }] }, { _id: 1, title: 1 }).lean();
         let count = 0;
@@ -170,7 +171,7 @@ router.post('/backfill-slugs', async (req, res) => {
 
 // Bulk operations: delete / hide / unhide / breaking / featured
 // POST /api/articles/bulk { ids: [...], action: 'delete' | 'hide' | 'unhide' | 'breaking-on' | 'breaking-off' | 'featured-on' | 'featured-off' }
-router.post('/bulk', async (req, res) => {
+router.post('/bulk', requireAdmin, async (req, res) => {
     try {
         const { ids, action } = req.body;
         if (!Array.isArray(ids) || ids.length === 0) {
@@ -212,7 +213,7 @@ router.post('/bulk', async (req, res) => {
 });
 
 // Delete article
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', requireAdmin, async (req, res) => {
     try {
         await Article.findByIdAndDelete(req.params.id);
         res.json({ message: 'Article deleted' });

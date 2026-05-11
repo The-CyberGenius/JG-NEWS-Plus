@@ -14,7 +14,34 @@ export const api = axios.create({
 // ─── Storage Keys (for session only now) ──────────────────────────────────────
 const KEYS = {
     ADMIN: 'jgnews_admin_session',
+    TOKEN: 'jgnews_admin_token',
 };
+
+// Auto-attach admin bearer token (if logged in) to every request.
+// Backend ignores it on public routes, requires it on admin-protected routes.
+api.interceptors.request.use((config) => {
+    const token = sessionStorage.getItem(KEYS.TOKEN);
+    if (token) {
+        config.headers = config.headers || {};
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+});
+
+// If any admin request returns 401, clear session and bounce to /admin login
+api.interceptors.response.use(
+    (res) => res,
+    (err) => {
+        if (err?.response?.status === 401) {
+            sessionStorage.removeItem(KEYS.TOKEN);
+            sessionStorage.removeItem(KEYS.ADMIN);
+            if (typeof window !== 'undefined' && window.location.pathname.startsWith('/admin')) {
+                window.location.href = '/admin';
+            }
+        }
+        return Promise.reject(err);
+    }
+);
 
 // ─── Articles CRUD ────────────────────────────────────────────────────────────
 export const getArticles = async ({ page, limit, fields, includeHidden, category } = {}) => {
@@ -140,8 +167,9 @@ export const updateSettings = async (updates) => {
 export const adminLogin = async (password) => {
     try {
         const response = await api.post('/admin/login', { password });
-        if (response.data.success) {
+        if (response.data.success && response.data.token) {
             sessionStorage.setItem(KEYS.ADMIN, 'true');
+            sessionStorage.setItem(KEYS.TOKEN, response.data.token);
             return true;
         }
         return false;
@@ -153,6 +181,7 @@ export const adminLogin = async (password) => {
 
 export const adminLogout = () => {
     sessionStorage.removeItem(KEYS.ADMIN);
+    sessionStorage.removeItem(KEYS.TOKEN);
 };
 
 export const isAdminLoggedIn = () =>

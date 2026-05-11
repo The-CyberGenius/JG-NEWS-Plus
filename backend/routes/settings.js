@@ -1,5 +1,6 @@
 import express from 'express';
 import Setting from '../models/Setting.js';
+import { requireAdmin } from '../middleware/requireAdmin.js';
 
 const router = express.Router();
 
@@ -17,7 +18,7 @@ router.get('/', async (req, res) => {
 });
 
 // Update settings
-router.put('/', async (req, res) => {
+router.put('/', requireAdmin, async (req, res) => {
     try {
         let settings = await Setting.findOne();
         if (settings) {

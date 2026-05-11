@@ -1,5 +1,6 @@
 import express from 'express';
 import Newspaper from '../models/Newspaper.js';
+import { requireAdmin } from '../middleware/requireAdmin.js';
 
 const router = express.Router();
 
@@ -25,7 +26,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // POST create new newspaper edition (admin)
-router.post('/', async (req, res) => {
+router.post('/', requireAdmin, async (req, res) => {
     const newspaper = new Newspaper(req.body);
     try {
         const saved = await newspaper.save();
@@ -36,7 +37,7 @@ router.post('/', async (req, res) => {
 });
 
 // PUT update newspaper edition (admin)
-router.put('/:id', async (req, res) => {
+router.put('/:id', requireAdmin, async (req, res) => {
     try {
         const updated = await Newspaper.findByIdAndUpdate(req.params.id, req.body, { new: true });
         res.json(updated);
@@ -46,7 +47,7 @@ router.put('/:id', async (req, res) => {
 });
 
 // DELETE newspaper edition (admin)
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', requireAdmin, async (req, res) => {
     try {
         await Newspaper.findByIdAndDelete(req.params.id);
         res.json({ message: 'Edition deleted' });

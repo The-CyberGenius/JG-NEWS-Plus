@@ -1,5 +1,6 @@
 import express from 'express';
 import Category from '../models/Category.js';
+import { requireAdmin } from '../middleware/requireAdmin.js';
 
 const router = express.Router();
 
@@ -14,7 +15,7 @@ router.get('/', async (req, res) => {
 });
 
 // Create category
-router.post('/', async (req, res) => {
+router.post('/', requireAdmin, async (req, res) => {
     const category = new Category({ name: req.body.name });
     try {
         const newCategory = await category.save();
@@ -25,7 +26,7 @@ router.post('/', async (req, res) => {
 });
 
 // Delete category
-router.delete('/:name', async (req, res) => {
+router.delete('/:name', requireAdmin, async (req, res) => {
     try {
         await Category.findOneAndDelete({ name: req.params.name });
         res.json({ message: 'Category deleted' });
