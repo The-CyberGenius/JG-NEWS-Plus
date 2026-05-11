@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
 import { useNews } from '../context/NewsContext';
+import { recategorizeArticles } from '../store/newsStore';
 
 export default function CategoryManager() {
-    const { categories, addCategory, deleteCategory } = useNews();
+    const { categories, addCategory, deleteCategory, refreshAll } = useNews();
     const [newCat, setNewCat] = useState('');
     const [toast, setToast] = useState('');
     const [confirmDel, setConfirmDel] = useState(null);
+    const [recatFrom, setRecatFrom] = useState('');
+    const [recatTo, setRecatTo] = useState('');
+    const [recatBusy, setRecatBusy] = useState(false);
 
     const showToast = (msg) => {
         setToast(msg);
@@ -30,6 +34,30 @@ export default function CategoryManager() {
         showToast(`🗑️ श्रेणी "${cat}" हटाई गई`);
     };
 
+    const handleRecategorize = async () => {
+        if (!recatFrom || !recatTo) {
+            showToast('⚠️ दोनों श्रेणियाँ चुनें');
+            return;
+        }
+        if (recatFrom === recatTo) {
+            showToast('⚠️ दोनों श्रेणियाँ अलग होनी चाहिए');
+            return;
+        }
+        if (!window.confirm(`क्या आप वाकई "${recatFrom}" की सारी खबरें "${recatTo}" में move करना चाहते हैं?`)) return;
+        setRecatBusy(true);
+        try {
+            const result = await recategorizeArticles({ from: recatFrom, to: recatTo });
+            showToast(`✅ ${result.modified} खबरें "${recatTo}" में move हो गईं`);
+            setRecatFrom('');
+            setRecatTo('');
+            if (refreshAll) refreshAll();
+        } catch (err) {
+            showToast('❌ Recategorize fail hua: ' + (err?.response?.data?.message || err.message));
+        } finally {
+            setRecatBusy(false);
+        }
+    };
+
     return (
         <div style={{ maxWidth: '700px' }}>
             {toast && <div className="toast toast-success">{toast}</div>}
@@ -52,6 +80,38 @@ export default function CategoryManager() {
                         ➕ जोड़ें
                     </button>
                 </form>
+            </div>
+
+            {/* Bulk Recategorize */}
+            <div style={{ background: 'white', borderRadius: 'var(--radius-md)', padding: '24px', boxShadow: 'var(--card-shadow)', marginBottom: '24px', border: '2px dashed var(--saffron-light)' }}>
+                <h3 style={{ fontWeight: 800, color: 'var(--navy)', marginBottom: '8px' }}>🔀 Bulk Recategorize</h3>
+                <p style={{ color: 'var(--gray-600)', fontSize: '0.82rem', marginBottom: '16px' }}>
+                    Ek category ki saari news ko doosri category me move karo. Useful agar aap "राजस्थान" jaisi general category ki articles ko proper topical categories (अपराध, राजनीति, etc.) me distribute karna chahte ho.
+                </p>
+                <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'flex-end' }}>
+                    <div style={{ flex: 1, minWidth: '160px' }}>
+                        <label className="form-label">From (source)</label>
+                        <select className="form-control" value={recatFrom} onChange={e => setRecatFrom(e.target.value)} disabled={recatBusy}>
+                            <option value="">श्रेणी चुनें...</option>
+                            {categories.map(c => <option key={c} value={c}>{c}</option>)}
+                        </select>
+                    </div>
+                    <div style={{ fontSize: '1.4rem', paddingBottom: '12px' }}>→</div>
+                    <div style={{ flex: 1, minWidth: '160px' }}>
+                        <label className="form-label">To (target)</label>
+                        <select className="form-control" value={recatTo} onChange={e => setRecatTo(e.target.value)} disabled={recatBusy}>
+                            <option value="">श्रेणी चुनें...</option>
+                            {categories.map(c => <option key={c} value={c}>{c}</option>)}
+                        </select>
+                    </div>
+                    <button
+                        onClick={handleRecategorize}
+                        className="btn btn-primary"
+                        disabled={recatBusy || !recatFrom || !recatTo}
+                    >
+                        {recatBusy ? '⏳ Moving…' : '🔀 Move All'}
+                    </button>
+                </div>
             </div>
 
             {/* Categories List */}

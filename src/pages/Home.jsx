@@ -160,9 +160,21 @@ export default function Home() {
         });
     }, [sortedArticles, extraArticles]);
 
-    // ── Latest news filter (category + date range) ──
+    // ── Latest news filter (category + location + date range) ──
     const [filterCat, setFilterCat] = useState('all');
+    const [filterLoc, setFilterLoc] = useState('all');
     const [filterRange, setFilterRange] = useState('all'); // all | today | yesterday | week | month
+    const [locations, setLocations] = useState([]);
+
+    useEffect(() => {
+        let cancelled = false;
+        import('../store/newsStore').then(({ getLocations }) => {
+            getLocations().then(data => {
+                if (!cancelled) setLocations(data);
+            });
+        });
+        return () => { cancelled = true; };
+    }, []);
 
     const filteredByControls = useMemo(() => {
         const now = Date.now();
@@ -174,6 +186,7 @@ export default function Home() {
         };
         return combinedSorted.filter(a => {
             if (filterCat !== 'all' && a.category !== filterCat) return false;
+            if (filterLoc !== 'all' && a.location !== filterLoc) return false;
             if (filterRange === 'all') return true;
             const t = new Date(a.date || a.createdAt || 0).getTime();
             if (filterRange === 'today') return t >= startOf(0);
@@ -182,9 +195,9 @@ export default function Home() {
             if (filterRange === 'month') return t >= now - 30 * dayMs;
             return true;
         });
-    }, [combinedSorted, filterCat, filterRange]);
+    }, [combinedSorted, filterCat, filterLoc, filterRange]);
 
-    const filtersActive = filterCat !== 'all' || filterRange !== 'all';
+    const filtersActive = filterCat !== 'all' || filterLoc !== 'all' || filterRange !== 'all';
     const latest = useMemo(() => filteredByControls.slice(0, latestCount), [filteredByControls, latestCount]);
     const hasMore = filtersActive
         ? filteredByControls.length > latestCount
@@ -485,9 +498,26 @@ export default function Home() {
                             >{c}</button>
                         ))}
                     </div>
+                    {locations.length > 0 && (
+                        <div className="news-filter__group">
+                            <span className="news-filter__label">📍 स्थान:</span>
+                            <button
+                                onClick={() => setFilterLoc('all')}
+                                className={`news-filter__chip${filterLoc === 'all' ? ' is-active' : ''}`}
+                            >सभी</button>
+                            {locations.slice(0, 10).map(l => (
+                                <button
+                                    key={l.location}
+                                    onClick={() => setFilterLoc(l.location)}
+                                    className={`news-filter__chip${filterLoc === l.location ? ' is-active' : ''}`}
+                                    title={`${l.count} खबरें`}
+                                >{l.location}</button>
+                            ))}
+                        </div>
+                    )}
                     {filtersActive && (
                         <button
-                            onClick={() => { setFilterCat('all'); setFilterRange('all'); }}
+                            onClick={() => { setFilterCat('all'); setFilterLoc('all'); setFilterRange('all'); }}
                             className="news-filter__clear"
                         >✕ Clear</button>
                     )}
@@ -497,7 +527,7 @@ export default function Home() {
                     <div className="empty-state" style={{ background: 'white', borderRadius: 'var(--radius-md)', boxShadow: 'var(--card-shadow)', marginBottom: '20px' }}>
                         <div className="empty-state-icon">🔍</div>
                         <h3>इन filters में कोई खबर नहीं मिली</h3>
-                        <button onClick={() => { setFilterCat('all'); setFilterRange('all'); }} className="btn btn-primary" style={{ marginTop: '8px' }}>Filters हटाएं</button>
+                        <button onClick={() => { setFilterCat('all'); setFilterLoc('all'); setFilterRange('all'); }} className="btn btn-primary" style={{ marginTop: '8px' }}>Filters हटाएं</button>
                     </div>
                 )}
 

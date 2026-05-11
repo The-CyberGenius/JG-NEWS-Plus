@@ -25,11 +25,12 @@ const sanitizeDate = (raw) => {
 // Get articles with optional pagination, category filter & field projection
 router.get('/', async (req, res) => {
     try {
-        const { page, limit, fields, includeHidden, category } = req.query;
+        const { page, limit, fields, includeHidden, category, location } = req.query;
 
         // Public site: filter out hidden. Admin passes ?includeHidden=true to see all.
         const filter = includeHidden === 'true' ? {} : { isHidden: { $ne: true } };
         if (category) filter.category = category;
+        if (location) filter.location = location;
 
         // Sort: createdAt desc as fallback for any rows with bad date (1970 epoch),
         // so missing-date articles still surface near the top of their bucket
@@ -127,6 +128,43 @@ router.put('/:id', requireAdmin, async (req, res) => {
         res.json(updatedArticle);
     } catch (error) {
         res.status(400).json({ message: error.message });
+    }
+});
+
+// Get distinct locations with article counts (for location filter pills)
+router.get('/meta/locations', async (req, res) => {
+    try {
+        const rows = await Article.aggregate([
+            { $match: { isHidden: { $ne: true }, location: { $ne: '' } } },
+            { $group: { _id: '$location', count: { $sum: 1 } } },
+            { $sort: { count: -1 } },
+            { $limit: 50 },
+        ]);
+        res.set('Cache-Control', 'public, max-age=120');
+        res.json(rows.map(r => ({ location: r._id, count: r.count })));
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+// Bulk re-categorize: move all articles in one category to another (or to a list of ids)
+// POST /api/articles/recategorize { from?: 'राजस्थान', ids?: [...], to: 'अपराध' }
+router.post('/recategorize', requireAdmin, async (req, res) => {
+    try {
+        const { from, ids, to } = req.body || {};
+        if (!to) return res.status(400).json({ message: 'Target category (to) is required' });
+
+        let result;
+        if (Array.isArray(ids) && ids.length > 0) {
+            result = await Article.updateMany({ _id: { $in: ids } }, { $set: { category: to } });
+        } else if (from) {
+            result = await Article.updateMany({ category: from }, { $set: { category: to } });
+        } else {
+            return res.status(400).json({ message: 'Provide either ids[] or from (source category)' });
+        }
+        res.json({ matched: result.matchedCount ?? result.n, modified: result.modifiedCount ?? result.nModified });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
     }
 });
 

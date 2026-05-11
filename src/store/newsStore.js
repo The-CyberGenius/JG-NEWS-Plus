@@ -44,7 +44,7 @@ api.interceptors.response.use(
 );
 
 // ─── Articles CRUD ────────────────────────────────────────────────────────────
-export const getArticles = async ({ page, limit, fields, includeHidden, category } = {}) => {
+export const getArticles = async ({ page, limit, fields, includeHidden, category, location } = {}) => {
     try {
         const params = {};
         if (page) params.page = page;
@@ -52,6 +52,7 @@ export const getArticles = async ({ page, limit, fields, includeHidden, category
         if (fields) params.fields = fields;
         if (includeHidden) params.includeHidden = 'true';
         if (category) params.category = category;
+        if (location) params.location = location;
 
         const response = await api.get('/articles', { params });
 
@@ -161,6 +162,23 @@ export const updateSettings = async (updates) => {
         console.error("Error updating settings", error);
         throw error;
     }
+};
+
+// Fetch distinct locations (with counts) for the location filter pills
+export const getLocations = async () => {
+    try {
+        const response = await api.get('/articles/meta/locations');
+        return response.data || [];
+    } catch (error) {
+        console.error('Error fetching locations', error);
+        return [];
+    }
+};
+
+// Bulk re-categorize articles (admin)
+export const recategorizeArticles = async ({ from, ids, to }) => {
+    const response = await api.post('/articles/recategorize', { from, ids, to });
+    return response.data;
 };
 
 // ─── Admin Auth ───────────────────────────────────────────────────────────────
