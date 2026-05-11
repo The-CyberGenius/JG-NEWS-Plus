@@ -925,6 +925,99 @@ ol {
   border-color: var(--navy);
 }
 
+/* ─── News Filter Bar (Latest News section) ─────────────── */
+.news-filter {
+  background: var(--white);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  margin-bottom: 20px;
+  box-shadow: var(--card-shadow);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+  border: 1px solid var(--gray-200);
+}
+
+.news-filter__group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.news-filter__group + .news-filter__group {
+  padding-left: 14px;
+  border-left: 1px solid var(--gray-200);
+}
+
+.news-filter__label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--gray-600);
+  letter-spacing: 0.2px;
+  margin-right: 2px;
+  white-space: nowrap;
+}
+
+.news-filter__chip {
+  background: var(--gray-100);
+  color: var(--text-secondary);
+  border: 1px solid transparent;
+  padding: 5px 12px;
+  border-radius: 100px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  white-space: nowrap;
+}
+
+.news-filter__chip:hover {
+  background: var(--gray-200);
+  color: var(--navy);
+}
+
+.news-filter__chip.is-active {
+  background: var(--navy);
+  color: var(--white);
+  border-color: var(--navy);
+  box-shadow: 0 2px 8px rgba(11, 30, 63, 0.25);
+}
+
+.news-filter__clear {
+  margin-left: auto;
+  background: transparent;
+  color: var(--red);
+  border: 1px solid var(--red);
+  padding: 5px 12px;
+  border-radius: 100px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.news-filter__clear:hover {
+  background: var(--red);
+  color: var(--white);
+}
+
+@media (max-width: 600px) {
+  .news-filter__group + .news-filter__group {
+    padding-left: 0;
+    border-left: none;
+    border-top: 1px solid var(--gray-200);
+    padding-top: 10px;
+    width: 100%;
+  }
+  .news-filter__clear {
+    margin-left: 0;
+    width: 100%;
+    text-align: center;
+  }
+}
+
 /* ─── Form Controls ─────────────────────────────────────── */
 .form-group {
   margin-bottom: 18px;

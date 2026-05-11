@@ -160,8 +160,35 @@ export default function Home() {
         });
     }, [sortedArticles, extraArticles]);
 
-    const latest = useMemo(() => combinedSorted.slice(0, latestCount), [combinedSorted, latestCount]);
-    const hasMore = combinedSorted.length > latestCount || serverHasMore;
+    // ── Latest news filter (category + date range) ──
+    const [filterCat, setFilterCat] = useState('all');
+    const [filterRange, setFilterRange] = useState('all'); // all | today | yesterday | week | month
+
+    const filteredByControls = useMemo(() => {
+        const now = Date.now();
+        const dayMs = 86400000;
+        const startOf = (offsetDays) => {
+            const d = new Date();
+            d.setHours(0, 0, 0, 0);
+            return d.getTime() - offsetDays * dayMs;
+        };
+        return combinedSorted.filter(a => {
+            if (filterCat !== 'all' && a.category !== filterCat) return false;
+            if (filterRange === 'all') return true;
+            const t = new Date(a.date || a.createdAt || 0).getTime();
+            if (filterRange === 'today') return t >= startOf(0);
+            if (filterRange === 'yesterday') return t >= startOf(1) && t < startOf(0);
+            if (filterRange === 'week') return t >= now - 7 * dayMs;
+            if (filterRange === 'month') return t >= now - 30 * dayMs;
+            return true;
+        });
+    }, [combinedSorted, filterCat, filterRange]);
+
+    const filtersActive = filterCat !== 'all' || filterRange !== 'all';
+    const latest = useMemo(() => filteredByControls.slice(0, latestCount), [filteredByControls, latestCount]);
+    const hasMore = filtersActive
+        ? filteredByControls.length > latestCount
+        : (combinedSorted.length > latestCount || serverHasMore);
 
     const handleLoadMore = useCallback(async () => {
         // If we still have unseen articles in local cache, just expand count
@@ -425,6 +452,55 @@ export default function Home() {
             {/* Latest News Grid */}
             <div className="container section-gap">
                 <SectionHeader title="ताजा समाचार" linkTo="/category/राजस्थान" />
+
+                {/* Filter bar — date range + category */}
+                <div className="news-filter">
+                    <div className="news-filter__group">
+                        <span className="news-filter__label">📅 समय:</span>
+                        {[
+                            { key: 'all', label: 'सभी' },
+                            { key: 'today', label: 'आज' },
+                            { key: 'yesterday', label: 'कल' },
+                            { key: 'week', label: 'इस सप्ताह' },
+                            { key: 'month', label: 'इस महीने' },
+                        ].map(o => (
+                            <button
+                                key={o.key}
+                                onClick={() => setFilterRange(o.key)}
+                                className={`news-filter__chip${filterRange === o.key ? ' is-active' : ''}`}
+                            >{o.label}</button>
+                        ))}
+                    </div>
+                    <div className="news-filter__group">
+                        <span className="news-filter__label">🏷️ श्रेणी:</span>
+                        <button
+                            onClick={() => setFilterCat('all')}
+                            className={`news-filter__chip${filterCat === 'all' ? ' is-active' : ''}`}
+                        >सभी</button>
+                        {(categories || []).slice(0, 8).map(c => (
+                            <button
+                                key={c}
+                                onClick={() => setFilterCat(c)}
+                                className={`news-filter__chip${filterCat === c ? ' is-active' : ''}`}
+                            >{c}</button>
+                        ))}
+                    </div>
+                    {filtersActive && (
+                        <button
+                            onClick={() => { setFilterCat('all'); setFilterRange('all'); }}
+                            className="news-filter__clear"
+                        >✕ Clear</button>
+                    )}
+                </div>
+
+                {!isLoading && filteredByControls.length === 0 && filtersActive && (
+                    <div className="empty-state" style={{ background: 'white', borderRadius: 'var(--radius-md)', boxShadow: 'var(--card-shadow)', marginBottom: '20px' }}>
+                        <div className="empty-state-icon">🔍</div>
+                        <h3>इन filters में कोई खबर नहीं मिली</h3>
+                        <button onClick={() => { setFilterCat('all'); setFilterRange('all'); }} className="btn btn-primary" style={{ marginTop: '8px' }}>Filters हटाएं</button>
+                    </div>
+                )}
+
                 <div className="news-grid news-grid-4">
                     {isLoading ? (
                         Array.from({ length: 4 }).map((_, i) => <NewsCardSkeleton key={i} />)

@@ -33,6 +33,8 @@ const toLocalInput = (d) => {
     } catch { return ''; }
 };
 
+const nowLocalInput = () => toLocalInput(new Date());
+
 export default function ArticleForm() {
     const { id } = useParams();
     const location = useLocation();
@@ -43,7 +45,7 @@ export default function ArticleForm() {
     const aiPrefill = location.state?.prefill || null;
     const fromAiSync = !!aiPrefill;
 
-    const [form, setForm] = useState(EMPTY_FORM);
+    const [form, setForm] = useState({ ...EMPTY_FORM, date: nowLocalInput() });
     const [saving, setSaving] = useState(false);
     const [toast, setToast] = useState('');
     const [imgPreview, setImgPreview] = useState('');
@@ -124,7 +126,7 @@ export default function ArticleForm() {
                 tags: aiPrefill.tags || '',
                 isBreaking: aiPrefill.isBreaking || false,
                 isFeatured: aiPrefill.isFeatured || false,
-                date: '',
+                date: nowLocalInput(),
             });
             setImgPreview(aiPrefill.image || '');
         }
