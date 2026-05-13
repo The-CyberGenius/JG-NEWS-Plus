@@ -605,7 +605,7 @@ ol {
 
 .ticker-inner {
   display: flex;
-  animation: ticker-scroll 10s linear infinite;
+  animation: ticker-scroll 5s linear infinite;
   white-space: nowrap;
   will-change: transform;
 }
