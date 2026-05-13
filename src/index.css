@@ -605,6 +605,7 @@ ol {
 
 .ticker-inner {
   display: flex;
+  width: max-content;
   animation: ticker-scroll 20s linear infinite;
   white-space: nowrap;
   will-change: transform;
@@ -621,6 +622,7 @@ ol {
   color: var(--white);
   text-decoration: none;
   transition: color 0.2s;
+  flex-shrink: 0;
 }
 
 .ticker-item:hover {
