@@ -188,7 +188,11 @@ export default function Home() {
             if (filterCat !== 'all' && a.category !== filterCat) return false;
             if (filterLoc !== 'all' && a.location !== filterLoc) return false;
             if (filterRange === 'all') return true;
-            const t = new Date(a.date || a.createdAt || 0).getTime();
+            // Use whichever timestamp is more recent — date (publish) or createdAt (added to DB)
+            const t = Math.max(
+                a.date ? new Date(a.date).getTime() : 0,
+                a.createdAt ? new Date(a.createdAt).getTime() : 0
+            );
             if (filterRange === 'today') return t >= startOf(0);
             if (filterRange === 'yesterday') return t >= startOf(1) && t < startOf(0);
             if (filterRange === 'week') return t >= now - 7 * dayMs;
