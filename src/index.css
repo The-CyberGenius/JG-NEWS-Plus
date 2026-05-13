@@ -606,9 +606,15 @@ ol {
 .ticker-inner {
   display: flex;
   width: max-content;
-  animation: ticker-scroll 20s linear infinite;
+  animation: ticker-scroll var(--ticker-speed, 36s) linear infinite;
   white-space: nowrap;
   will-change: transform;
+}
+
+@media (max-width: 767px) {
+  .ticker-inner {
+    animation-duration: calc(var(--ticker-speed, 36s) * 2);
+  }
 }
 
 .ticker-wrap:hover .ticker-inner {
