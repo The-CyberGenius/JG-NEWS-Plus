@@ -179,7 +179,7 @@ export default function Header() {
                         {lang === 'hi' ? 'ब्रेकिंग' : 'Breaking'}
                     </div>
                     <div className="ticker-content">
-                        <div className="ticker-inner">
+                        <div className="ticker-inner" style={{ animationDuration: `${Math.max(20, breakingArticles.length * 2.5)}s` }}>
                             {[...breakingArticles, ...breakingArticles].map((a, i) => (
                                 <Link key={`${a.id}-${i}`} to={articleHref(a)} className="ticker-item">
                                     <span className="ticker-dot">●</span>{a.title}
