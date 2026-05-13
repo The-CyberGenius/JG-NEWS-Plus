@@ -73,7 +73,7 @@ export default function Header() {
             <header style={{ background: 'white', boxShadow: '0 2px 16px rgba(10,22,40,0.12)', position: 'sticky', top: 0, zIndex: 80 }}>
                 <div className="container" style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 16px' }}>
                     {/* Logo */}
-                    <Link to="/" style={{ flex: '0 0 auto', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Link to="/" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} style={{ flex: '0 0 auto', display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none', cursor: 'pointer' }}>
                         <img
                             src="/logo.png"
                             alt="JG News Plus"
@@ -179,7 +179,7 @@ export default function Header() {
                         {lang === 'hi' ? 'ब्रेकिंग' : 'Breaking'}
                     </div>
                     <div className="ticker-content">
-                        <div className="ticker-inner" style={{ animationDuration: `${Math.max(20, breakingArticles.length * 2.5)}s` }}>
+                        <div className="ticker-inner" style={{ animationDuration: `${Math.max(8, breakingArticles.length * 1.2)}s` }}>
                             {[...breakingArticles, ...breakingArticles].map((a, i) => (
                                 <Link key={`${a.id}-${i}`} to={articleHref(a)} className="ticker-item">
                                     <span className="ticker-dot">●</span>{a.title}
