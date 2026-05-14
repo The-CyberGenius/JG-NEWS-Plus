@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useNews } from '../context/NewsContext';
-import { syncNews, extractArticle } from '../store/newsStore';
+import { syncNews, getSyncSources, extractArticle } from '../store/newsStore';
 import { timeAgo, getRandomFallbackImage } from '../utils/helpers';
 
-const CATEGORIES = [
-    { id: 'rajasthan', label: '🚩 राजस्थान', color: 'var(--saffron)' },
-    { id: 'india', label: '🇮🇳 भारत', color: 'var(--teal)' },
-    { id: 'world', label: '🌍 दुनिया', color: 'var(--navy)' },
-];
+const CAT_META = {
+    rajasthan: { label: '🚩 राजस्थान', color: 'var(--saffron)' },
+    india:     { label: '🇮🇳 भारत',    color: 'var(--teal)' },
+    world:     { label: '🌍 दुनिया',   color: 'var(--navy)' },
+};
 
 const RAJASTHAN_DISTRICTS = [
     'अजमेर', 'अलवर', 'अनूपगढ़', 'बालोतरा', 'बांसवाड़ा', 'बारां', 'बाड़मेर', 'ब्यावर', 'भरतपुर', 'भीलवाड़ा', 'बीकानेर', 'बूंदी', 'चित्तौड़गढ़', 'चूरू', 'दौसा', 'डीग', 'धौलपुर', 'डीडवाना-कुचामन', 'दूदू', 'डूंगरपुर', 'गंगानगर', 'गंगापुर सिटी', 'हनुमानगढ़', 'जयपुर', 'जयपुर ग्रामीण', 'जैसलमेर', 'जालौर', 'झालावाड़', 'झुंझुनूं', 'जोधपुर', 'जोधपुर ग्रामीण', 'करौली', 'केकड़ी', 'खैरथल-तिजारा', 'कोटा', 'कोटपुतली-बहरोड़', 'नागौर', 'नीम का थाना', 'पाली', 'फलोदी', 'प्रतापगढ़', 'राजसमंद', 'सलुंबर', 'सांचौर', 'सवाई माधोपुर', 'शाहपुरा', 'सीकर', 'सिरोही', 'टोंक', 'उदयपुर', 'अन्य'
@@ -80,29 +80,39 @@ export default function NewsSyncManager() {
     const navigate = useNavigate();
     const { addArticle, categories } = useNews();
     const [fetchedNews, setFetchedNews] = useState([]);
-    const [activeTab, setActiveTab] = useState('rajasthan');
+    const [sources, setSources] = useState([]);
+    const [activeSource, setActiveSource] = useState(null); // source id
     const [loading, setLoading] = useState(false);
     const [toast, setToast] = useState('');
     const [readingItem, setReadingItem] = useState(null);
 
-    // Preview Modal State
     const [previewItem, setPreviewItem] = useState(null);
     const [posting, setPosting] = useState(false);
-    
-    // Auto Post All State
     const [progress, setProgress] = useState(null);
 
-    const fetchLatest = async (cat = activeTab) => {
+    // Load sources list once on mount
+    useEffect(() => {
+        getSyncSources().then(list => {
+            if (list.length > 0) {
+                setSources(list);
+                setActiveSource(list[0].id);
+            }
+        });
+    }, []);
+
+    const fetchLatest = async (sourceId) => {
+        if (!sourceId) return;
         setLoading(true);
-        const data = await syncNews(cat);
-        const initializedData = data.map(item => ({ ...item, extracted: false, isExtracting: false }));
-        setFetchedNews(initializedData);
+        const data = await syncNews({ source: sourceId });
+        setFetchedNews((data || []).map(item => ({ ...item, extracted: false, isExtracting: false })));
         setLoading(false);
     };
 
     useEffect(() => {
-        fetchLatest(activeTab);
-    }, [activeTab]);
+        if (activeSource) fetchLatest(activeSource);
+    }, [activeSource]);
+
+    const activeSourceMeta = sources.find(s => s.id === activeSource);
 
     // Background extraction worker
     useEffect(() => {
@@ -172,7 +182,7 @@ export default function NewsSyncManager() {
                 author: 'AI Sync',
                 isBreaking: false,
                 isFeatured: false,
-                tags: ['AI Sync', previewItem.source, activeTab]
+                tags: ['AI Sync', previewItem.source, activeSourceMeta?.category || 'rajasthan']
             };
             await addArticle(data);
             setToast(`🚀 Published Successfully!`);
@@ -192,12 +202,13 @@ export default function NewsSyncManager() {
 
         setProgress({ current: 0, total: fetchedNews.length });
         let successCount = 0;
+        const isRajasthan = activeSourceMeta?.category === 'rajasthan';
 
         for (let i = 0; i < fetchedNews.length; i++) {
             const item = fetchedNews[i];
             try {
-                const location = activeTab === 'rajasthan' ? detectLocation(item.title, item.fullContent) : 'अन्य';
-                const assignedCat = activeTab === 'rajasthan' ? 'राजस्थान' : categories[0] || 'अन्य';
+                const location = isRajasthan ? detectLocation(item.title, item.fullContent) : 'अन्य';
+                const assignedCat = isRajasthan ? 'राजस्थान' : categories[0] || 'अन्य';
 
                 const heroImg = item.image || getRandomFallbackImage();
                 const cleanedContent = cleanContentHTML(item.fullContent, heroImg);
@@ -211,7 +222,7 @@ export default function NewsSyncManager() {
                     author: 'AI Sync',
                     isBreaking: false,
                     isFeatured: false,
-                    tags: ['AI Sync', item.source, activeTab]
+                    tags: ['AI Sync', item.source, activeSourceMeta?.category || 'rajasthan']
                 };
 
                 await addArticle(data);
@@ -230,32 +241,30 @@ export default function NewsSyncManager() {
     };
 
     const openPreview = (item) => {
-        const detected = activeTab === 'rajasthan' ? detectLocation(item.title, item.fullContent) : 'अन्य';
+        const isRajasthan = activeSourceMeta?.category === 'rajasthan';
         setPreviewItem({
             ...item,
-            location: detected,
-            assignedCat: activeTab === 'rajasthan' ? 'राजस्थान' : categories[0] || 'अन्य'
+            location: isRajasthan ? detectLocation(item.title, item.fullContent) : 'अन्य',
+            assignedCat: isRajasthan ? 'राजस्थान' : categories[0] || 'अन्य',
         });
     };
 
-    // ─── Edit & Post: open full ArticleForm with prefilled data ─────
     const editAndPost = (item) => {
+        const isRajasthan = activeSourceMeta?.category === 'rajasthan';
         const heroImg = item.image || getRandomFallbackImage();
         const cleanedContent = cleanContentHTML(item.fullContent, heroImg);
-        const detectedLoc = activeTab === 'rajasthan' ? detectLocation(item.title, item.fullContent) : 'अन्य';
         const prefill = {
             title: item.title || '',
             excerpt: makeExcerpt(item.fullContent, 180),
             content: `${cleanedContent}<p><br/>Source: <a href="${item.link}" target="_blank">${item.source}</a></p>`,
-            category: activeTab === 'rajasthan' ? 'राजस्थान' : (categories[0] || ''),
-            location: detectedLoc,
+            category: isRajasthan ? 'राजस्थान' : (categories[0] || ''),
+            location: isRajasthan ? detectLocation(item.title, item.fullContent) : 'अन्य',
             image: heroImg,
             videoUrl: '',
             author: 'AI Sync',
-            tags: ['AI Sync', item.source, activeTab].join(', '),
+            tags: ['AI Sync', item.source, activeSourceMeta?.category || 'rajasthan'].join(', '),
             isBreaking: false,
             isFeatured: false,
-            // Track which AI sync link this came from so we can remove it after save
             __aiSyncLink: item.link,
         };
         // Pass via React Router state — ArticleForm reads & prefills
@@ -290,26 +299,43 @@ export default function NewsSyncManager() {
                 </div>
             )}
 
-            <div style={{ display: 'flex', gap: '10px', marginBottom: '24px', background: 'var(--gray-100)', padding: '6px', borderRadius: '12px', width: 'fit-content' }}>
-                {CATEGORIES.map(cat => (
-                    <button
-                        key={cat.id}
-                        onClick={() => setActiveTab(cat.id)}
-                        style={{
-                            padding: '10px 24px', borderRadius: '10px', border: 'none', cursor: 'pointer', fontWeight: 800, fontSize: '0.9rem', transition: 'all 0.3s',
-                            background: activeTab === cat.id ? cat.color : 'transparent',
-                            color: activeTab === cat.id ? 'white' : 'var(--gray-600)'
-                        }}
-                    >
-                        {cat.label}
-                    </button>
-                ))}
+            {/* Source selector — grouped by category */}
+            <div style={{ marginBottom: '24px' }}>
+                {Object.entries(CAT_META).map(([cat, meta]) => {
+                    const catSources = sources.filter(s => s.category === cat);
+                    if (catSources.length === 0) return null;
+                    return (
+                        <div key={cat} style={{ marginBottom: '12px' }}>
+                            <div style={{ fontSize: '0.72rem', fontWeight: 800, color: 'var(--gray-500)', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '6px' }}>
+                                {meta.label}
+                            </div>
+                            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                                {catSources.map(s => (
+                                    <button
+                                        key={s.id}
+                                        onClick={() => setActiveSource(s.id)}
+                                        style={{
+                                            padding: '7px 16px', borderRadius: '100px', border: '2px solid',
+                                            borderColor: activeSource === s.id ? meta.color : 'var(--gray-200)',
+                                            background: activeSource === s.id ? meta.color : 'white',
+                                            color: activeSource === s.id ? 'white' : 'var(--gray-700)',
+                                            fontWeight: 700, fontSize: '0.82rem', cursor: 'pointer',
+                                            transition: 'all 0.2s',
+                                        }}
+                                    >
+                                        {s.name}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    );
+                })}
             </div>
 
             {loading && (
                 <div style={{ textAlign: 'center', padding: '100px', color: 'var(--gray-500)' }}>
                     <div className="spinner" style={{ margin: '0 auto 15px' }}></div>
-                    {activeTab.toUpperCase()} की खबरें खोजी जा रही हैं...
+                    {activeSourceMeta?.name || 'खबरें'} से खबरें खोजी जा रही हैं...
                 </div>
             )}
 
@@ -346,7 +372,7 @@ export default function NewsSyncManager() {
                                             <button onClick={() => setReadingItem(item)} style={{ background: 'none', border: 'none', color: 'var(--teal)', fontWeight: 800, fontSize: '0.85rem', cursor: 'pointer', padding: 0 }}>
                                                 📖 पूरी खबर पढ़ें
                                             </button>
-                                            <button onClick={() => editAndPost(item)} className="btn btn-sm" style={{ background: CATEGORIES.find(c => c.id === activeTab).color, color: 'white', padding: '6px 16px' }} title="Open in editor — edit before publishing">
+                                            <button onClick={() => editAndPost(item)} className="btn btn-sm" style={{ background: CAT_META[activeSourceMeta?.category]?.color || 'var(--teal)', color: 'white', padding: '6px 16px' }} title="Open in editor — edit before publishing">
                                                 ✏️ Edit & Post
                                             </button>
                                             <button onClick={() => openPreview(item)} className="btn btn-sm" style={{ background: 'transparent', color: 'var(--gray-600)', border: '1px solid var(--gray-300)', padding: '5px 12px', fontSize: '0.78rem' }} title="Quick publish without editing">
@@ -393,7 +419,7 @@ export default function NewsSyncManager() {
 
                             <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', borderTop: '1px solid var(--gray-100)', paddingTop: '20px', marginTop: '20px' }}>
                                 <button className="btn btn-navy btn-sm" onClick={() => setReadingItem(null)} style={{ background: 'var(--gray-200)', color: 'var(--navy)' }}>बंद करें (Close)</button>
-                                <button className="btn" onClick={() => { const ri = readingItem; setReadingItem(null); editAndPost(ri); }} style={{ background: CATEGORIES.find(c => c.id === activeTab).color, color: 'white', padding: '10px 25px', borderRadius: '12px', fontWeight: 800 }}>
+                                <button className="btn" onClick={() => { const ri = readingItem; setReadingItem(null); editAndPost(ri); }} style={{ background: CAT_META[activeSourceMeta?.category]?.color || 'var(--teal)', color: 'white', padding: '10px 25px', borderRadius: '12px', fontWeight: 800 }}>
                                     ✏️ Edit & Post
                                 </button>
                             </div>
