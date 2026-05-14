@@ -24,22 +24,33 @@ const parser = new Parser({
     }
 });
 
-const FEED_MAP = {
-    india: [
-        { name: 'NDTV India', url: 'https://feeds.feedburner.com/ndtvnews-india-news' },
-        { name: 'Google India', url: 'https://news.google.com/rss/search?q=India+News&hl=hi&gl=IN&ceid=IN:hi' }
-    ],
-    world: [
-        { name: 'Google World', url: 'https://news.google.com/rss/search?q=World+News&hl=hi&gl=IN&ceid=IN:hi' },
-        { name: 'BBC World', url: 'http://feeds.bbci.co.uk/news/world/rss.xml' }
-    ],
-    rajasthan: [
-        { name: 'Google Rajasthan', url: 'https://news.google.com/rss/search?q=Rajasthan+News&hl=hi&gl=IN&ceid=IN:hi' },
-        { name: 'Amar Ujala Raj', url: 'https://www.amarujala.com/rss/rajasthan.xml' },
-        { name: 'News18 Rajasthan', url: 'https://hindi.news18.com/rss/rajasthan.xml' },
-        { name: 'Zee Rajasthan', url: 'https://zeenews.india.com/hindi/india/rajasthan/rss' }
-    ]
-};
+// All sources — each has a unique id so /sync?source=<id> fetches just that one.
+// category field groups them for backward-compat: /sync?category=rajasthan still works.
+const ALL_SOURCES = [
+    // ── Rajasthan ───────────────────────────────────────────────────────────
+    { id: 'rajasthan-patrika', name: 'Rajasthan Patrika', category: 'rajasthan', url: 'https://www.patrika.com/rss/rajasthan-news.xml' },
+    { id: 'dainik-bhaskar',    name: 'Dainik Bhaskar',   category: 'rajasthan', url: 'https://www.bhaskar.com/rss-feed/1061/' },
+    { id: 'amar-ujala-raj',    name: 'Amar Ujala Raj',   category: 'rajasthan', url: 'https://www.amarujala.com/rss/rajasthan.xml' },
+    { id: 'news18-rajasthan',  name: 'News18 Rajasthan', category: 'rajasthan', url: 'https://hindi.news18.com/rss/rajasthan.xml' },
+    { id: 'navbharat-times',   name: 'Navbharat Times',  category: 'rajasthan', url: 'https://navbharattimes.indiatimes.com/rss/rajasthan.cms' },
+    { id: 'hindustan',         name: 'Hindustan',        category: 'rajasthan', url: 'https://www.livehindustan.com/rss/news/rajasthan.xml' },
+    { id: 'jagran-rajasthan',  name: 'Jagran',           category: 'rajasthan', url: 'https://www.jagran.com/rss/news-rajasthan.xml' },
+    { id: 'zee-rajasthan',     name: 'Zee Rajasthan',    category: 'rajasthan', url: 'https://zeenews.india.com/hindi/india/rajasthan/rss' },
+    { id: 'google-rajasthan',  name: 'Google Rajasthan', category: 'rajasthan', url: 'https://news.google.com/rss/search?q=Rajasthan+News&hl=hi&gl=IN&ceid=IN:hi' },
+    // ── India ───────────────────────────────────────────────────────────────
+    { id: 'ndtv-india',        name: 'NDTV India',       category: 'india',     url: 'https://feeds.feedburner.com/ndtvnews-india-news' },
+    { id: 'google-india',      name: 'Google India',     category: 'india',     url: 'https://news.google.com/rss/search?q=India+News&hl=hi&gl=IN&ceid=IN:hi' },
+    // ── World ───────────────────────────────────────────────────────────────
+    { id: 'google-world',      name: 'Google World',     category: 'world',     url: 'https://news.google.com/rss/search?q=World+News&hl=hi&gl=IN&ceid=IN:hi' },
+    { id: 'bbc-world',         name: 'BBC World',        category: 'world',     url: 'http://feeds.bbci.co.uk/news/world/rss.xml' },
+];
+
+// Also expose sources list via a GET endpoint so frontend can show them dynamically.
+const FEED_MAP = ALL_SOURCES.reduce((acc, s) => {
+    if (!acc[s.category]) acc[s.category] = [];
+    acc[s.category].push(s);
+    return acc;
+}, {});
 
 const extractImage = (html) => {
     if (!html) return '';
@@ -122,9 +133,19 @@ const resolveGoogleNewsUrl = async (url) => {
     }
 };
 
+// Expose source list so admin UI can render source pills without hardcoding
+router.get('/sources', (req, res) => res.json(ALL_SOURCES));
+
 router.get('/sync', async (req, res) => {
-    const { category = 'india' } = req.query;
-    const feeds = FEED_MAP[category] || FEED_MAP.india;
+    const { category, source } = req.query;
+    let feeds;
+    if (source) {
+        const found = ALL_SOURCES.find(s => s.id === source);
+        feeds = found ? [found] : [];
+    } else {
+        feeds = FEED_MAP[category] || FEED_MAP.rajasthan;
+    }
+    if (feeds.length === 0) return res.status(404).json({ message: 'Source not found' });
 
     try {
         let allItems = [];

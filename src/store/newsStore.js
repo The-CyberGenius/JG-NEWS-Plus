@@ -292,9 +292,20 @@ export const uploadImage = async (file, onProgress) => {
     return { url: data.secure_url, publicId: data.public_id };
 };
 // ─── News Sync (RSS) ────────────────────────────────────────────────────────
-export const syncNews = async (category = 'india') => {
+export const getSyncSources = async () => {
     try {
-        const response = await api.get(`/news-sync/sync?category=${category}`);
+        const response = await api.get('/news-sync/sources');
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching sources", error);
+        return [];
+    }
+};
+
+export const syncNews = async ({ category, source } = {}) => {
+    try {
+        const params = source ? { source } : { category: category || 'rajasthan' };
+        const response = await api.get('/news-sync/sync', { params });
         return response.data;
     } catch (error) {
         console.error("Error syncing news", error);
