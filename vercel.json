@@ -3,9 +3,22 @@
     "buildCommand": "npm run build",
     "outputDirectory": "dist",
     "framework": null,
+    "functions": {
+        "api/index.js": {
+            "includeFiles": "dist/index.html"
+        }
+    },
     "rewrites": [
         {
             "source": "/sitemap.xml",
+            "destination": "/api"
+        },
+        {
+            "source": "/article/:slug",
+            "destination": "/api"
+        },
+        {
+            "source": "/category/:name",
             "destination": "/api"
         },
         {
