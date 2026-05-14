@@ -8,13 +8,24 @@ const SUGGESTED_DEFAULT_CATEGORIES = [
 ];
 
 export default function CategoryManager() {
-    const { categories, addCategory, deleteCategory, refreshAll } = useNews();
+    const { articles, categories, addCategory, deleteCategory, refresh } = useNews();
     const [newCat, setNewCat] = useState('');
     const [toast, setToast] = useState('');
     const [confirmDel, setConfirmDel] = useState(null);
     const [recatFrom, setRecatFrom] = useState('');
     const [recatTo, setRecatTo] = useState('');
     const [recatBusy, setRecatBusy] = useState(false);
+
+    // Union of official categories + any orphan categories used by articles but not in the official list.
+    // Lets admins recategorize articles tagged with stale/legacy values like "FEED".
+    const sourceCategories = React.useMemo(() => {
+        const used = new Set();
+        for (const a of articles || []) {
+            if (a.category) used.add(a.category);
+        }
+        const orphans = [...used].filter(c => !categories.includes(c));
+        return [...categories, ...orphans];
+    }, [articles, categories]);
 
     const showToast = (msg) => {
         setToast(msg);
@@ -68,7 +79,7 @@ export default function CategoryManager() {
             showToast(`✅ ${result.modified} खबरें "${recatTo}" में move हो गईं`);
             setRecatFrom('');
             setRecatTo('');
-            if (refreshAll) refreshAll();
+            if (refresh) await refresh();
         } catch (err) {
             showToast('❌ Recategorize fail hua: ' + (err?.response?.data?.message || err.message));
         } finally {
@@ -121,7 +132,11 @@ export default function CategoryManager() {
                         <label className="form-label">From (source)</label>
                         <select className="form-control" value={recatFrom} onChange={e => setRecatFrom(e.target.value)} disabled={recatBusy}>
                             <option value="">श्रेणी चुनें...</option>
-                            {categories.map(c => <option key={c} value={c}>{c}</option>)}
+                            {sourceCategories.map(c => (
+                                <option key={c} value={c}>
+                                    {categories.includes(c) ? c : `${c} (orphan)`}
+                                </option>
+                            ))}
                         </select>
                     </div>
                     <div style={{ fontSize: '1.4rem', paddingBottom: '12px' }}>→</div>
