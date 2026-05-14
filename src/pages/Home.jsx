@@ -119,9 +119,6 @@ export default function Home() {
         fetchWeather();
     }, []);
 
-    // Hero slider: last 10 articles by date
-    const heroSlides = useMemo(() => sortedArticles.slice(0, 10), [sortedArticles]);
-
     // Sort articles by date desc explicitly so newest are always first
     const sortedArticles = useMemo(() => {
         return [...articles].sort((a, b) => {
@@ -130,6 +127,9 @@ export default function Home() {
             return db - da;
         });
     }, [articles]);
+
+    // Hero slider: last 10 articles by date
+    const heroSlides = useMemo(() => sortedArticles.slice(0, 10), [sortedArticles]);
 
     const newsFlash = useMemo(() => sortedArticles.slice(0, 10), [sortedArticles]);
 
