@@ -1,6 +1,10 @@
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import Article from '../models/Article.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const SITE_URL = process.env.SITE_URL || 'https://jgnews.live';
 const DEFAULT_IMAGE = `${SITE_URL}/logo.png`;
@@ -24,20 +28,42 @@ const stripTags = (html) => String(html || '').replace(/<[^>]+>/g, ' ').replace(
 
 // SPA shell — read once, cached. Used for non-bot requests so the React app loads.
 let cachedShell = null;
-const getSpaShell = () => {
-    if (cachedShell !== null) return cachedShell;
+let shellFetchPromise = null;
+
+const tryReadShellFromDisk = () => {
     const candidates = [
+        path.resolve(__dirname, '..', '..', 'dist', 'index.html'),
         path.resolve(process.cwd(), 'dist', 'index.html'),
         path.resolve(process.cwd(), 'index.html'),
+        '/var/task/dist/index.html',
     ];
     for (const p of candidates) {
         try {
-            cachedShell = fs.readFileSync(p, 'utf8');
-            return cachedShell;
+            const content = fs.readFileSync(p, 'utf8');
+            if (content) return content;
         } catch { /* try next */ }
     }
-    cachedShell = '';
-    return cachedShell;
+    return null;
+};
+
+// Lazy async loader — disk first, then HTTP fetch as last-resort fallback.
+// HTTP fallback only triggers if disk read fails (function bundle missing dist/index.html).
+const getSpaShell = async () => {
+    if (cachedShell) return cachedShell;
+    const fromDisk = tryReadShellFromDisk();
+    if (fromDisk) {
+        cachedShell = fromDisk;
+        return cachedShell;
+    }
+    // Fallback: fetch /index.html via HTTP from the deployed site. Cached after first call.
+    if (!shellFetchPromise) {
+        const base = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : SITE_URL;
+        shellFetchPromise = fetch(`${base}/index.html`, { headers: { 'User-Agent': 'crawlerRender/1.0' } })
+            .then(r => r.ok ? r.text() : '')
+            .then(t => { if (t) cachedShell = t; return cachedShell; })
+            .catch(() => null);
+    }
+    return shellFetchPromise;
 };
 
 function articleBotHtml(article) {
@@ -169,8 +195,12 @@ export default async function crawlerRender(req, res, next) {
 
     // Non-bot user — return the SPA shell so React loads normally.
     if (!bot) {
-        const shell = getSpaShell();
-        if (!shell) return next();
+        const shell = await getSpaShell();
+        if (!shell) {
+            // Last-resort: redirect to home so user at least lands on a working page.
+            // React Router will then handle deep-link navigation if they click around.
+            return res.redirect(302, '/');
+        }
         res.set('Content-Type', 'text/html; charset=utf-8');
         res.set('Cache-Control', 'public, max-age=300, stale-while-revalidate=86400');
         return res.send(shell);
