@@ -18,6 +18,7 @@ import seoRoutes from './routes/seo.js';
 import subscriberRoutes from './routes/subscribers.js';
 import Article from './models/Article.js';
 import Category from './models/Category.js';
+import crawlerRender from './middleware/crawlerRender.js';
 
 dotenv.config();
 
@@ -99,6 +100,10 @@ app.get('/sitemap.xml', async (req, res) => {
 app.get('/api', (req, res) => {
     res.send('JG NEWS PLUS API is running...');
 });
+
+// Crawler-only SSR for /article/:slug and /category/:name (bots get real meta,
+// users get the SPA shell so React loads as before).
+app.use(crawlerRender);
 
 const PORT = process.env.PORT || 5001;
 if (process.env.NODE_ENV !== 'production') {
