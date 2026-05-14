@@ -815,6 +815,44 @@ ol {
   border-radius: 4px;
 }
 
+.hero-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 5;
+  background: rgba(0, 0, 0, 0.45);
+  border: none;
+  color: white;
+  font-size: 1.8rem;
+  line-height: 1;
+  cursor: pointer;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, transform 0.2s;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  flex-shrink: 0;
+}
+
+.hero-arrow:hover {
+  background: rgba(0, 0, 0, 0.72);
+}
+
+.hero-arrow--prev { left: 10px; }
+.hero-arrow--next { right: 10px; }
+
+@media (max-width: 599px) {
+  .hero-arrow {
+    width: 32px;
+    height: 32px;
+    font-size: 1.4rem;
+  }
+}
+
 /* News Flash Sidebar */
 .news-flash {
   background: white;

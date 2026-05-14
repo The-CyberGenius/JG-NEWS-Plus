@@ -119,13 +119,8 @@ export default function Home() {
         fetchWeather();
     }, []);
 
-    // Hero slider articles: featured first, then breaking, then latest
-    const heroSlides = useMemo(() => {
-        const featured = articles.filter(a => a.isFeatured);
-        const breaking = articles.filter(a => a.isBreaking && !a.isFeatured);
-        const pool = [...featured, ...breaking, ...articles.filter(a => !a.isFeatured && !a.isBreaking)];
-        return pool.slice(0, 5);
-    }, [articles]);
+    // Hero slider: last 10 articles by date
+    const heroSlides = useMemo(() => sortedArticles.slice(0, 10), [sortedArticles]);
 
     // Sort articles by date desc explicitly so newest are always first
     const sortedArticles = useMemo(() => {
@@ -257,6 +252,16 @@ export default function Home() {
         }, 4000);
     }, [heroSlides.length]);
 
+    const goNext = useCallback(() => {
+        setSlideIdx(prev => (prev + 1) % Math.max(1, heroSlides.length));
+        startSlideTimer();
+    }, [heroSlides.length, startSlideTimer]);
+
+    const goPrev = useCallback(() => {
+        setSlideIdx(prev => (prev - 1 + Math.max(1, heroSlides.length)) % Math.max(1, heroSlides.length));
+        startSlideTimer();
+    }, [heroSlides.length, startSlideTimer]);
+
     useEffect(() => {
         if (heroSlides.length > 1) startSlideTimer();
         return () => { if (slideTimer.current) clearInterval(slideTimer.current); };
@@ -387,6 +392,20 @@ export default function Home() {
                                     </Link>
                                 ))}
                             </div>
+                            {heroSlides.length > 1 && (
+                                <>
+                                    <button
+                                        className="hero-arrow hero-arrow--prev"
+                                        onClick={(e) => { e.preventDefault(); goPrev(); }}
+                                        aria-label="पिछली खबर"
+                                    >&#8249;</button>
+                                    <button
+                                        className="hero-arrow hero-arrow--next"
+                                        onClick={(e) => { e.preventDefault(); goNext(); }}
+                                        aria-label="अगली खबर"
+                                    >&#8250;</button>
+                                </>
+                            )}
                             <div className="hero-dots">
                                 {heroSlides.map((_, i) => (
                                     <button
