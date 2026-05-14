@@ -34,10 +34,15 @@ const FEED_MAP = {
         { name: 'BBC World', url: 'http://feeds.bbci.co.uk/news/world/rss.xml' }
     ],
     rajasthan: [
-        { name: 'Google Rajasthan', url: 'https://news.google.com/rss/search?q=Rajasthan+News&hl=hi&gl=IN&ceid=IN:hi' },
+        { name: 'Rajasthan Patrika', url: 'https://www.patrika.com/rss/rajasthan-news.xml' },
+        { name: 'Dainik Bhaskar', url: 'https://www.bhaskar.com/rss-feed/1061/' },
         { name: 'Amar Ujala Raj', url: 'https://www.amarujala.com/rss/rajasthan.xml' },
         { name: 'News18 Rajasthan', url: 'https://hindi.news18.com/rss/rajasthan.xml' },
-        { name: 'Zee Rajasthan', url: 'https://zeenews.india.com/hindi/india/rajasthan/rss' }
+        { name: 'Navbharat Times', url: 'https://navbharattimes.indiatimes.com/rss/rajasthan.cms' },
+        { name: 'Hindustan', url: 'https://www.livehindustan.com/rss/news/rajasthan.xml' },
+        { name: 'Jagran', url: 'https://www.jagran.com/rss/news-rajasthan.xml' },
+        { name: 'Zee Rajasthan', url: 'https://zeenews.india.com/hindi/india/rajasthan/rss' },
+        { name: 'Google Rajasthan', url: 'https://news.google.com/rss/search?q=Rajasthan+News&hl=hi&gl=IN&ceid=IN:hi' }
     ]
 };
 
