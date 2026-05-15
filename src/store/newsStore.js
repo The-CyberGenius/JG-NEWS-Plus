@@ -181,6 +181,12 @@ export const recategorizeArticles = async ({ from, ids, to }) => {
     return response.data;
 };
 
+// Auto-categorize all existing articles based on title + content keywords (admin)
+export const autoCategorizeArticles = async ({ dryRun = false } = {}) => {
+    const response = await api.post('/articles/auto-categorize', { dryRun });
+    return response.data;
+};
+
 // ─── Admin Auth ───────────────────────────────────────────────────────────────
 export const adminLogin = async (password) => {
     try {
