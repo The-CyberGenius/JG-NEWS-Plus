@@ -12,8 +12,15 @@ export default function Header() {
     const [searchQ, setSearchQ] = useState('');
     const navigate = useNavigate();
 
+    // Only show categories that have at least one visible article.
+    // राजस्थान is special — acts as "All" page, so show it whenever any article exists.
+    const visibleArticles = articles.filter(a => !a.isHidden);
+    const categoriesWithArticles = dbCategories.filter(cat => {
+        if (cat === 'राजस्थान') return visibleArticles.length > 0;
+        return visibleArticles.some(a => a.category === cat);
+    });
     // Dynamically insert categories into the center of the navbar. Limit main navbar categories to 6.
-    const displayCategories = dbCategories.slice(0, 6);
+    const displayCategories = categoriesWithArticles.slice(0, 6);
     const NAV_LINKS = [
         { label: t.home, path: '/' },
         ...displayCategories.map(c => ({ label: c, path: `/category/${c}` })),
