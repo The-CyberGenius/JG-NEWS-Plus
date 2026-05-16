@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useCallback, useRef } from 'react';
 import {
-    getArticles, getCategories, getSettings,
+    getArticles, getCategories, getCategoryDetails, getSettings,
     addArticle, updateArticle, deleteArticle,
     addCategory, deleteCategory, updateSettings,
     adminLogin, adminLogout, isAdminLoggedIn,
@@ -11,6 +11,7 @@ const NewsContext = createContext(null);
 export const NewsProvider = ({ children }) => {
     const [articles, setArticles] = useState([]);
     const [categories, setCategories] = useState([]);
+    const [categoryDetails, setCategoryDetails] = useState([]);
     const [settings, setSettings] = useState({});
     const [isLoading, setIsLoading] = useState(true);
     const [adminAuth, setAdminAuth] = useState(() => isAdminLoggedIn());
@@ -25,9 +26,10 @@ export const NewsProvider = ({ children }) => {
         try {
             // For public site: load first 30 articles (summary fields only - no heavy content)
             // This makes initial load MUCH faster
-            const [articlesResult, fetchedCategories, fetchedSettings] = await Promise.all([
+            const [articlesResult, fetchedCategories, fetchedDetails, fetchedSettings] = await Promise.all([
                 getArticles({ page: 1, limit: 30, fields: 'summary' }),
                 getCategories(),
+                getCategoryDetails(),
                 getSettings(),
             ]);
 
@@ -35,6 +37,7 @@ export const NewsProvider = ({ children }) => {
             const articleList = articlesResult.articles || articlesResult;
             setArticles(articleList);
             setCategories(fetchedCategories);
+            setCategoryDetails(fetchedDetails);
             setSettings(fetchedSettings);
         } catch (error) {
             console.error(error);
@@ -47,14 +50,16 @@ export const NewsProvider = ({ children }) => {
     const refreshAll = useCallback(async () => {
         setIsLoading(true);
         try {
-            const [fetchedArticles, fetchedCategories, fetchedSettings] = await Promise.all([
+            const [fetchedArticles, fetchedCategories, fetchedDetails, fetchedSettings] = await Promise.all([
                 getArticles({ includeHidden: true }), // admin sees all articles incl. hidden
                 getCategories(),
+                getCategoryDetails(),
                 getSettings(),
             ]);
             const articleList = Array.isArray(fetchedArticles) ? fetchedArticles : (fetchedArticles.articles || []);
             setArticles(articleList);
             setCategories(fetchedCategories);
+            setCategoryDetails(fetchedDetails);
             setSettings(fetchedSettings);
         } catch (error) {
             console.error(error);
@@ -116,6 +121,7 @@ export const NewsProvider = ({ children }) => {
         <NewsContext.Provider value={{
             articles,
             categories,
+            categoryDetails,
             settings,
             adminAuth,
             isLoading,

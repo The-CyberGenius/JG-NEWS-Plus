@@ -1,5 +1,23 @@
 import React, { createContext, useContext, useState } from 'react';
 
+// Hindi category name → English translation
+export const CATEGORY_EN = {
+    'मनोरंजन': 'Entertainment',
+    'शिक्षा': 'Education',
+    'ग्रामीण': 'Rural',
+    'अपराध': 'Crime',
+    'खेल': 'Sports',
+    'राजस्थान': 'Rajasthan',
+    'राजनीति': 'Politics',
+    'व्यापार': 'Business',
+    'स्वास्थ्य': 'Health',
+    'तकनीक': 'Technology',
+    'भारत': 'India',
+    'दुनिया': 'World',
+    'धर्म': 'Religion',
+    'ई-अखबार': 'E-Paper',
+};
+
 export const translations = {
     hi: {
         home: 'होम',
@@ -19,6 +37,7 @@ export const translations = {
         liveWatch: 'JG News Plus\nLIVE देखें',
         liveDesc: '24x7 राजस्थान की सबसे तेज़ और सच्ची खबरें। निडर, निष्पक्ष और निर्भीक।',
         breakingNews: 'ब्रेकिंग न्यूज़',
+        breaking: 'ब्रेकिंग',
         featured: 'मुख्य',
         back: '← वापस जाएं',
         shareOn: 'शेयर करें:',
@@ -42,6 +61,19 @@ export const translations = {
         langLabel: 'English',
         motto: 'निडर • निष्पक्ष • निर्भीक',
         tagline: 'Rajasthan | 24x7 NEWS',
+        loadMore: 'और खबरें देखें',
+        loading: 'लोड हो रहा है…',
+        newsFound: 'खबरें मिलीं',
+        noFilter: 'इन filters में कोई खबर नहीं मिली',
+        latestUpdate: 'ताज़ा अपडेट',
+        ePaper: 'ई-अखबार',
+        ePaperTagline: 'राजस्थान का सबसे भरोसेमंद डिजिटल समाचार पत्र।',
+        dailyEdition: 'दैनिक संस्करण',
+        dailyEditionDesc: 'हर दिन ताज़ा अखबार',
+        categoryLabel: '🏷️ श्रेणी:',
+        allCategories: 'सभी',
+        prevArticle: 'पिछली खबर',
+        nextArticle: 'अगली खबर',
     },
     en: {
         home: 'Home',
@@ -60,7 +92,8 @@ export const translations = {
         watchNow: '▶ Watch Now',
         liveWatch: 'JG News Plus\nWatch LIVE',
         liveDesc: '24x7 Rajasthan\'s fastest and most credible news. Fearless, Impartial, Courageous.',
-        breakingNews: 'Breaking',
+        breakingNews: 'Breaking News',
+        breaking: 'Breaking',
         featured: 'Featured',
         back: '← Go Back',
         shareOn: 'Share:',
@@ -84,6 +117,19 @@ export const translations = {
         langLabel: 'हिंदी',
         motto: 'Fearless • Impartial • Courageous',
         tagline: 'Rajasthan | 24x7 NEWS',
+        loadMore: 'Load More',
+        loading: 'Loading…',
+        newsFound: 'news found',
+        noFilter: 'No news found for these filters',
+        latestUpdate: 'Latest Update',
+        ePaper: 'E-Paper',
+        ePaperTagline: 'Rajasthan\'s most trusted digital newspaper.',
+        dailyEdition: 'Daily Edition',
+        dailyEditionDesc: 'Fresh newspaper every day',
+        categoryLabel: '🏷️ Category:',
+        allCategories: 'All',
+        prevArticle: 'Previous',
+        nextArticle: 'Next',
     },
 };
 
@@ -100,8 +146,11 @@ export const LangProvider = ({ children }) => {
 
     const t = translations[lang];
 
+    // Translate a Hindi category name to the current language
+    const tCat = (name) => lang === 'en' ? (CATEGORY_EN[name] || name) : name;
+
     return (
-        <LangContext.Provider value={{ lang, toggleLang, t }}>
+        <LangContext.Provider value={{ lang, toggleLang, t, tCat }}>
             {children}
         </LangContext.Provider>
     );

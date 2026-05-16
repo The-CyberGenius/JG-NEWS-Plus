@@ -6,11 +6,13 @@ import { NewsCardSkeleton } from '../components/Skeletons';
 import { SEO } from '../utils/seo';
 import { getArticles } from '../store/newsStore';
 import { optimizeImage, srcSet } from '../utils/imageUrl';
+import { useLang } from '../context/LangContext';
 
 const PAGE_SIZE = 12;
 
 function NewsCard({ article }) {
     const [imgFailed, setImgFailed] = useState(false);
+    const { t } = useLang();
     const validImageUrl = !!(article.image && /^https?:\/\//i.test(article.image.trim()));
     const hasImage = validImageUrl && !imgFailed;
 
@@ -27,13 +29,13 @@ function NewsCard({ article }) {
                         decoding="async"
                         onError={() => setImgFailed(true)}
                     />
-                    {article.isBreaking && <span className="badge badge-red">ब्रेकिंग</span>}
+                    {article.isBreaking && <span className="badge badge-red">{t.breaking}</span>}
                 </div>
             ) : (
                 <div className="news-card__placeholder">
                     <span className="news-card__placeholder-cat">{article.category}</span>
                     <h3 className="news-card__placeholder-title">{article.title}</h3>
-                    {article.isBreaking && <span className="badge badge-red news-card__placeholder-badge">ब्रेकिंग</span>}
+                    {article.isBreaking && <span className="badge badge-red news-card__placeholder-badge">{t.breaking}</span>}
                 </div>
             )}
             <div className="news-card__body">
@@ -51,6 +53,7 @@ function NewsCard({ article }) {
 
 export default function CategoryPage() {
     const { category } = useParams();
+    const { t, tCat } = useLang();
     const [articles, setArticles] = useState([]);
     const [page, setPage] = useState(1);
     const [pages, setPages] = useState(1);
@@ -98,16 +101,16 @@ export default function CategoryPage() {
             />
             {/* Breadcrumb */}
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '24px', fontSize: '0.85rem', color: 'var(--gray-600)' }}>
-                <Link to="/" style={{ color: 'var(--teal)' }}>होम</Link>
+                <Link to="/" style={{ color: 'var(--teal)' }}>{t.home}</Link>
                 <span>›</span>
-                <span style={{ fontWeight: 700, color: 'var(--navy)' }}>{category}</span>
+                <span style={{ fontWeight: 700, color: 'var(--navy)' }}>{tCat(category)}</span>
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '28px' }}>
                 <span style={{ background: 'var(--teal)', width: '4px', borderRadius: '2px', alignSelf: 'stretch' }} />
                 <div>
-                    <h1 style={{ fontSize: '1.8rem', fontWeight: 900, color: 'var(--navy)' }}>{category}</h1>
-                    <p style={{ color: 'var(--gray-600)', fontSize: '0.85rem' }}>{total} खबरें मिलीं</p>
+                    <h1 style={{ fontSize: '1.8rem', fontWeight: 900, color: 'var(--navy)' }}>{tCat(category)}</h1>
+                    <p style={{ color: 'var(--gray-600)', fontSize: '0.85rem' }}>{total} {t.found}</p>
                 </div>
             </div>
 
@@ -118,8 +121,8 @@ export default function CategoryPage() {
             ) : articles.length === 0 ? (
                 <div className="empty-state">
                     <div className="empty-state-icon">📰</div>
-                    <h3>इस श्रेणी में कोई खबर नहीं है</h3>
-                    <Link to="/" className="btn btn-primary" style={{ marginTop: '8px' }}>होम पर जाएं</Link>
+                    <h3>{t.noNews}</h3>
+                    <Link to="/" className="btn btn-primary" style={{ marginTop: '8px' }}>{t.goHome}</Link>
                 </div>
             ) : (
                 <>
@@ -134,7 +137,7 @@ export default function CategoryPage() {
                                 className="btn btn-navy"
                                 style={{ minWidth: '180px', justifyContent: 'center' }}
                             >
-                                {loadingMore ? 'लोड हो रहा है…' : 'और खबरें देखें'}
+                                {loadingMore ? t.loading : t.loadMore}
                             </button>
                         </div>
                     )}

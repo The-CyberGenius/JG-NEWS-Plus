@@ -5,19 +5,25 @@ import { useNews } from '../context/NewsContext';
 import { useLang } from '../context/LangContext';
 
 export default function Header() {
-    const { articles, categories: dbCategories } = useNews();
-    const { lang, toggleLang, t } = useLang();
+    const { articles, categories: dbCategories, categoryDetails } = useNews();
+    const { lang, toggleLang, t, tCat } = useLang();
     const [menuOpen, setMenuOpen] = useState(false);
     const [searchOpen, setSearchOpen] = useState(false);
     const [searchQ, setSearchQ] = useState('');
     const navigate = useNavigate();
 
+    // Show only categories that have at least one visible article — uses real counts
+    // from backend (not just the 30 articles loaded in context). categoryDetails is
+    // already sorted by admin-defined order.
+    const nonEmptyCategories = (categoryDetails || [])
+        .filter(c => c.articleCount > 0)
+        .map(c => c.name);
     // Dynamically insert categories into the center of the navbar. Limit main navbar categories to 6.
-    const displayCategories = dbCategories.slice(0, 6);
+    const displayCategories = nonEmptyCategories.slice(0, 6);
     const NAV_LINKS = [
         { label: t.home, path: '/' },
-        ...displayCategories.map(c => ({ label: c, path: `/category/${c}` })),
-        { label: lang === 'hi' ? 'ई-अखबार' : 'E-Paper', path: '/epaper' },
+        ...displayCategories.map(c => ({ label: tCat(c), path: `/category/${c}` })),
+        { label: t.ePaper, path: '/epaper' },
         { label: t.liveTV, path: '/live' },
     ];
 

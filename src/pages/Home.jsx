@@ -160,6 +160,8 @@ export default function Home() {
     const [filterLoc, setFilterLoc] = useState('all');
     const [filterRange, setFilterRange] = useState('all'); // all | today | yesterday | week | month
     const [locations, setLocations] = useState([]);
+    const [filteredFromServer, setFilteredFromServer] = useState(null); // null = use local, array = server results
+    const [filterLoading, setFilterLoading] = useState(false);
 
     useEffect(() => {
         let cancelled = false;
@@ -171,36 +173,59 @@ export default function Home() {
         return () => { cancelled = true; };
     }, []);
 
-    const filteredByControls = useMemo(() => {
-        const now = Date.now();
-        const dayMs = 86400000;
-        const startOf = (offsetDays) => {
+    // Build dateFrom/dateTo from filterRange
+    const getDateRange = (range) => {
+        const now = new Date();
+        const startOfDay = (offsetDays = 0) => {
             const d = new Date();
             d.setHours(0, 0, 0, 0);
-            return d.getTime() - offsetDays * dayMs;
+            d.setDate(d.getDate() - offsetDays);
+            return d;
         };
-        return combinedSorted.filter(a => {
-            if (filterCat !== 'all' && a.category !== filterCat) return false;
-            if (filterLoc !== 'all' && a.location !== filterLoc) return false;
-            if (filterRange === 'all') return true;
-            // Use whichever timestamp is more recent — date (publish) or createdAt (added to DB)
-            const t = Math.max(
-                a.date ? new Date(a.date).getTime() : 0,
-                a.createdAt ? new Date(a.createdAt).getTime() : 0
-            );
-            if (filterRange === 'today') return t >= startOf(0);
-            if (filterRange === 'yesterday') return t >= startOf(1) && t < startOf(0);
-            if (filterRange === 'week') return t >= now - 7 * dayMs;
-            if (filterRange === 'month') return t >= now - 30 * dayMs;
-            return true;
+        if (range === 'today') return { dateFrom: startOfDay(0).toISOString() };
+        if (range === 'yesterday') return { dateFrom: startOfDay(1).toISOString(), dateTo: startOfDay(0).toISOString() };
+        if (range === 'week') return { dateFrom: new Date(now - 7 * 86400000).toISOString() };
+        if (range === 'month') return { dateFrom: new Date(now - 30 * 86400000).toISOString() };
+        return {};
+    };
+
+    // Whenever any filter changes, fetch fresh from server
+    useEffect(() => {
+        const anyActive = filterCat !== 'all' || filterLoc !== 'all' || filterRange !== 'all';
+        if (!anyActive) {
+            setFilteredFromServer(null);
+            return;
+        }
+        let cancelled = false;
+        setFilterLoading(true);
+        const params = { limit: 100, fields: 'summary' };
+        if (filterCat !== 'all') params.category = filterCat;
+        if (filterLoc !== 'all') params.location = filterLoc;
+        const { dateFrom, dateTo } = getDateRange(filterRange);
+        if (dateFrom) params.dateFrom = dateFrom;
+        if (dateTo) params.dateTo = dateTo;
+
+        api.get('/articles', { params }).then(res => {
+            if (cancelled) return;
+            const list = (res.data?.articles || res.data || []).map(a => ({ ...a, id: a._id || a.id }));
+            setFilteredFromServer(list);
+        }).catch(() => {
+            if (!cancelled) setFilteredFromServer([]);
+        }).finally(() => {
+            if (!cancelled) setFilterLoading(false);
         });
-    }, [combinedSorted, filterCat, filterLoc, filterRange]);
+        return () => { cancelled = true; };
+    }, [filterCat, filterLoc, filterRange]);
+
+    const filteredByControls = filteredFromServer !== null ? filteredFromServer : combinedSorted;
 
     const filtersActive = filterCat !== 'all' || filterLoc !== 'all' || filterRange !== 'all';
     const latest = useMemo(() => filteredByControls.slice(0, latestCount), [filteredByControls, latestCount]);
     const hasMore = filtersActive
         ? filteredByControls.length > latestCount
         : (combinedSorted.length > latestCount || serverHasMore);
+
+    const clearFilters = () => { setFilterCat('all'); setFilterLoc('all'); setFilterRange('all'); };
 
     const handleLoadMore = useCallback(async () => {
         // If we still have unseen articles in local cache, just expand count
@@ -539,23 +564,25 @@ export default function Home() {
                         </div>
                     )}
                     {filtersActive && (
-                        <button
-                            onClick={() => { setFilterCat('all'); setFilterLoc('all'); setFilterRange('all'); }}
-                            className="news-filter__clear"
-                        >✕ Clear</button>
+                        <button onClick={clearFilters} className="news-filter__clear">✕ Clear</button>
                     )}
                 </div>
 
-                {!isLoading && filteredByControls.length === 0 && filtersActive && (
+                {filterLoading && (
+                    <div style={{ textAlign: 'center', padding: '30px', color: 'var(--gray-500)', fontSize: '0.9rem' }}>
+                        ⏳ खबरें खोजी जा रही हैं...
+                    </div>
+                )}
+                {!isLoading && !filterLoading && filteredByControls.length === 0 && filtersActive && (
                     <div className="empty-state" style={{ background: 'white', borderRadius: 'var(--radius-md)', boxShadow: 'var(--card-shadow)', marginBottom: '20px' }}>
                         <div className="empty-state-icon">🔍</div>
                         <h3>इन filters में कोई खबर नहीं मिली</h3>
-                        <button onClick={() => { setFilterCat('all'); setFilterLoc('all'); setFilterRange('all'); }} className="btn btn-primary" style={{ marginTop: '8px' }}>Filters हटाएं</button>
+                        <button onClick={clearFilters} className="btn btn-primary" style={{ marginTop: '8px' }}>Filters हटाएं</button>
                     </div>
                 )}
 
                 <div className="news-grid news-grid-4">
-                    {isLoading ? (
+                    {(isLoading || filterLoading) ? (
                         Array.from({ length: 4 }).map((_, i) => <NewsCardSkeleton key={i} />)
                     ) : latest.map(a => <NewsCard key={a.id} article={a} />)}
                 </div>

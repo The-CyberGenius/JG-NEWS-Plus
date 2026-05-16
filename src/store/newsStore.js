@@ -125,6 +125,27 @@ export const getCategories = async () => {
     }
 };
 
+// Returns [{ name, order, articleCount }] — for navbar filtering & reorder UI
+export const getCategoryDetails = async () => {
+    try {
+        const response = await api.get('/categories/details');
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching category details", error);
+        return [];
+    }
+};
+
+export const reorderCategories = async (names) => {
+    try {
+        const response = await api.put('/categories/reorder', { names });
+        return response.data;
+    } catch (error) {
+        console.error("Error reordering categories", error);
+        throw error;
+    }
+};
+
 export const addCategory = async (name) => {
     try {
         await api.post('/categories', { name });
@@ -178,6 +199,12 @@ export const getLocations = async () => {
 // Bulk re-categorize articles (admin)
 export const recategorizeArticles = async ({ from, ids, to }) => {
     const response = await api.post('/articles/recategorize', { from, ids, to });
+    return response.data;
+};
+
+// Auto-categorize all existing articles based on title + content keywords (admin)
+export const autoCategorizeArticles = async ({ dryRun = false } = {}) => {
+    const response = await api.post('/articles/auto-categorize', { dryRun });
     return response.data;
 };
 

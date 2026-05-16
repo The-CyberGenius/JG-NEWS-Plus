@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useNews } from '../context/NewsContext';
-import { syncNews, getSyncSources, extractArticle } from '../store/newsStore';
+import { syncNews, getSyncSources, extractArticle, autoCategorizeArticles } from '../store/newsStore';
 import { timeAgo, getRandomFallbackImage } from '../utils/helpers';
 
 const CAT_META = {
@@ -96,7 +96,7 @@ const makeExcerpt = (html, max = 180) => {
 
 export default function NewsSyncManager() {
     const navigate = useNavigate();
-    const { addArticle, categories } = useNews();
+    const { addArticle, categories, refresh } = useNews();
     const [fetchedNews, setFetchedNews] = useState([]);
     const [sources, setSources] = useState([]);
     const [activeSource, setActiveSource] = useState(null); // source id
@@ -107,6 +107,22 @@ export default function NewsSyncManager() {
     const [previewItem, setPreviewItem] = useState(null);
     const [posting, setPosting] = useState(false);
     const [progress, setProgress] = useState(null);
+    const [recategorizing, setRecategorizing] = useState(false);
+
+    const handleAutoCategorize = async () => {
+        if (!window.confirm('यह सभी मौजूदा खबरों को उनके content के आधार पर सही category में move कर देगा। जारी रखें?')) return;
+        setRecategorizing(true);
+        try {
+            const result = await autoCategorizeArticles({ dryRun: false });
+            setToast(`✅ ${result.updated} खबरें auto-categorize हो गईं (${result.scanned} scan कीं)`);
+            if (refresh) await refresh();
+        } catch (err) {
+            setToast('❌ Auto-categorize fail हुआ');
+        } finally {
+            setRecategorizing(false);
+            setTimeout(() => setToast(''), 4000);
+        }
+    };
 
     // Load sources list once on mount
     useEffect(() => {
@@ -299,10 +315,13 @@ export default function NewsSyncManager() {
                     <p style={{ color: 'var(--gray-600)', fontSize: '0.88rem' }}>ताज़ा खबरें सीधे आपके पोर्टल पर</p>
                 </div>
                 <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                    <button onClick={handleAutoCategorize} className="btn" style={{ background: 'var(--saffron)', color: 'white' }} disabled={recategorizing || loading || progress} title="सभी existing articles को content के आधार पर सही category में move करें">
+                        {recategorizing ? '⏳ Categorizing...' : '🪄 Auto-Categorize All Old Articles'}
+                    </button>
                     <button onClick={handlePostAll} className="btn" style={{ background: 'var(--teal)', color: 'white' }} disabled={loading || progress || fetchedNews.length === 0}>
                         🚀 Post All (Auto)
                     </button>
-                    <button onClick={() => fetchLatest()} className="btn btn-navy" disabled={loading || progress}>
+                    <button onClick={() => fetchLatest(activeSource)} className="btn btn-navy" disabled={loading || progress}>
                         {loading ? '⏳ Syncing...' : '🔄 Refresh List'}
                     </button>
                 </div>
