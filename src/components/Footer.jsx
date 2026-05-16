@@ -1,29 +1,22 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { useLang } from '../context/LangContext';
+import { useLang, CATEGORY_EN } from '../context/LangContext';
 
 export default function Footer() {
-    const { t, lang } = useLang();
+    const { t, lang, tCat } = useLang();
 
     const FOOTER_CATS = [
-        { label: lang === 'hi' ? 'राजस्थान' : 'Rajasthan', path: '/category/राजस्थान' },
-        { label: t.politics, path: '/category/राजनीति' },
-        { label: t.sports, path: '/category/खेल' },
-        { label: t.entertainment, path: '/category/मनोरंजन' },
-        { label: t.crime, path: '/category/अपराध' },
-        { label: t.business, path: '/category/व्यापार' },
-        { label: lang === 'hi' ? 'शिक्षा' : 'Education', path: '/category/शिक्षा' },
-        { label: lang === 'hi' ? 'धर्म' : 'Religion', path: '/category/धर्म' },
-    ];
+        'राजस्थान', 'राजनीति', 'खेल', 'मनोरंजन', 'अपराध', 'व्यापार', 'शिक्षा', 'धर्म',
+    ].map(cat => ({ label: tCat(cat), path: `/category/${cat}` }));
 
     const QUICK_LINKS = [
-        { label: lang === 'hi' ? 'ई-अखबार' : 'E-Newspaper', path: '/epaper' },
-        { label: lang === 'hi' ? 'लाइव टीवी' : 'Live TV', path: '/live' },
-        { label: lang === 'hi' ? 'वीडियो' : 'Videos', path: '/videos' },
-        { label: lang === 'hi' ? 'फोटो गैलरी' : 'Photo Gallery', path: '/photos' },
-        { label: lang === 'hi' ? 'हमारे बारे में' : 'About Us', path: '/about' },
-        { label: lang === 'hi' ? 'संपर्क करें' : 'Contact Us', path: '/contact' },
-        { label: lang === 'hi' ? '⚙️ Admin Panel' : '⚙️ Admin Panel', path: '/admin' },
+        { label: t.ePaper, path: '/epaper' },
+        { label: t.liveTV, path: '/live' },
+        { label: t.videos, path: '/videos' },
+        { label: t.photos, path: '/photos' },
+        { label: t.about, path: '/about' },
+        { label: t.contactUs, path: '/contact' },
+        { label: '⚙️ Admin Panel', path: '/admin' },
     ];
 
     return (
