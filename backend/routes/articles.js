@@ -26,13 +26,18 @@ const sanitizeDate = (raw) => {
 // Get articles with optional pagination, category filter & field projection
 router.get('/', async (req, res) => {
     try {
-        const { page, limit, fields, includeHidden, category, location } = req.query;
+        const { page, limit, fields, includeHidden, category, location, dateFrom, dateTo } = req.query;
 
         // Public site: filter out hidden. Admin passes ?includeHidden=true to see all.
         const filter = includeHidden === 'true' ? {} : { isHidden: { $ne: true } };
         // राजस्थान acts as "All" — show every article regardless of category
         if (category && category !== 'राजस्थान') filter.category = category;
-        if (location) filter.location = location;
+        if (location && location !== 'all') filter.location = location;
+        if (dateFrom || dateTo) {
+            filter.date = {};
+            if (dateFrom) filter.date.$gte = new Date(dateFrom);
+            if (dateTo) filter.date.$lt = new Date(dateTo);
+        }
 
         // Sort: createdAt desc as fallback for any rows with bad date (1970 epoch),
         // so missing-date articles still surface near the top of their bucket
