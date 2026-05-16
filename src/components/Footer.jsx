@@ -23,6 +23,7 @@ export default function Footer() {
         { label: lang === 'hi' ? 'फोटो गैलरी' : 'Photo Gallery', path: '/photos' },
         { label: lang === 'hi' ? 'हमारे बारे में' : 'About Us', path: '/about' },
         { label: lang === 'hi' ? 'संपर्क करें' : 'Contact Us', path: '/contact' },
+        { label: lang === 'hi' ? '⚙️ Admin Panel' : '⚙️ Admin Panel', path: '/admin' },
     ];
 
     return (
