@@ -6,7 +6,7 @@ import { useLang } from '../context/LangContext';
 
 export default function Header() {
     const { articles, categories: dbCategories, categoryDetails } = useNews();
-    const { lang, toggleLang, t } = useLang();
+    const { lang, toggleLang, t, tCat } = useLang();
     const [menuOpen, setMenuOpen] = useState(false);
     const [searchOpen, setSearchOpen] = useState(false);
     const [searchQ, setSearchQ] = useState('');
@@ -22,8 +22,8 @@ export default function Header() {
     const displayCategories = nonEmptyCategories.slice(0, 6);
     const NAV_LINKS = [
         { label: t.home, path: '/' },
-        ...displayCategories.map(c => ({ label: c, path: `/category/${c}` })),
-        { label: lang === 'hi' ? 'ई-अखबार' : 'E-Paper', path: '/epaper' },
+        ...displayCategories.map(c => ({ label: tCat(c), path: `/category/${c}` })),
+        { label: t.ePaper, path: '/epaper' },
         { label: t.liveTV, path: '/live' },
     ];
 
