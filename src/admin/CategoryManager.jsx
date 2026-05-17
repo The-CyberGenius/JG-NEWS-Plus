@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNews } from '../context/NewsContext';
-import { recategorizeArticles } from '../store/newsStore';
+import { recategorizeArticles, reorderCategories } from '../store/newsStore';
 
 // Standard professional news categories (preset names — no auto-classification)
 const SUGGESTED_DEFAULT_CATEGORIES = [
@@ -8,13 +8,31 @@ const SUGGESTED_DEFAULT_CATEGORIES = [
 ];
 
 export default function CategoryManager() {
-    const { articles, categories, addCategory, deleteCategory, refresh } = useNews();
+    const { articles, categories, categoryDetails, addCategory, deleteCategory, refresh } = useNews();
     const [newCat, setNewCat] = useState('');
     const [toast, setToast] = useState('');
     const [confirmDel, setConfirmDel] = useState(null);
     const [recatFrom, setRecatFrom] = useState('');
     const [recatTo, setRecatTo] = useState('');
     const [recatBusy, setRecatBusy] = useState(false);
+    const [reorderBusy, setReorderBusy] = useState(false);
+
+    const moveCategory = async (index, direction) => {
+        if (reorderBusy) return;
+        const ordered = [...categories];
+        const newIndex = index + direction;
+        if (newIndex < 0 || newIndex >= ordered.length) return;
+        [ordered[index], ordered[newIndex]] = [ordered[newIndex], ordered[index]];
+        setReorderBusy(true);
+        try {
+            await reorderCategories(ordered);
+            if (refresh) await refresh();
+        } catch (err) {
+            showToast('❌ Reorder fail hua');
+        } finally {
+            setReorderBusy(false);
+        }
+    };
 
     // Union of official categories + any orphan categories used by articles but not in the official list.
     // Lets admins recategorize articles tagged with stale/legacy values like "FEED".
@@ -162,27 +180,54 @@ export default function CategoryManager() {
                 <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--gray-200)', background: 'var(--navy)' }}>
                     <span style={{ fontWeight: 800, color: 'white', fontSize: '0.88rem' }}>मौजूदा श्रेणियाँ</span>
                 </div>
-                {categories.map((cat, i) => (
-                    <div key={cat} style={{
-                        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                        padding: '14px 20px', borderBottom: i < categories.length - 1 ? '1px solid var(--gray-200)' : 'none',
-                        transition: 'var(--transition)',
-                    }}
-                        onMouseEnter={e => e.currentTarget.style.background = 'var(--gray-100)'}
-                        onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-                    >
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                            <span className="badge badge-teal">{cat}</span>
-                        </div>
-                        <button
-                            onClick={() => setConfirmDel(cat)}
-                            className="btn btn-sm btn-danger"
-                            style={{ opacity: 0.8 }}
+                {categories.map((cat, i) => {
+                    const detail = (categoryDetails || []).find(d => d.name === cat);
+                    const count = detail?.articleCount ?? 0;
+                    return (
+                        <div key={cat} style={{
+                            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                            padding: '14px 20px', borderBottom: i < categories.length - 1 ? '1px solid var(--gray-200)' : 'none',
+                            transition: 'var(--transition)',
+                        }}
+                            onMouseEnter={e => e.currentTarget.style.background = 'var(--gray-100)'}
+                            onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
                         >
-                            🗑️ हटाएं
-                        </button>
-                    </div>
-                ))}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                <span className="badge badge-teal">{cat}</span>
+                                <span style={{ fontSize: '0.8rem', color: 'var(--gray-500)', fontWeight: 700 }}>
+                                    {count} खबरें
+                                </span>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <button
+                                    onClick={() => moveCategory(i, -1)}
+                                    disabled={reorderBusy || i === 0}
+                                    className="btn btn-sm"
+                                    style={{ background: 'var(--gray-100)', color: 'var(--navy)', opacity: i === 0 ? 0.3 : 1, padding: '4px 10px' }}
+                                    title="ऊपर / Left move"
+                                >
+                                    ←
+                                </button>
+                                <button
+                                    onClick={() => moveCategory(i, 1)}
+                                    disabled={reorderBusy || i === categories.length - 1}
+                                    className="btn btn-sm"
+                                    style={{ background: 'var(--gray-100)', color: 'var(--navy)', opacity: i === categories.length - 1 ? 0.3 : 1, padding: '4px 10px' }}
+                                    title="नीचे / Right move"
+                                >
+                                    →
+                                </button>
+                                <button
+                                    onClick={() => setConfirmDel(cat)}
+                                    className="btn btn-sm btn-danger"
+                                    style={{ opacity: 0.8, marginLeft: '6px' }}
+                                >
+                                    🗑️ हटाएं
+                                </button>
+                            </div>
+                        </div>
+                    );
+                })}
                 {categories.length === 0 && (
                     <div className="empty-state">
                         <div className="empty-state-icon">🏷️</div>

@@ -5,19 +5,25 @@ import { useNews } from '../context/NewsContext';
 import { useLang } from '../context/LangContext';
 
 export default function Header() {
-    const { articles, categories: dbCategories } = useNews();
-    const { lang, toggleLang, t } = useLang();
+    const { articles, categories: dbCategories, categoryDetails } = useNews();
+    const { lang, toggleLang, t, tCat } = useLang();
     const [menuOpen, setMenuOpen] = useState(false);
     const [searchOpen, setSearchOpen] = useState(false);
     const [searchQ, setSearchQ] = useState('');
     const navigate = useNavigate();
 
+    // Show only categories that have at least one visible article — uses real counts
+    // from backend (not just the 30 articles loaded in context). categoryDetails is
+    // already sorted by admin-defined order.
+    const nonEmptyCategories = (categoryDetails || [])
+        .filter(c => c.articleCount > 0)
+        .map(c => c.name);
     // Dynamically insert categories into the center of the navbar. Limit main navbar categories to 6.
-    const displayCategories = dbCategories.slice(0, 6);
+    const displayCategories = nonEmptyCategories.slice(0, 6);
     const NAV_LINKS = [
         { label: t.home, path: '/' },
-        ...displayCategories.map(c => ({ label: c, path: `/category/${c}` })),
-        { label: lang === 'hi' ? 'ई-अखबार' : 'E-Paper', path: '/epaper' },
+        ...displayCategories.map(c => ({ label: tCat(c), path: `/category/${c}` })),
+        { label: t.ePaper, path: '/epaper' },
         { label: t.liveTV, path: '/live' },
     ];
 
@@ -59,7 +65,7 @@ export default function Header() {
                             onMouseLeave={e => { e.currentTarget.style.color = 'rgba(255,255,255,0.8)'; e.currentTarget.style.background = 'transparent'; }}>
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.259 5.63L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
                         </a>
-                        <a href="https://www.youtube.com/@JGNewsPlus" target="_blank" rel="noreferrer" aria-label="YouTube"
+                        <a href="https://www.youtube.com/@MANOJ-1974-JG" target="_blank" rel="noreferrer" aria-label="YouTube"
                             style={{ color: 'rgba(255,255,255,0.8)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '26px', height: '26px', borderRadius: '50%', transition: 'all 0.2s' }}
                             onMouseEnter={e => { e.currentTarget.style.color = '#FF0000'; e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; }}
                             onMouseLeave={e => { e.currentTarget.style.color = 'rgba(255,255,255,0.8)'; e.currentTarget.style.background = 'transparent'; }}>

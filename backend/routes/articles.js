@@ -2,6 +2,7 @@ import express from 'express';
 import Article from '../models/Article.js';
 import { slugify, uniqueSlug } from '../utils/slugify.js';
 import { requireAdmin } from '../middleware/requireAdmin.js';
+import { detectCategory } from '../utils/categoryDetector.js';
 
 const router = express.Router();
 
@@ -25,12 +26,18 @@ const sanitizeDate = (raw) => {
 // Get articles with optional pagination, category filter & field projection
 router.get('/', async (req, res) => {
     try {
-        const { page, limit, fields, includeHidden, category, location } = req.query;
+        const { page, limit, fields, includeHidden, category, location, dateFrom, dateTo } = req.query;
 
         // Public site: filter out hidden. Admin passes ?includeHidden=true to see all.
         const filter = includeHidden === 'true' ? {} : { isHidden: { $ne: true } };
-        if (category) filter.category = category;
-        if (location) filter.location = location;
+        // राजस्थान acts as "All" — show every article regardless of category
+        if (category && category !== 'राजस्थान') filter.category = category;
+        if (location && location !== 'all') filter.location = location;
+        if (dateFrom || dateTo) {
+            filter.date = {};
+            if (dateFrom) filter.date.$gte = new Date(dateFrom);
+            if (dateTo) filter.date.$lt = new Date(dateTo);
+        }
 
         // Sort: createdAt desc as fallback for any rows with bad date (1970 epoch),
         // so missing-date articles still surface near the top of their bucket
@@ -163,6 +170,33 @@ router.post('/recategorize', requireAdmin, async (req, res) => {
             return res.status(400).json({ message: 'Provide either ids[] or from (source category)' });
         }
         res.json({ matched: result.matchedCount ?? result.n, modified: result.modifiedCount ?? result.nModified });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+// Auto-categorize all existing articles based on title + content keywords.
+// POST /api/articles/auto-categorize { dryRun?: boolean }
+router.post('/auto-categorize', requireAdmin, async (req, res) => {
+    try {
+        const { dryRun } = req.body || {};
+        const articles = await Article.find({}, { _id: 1, title: 1, content: 1, excerpt: 1, category: 1 }).lean();
+        let scanned = 0, updated = 0;
+        const changes = [];
+
+        for (const a of articles) {
+            scanned++;
+            const detected = detectCategory(a.title, `${a.excerpt || ''} ${a.content || ''}`);
+            if (detected !== a.category) {
+                changes.push({ id: a._id, title: a.title, from: a.category, to: detected });
+                if (!dryRun) {
+                    await Article.updateOne({ _id: a._id }, { $set: { category: detected } });
+                }
+                updated++;
+            }
+        }
+
+        res.json({ scanned, updated, dryRun: !!dryRun, sample: changes.slice(0, 10) });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

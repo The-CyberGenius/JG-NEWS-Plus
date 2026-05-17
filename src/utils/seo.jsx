@@ -100,7 +100,7 @@ export function organizationStructuredData() {
         sameAs: [
             'https://www.instagram.com/jgnewsrajasthan/',
             'https://x.com/jgnewslive',
-            'https://www.youtube.com/@JGNewsPlus',
+            'https://www.youtube.com/@MANOJ-1974-JG',
         ],
         description: 'JG News Plus Rajasthan - 24x7 Latest News in Hindi',
     };

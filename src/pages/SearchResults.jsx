@@ -3,11 +3,13 @@ import { articleHref } from '../utils/articleHref';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useNews } from '../context/NewsContext';
 import { timeAgo } from '../utils/helpers';
+import { useLang } from '../context/LangContext';
 
 export default function SearchResults() {
     const [params] = useSearchParams();
     const q = params.get('q') || '';
     const { articles } = useNews();
+    const { t } = useLang();
 
     const results = useMemo(() => {
         if (!q.trim()) return [];
@@ -24,18 +26,18 @@ export default function SearchResults() {
     return (
         <div className="container section-gap">
             <h1 style={{ fontSize: '1.5rem', fontWeight: 900, color: 'var(--navy)', marginBottom: '6px' }}>
-                खोज परिणाम: "{q}"
+                {t.searchResults}: "{q}"
             </h1>
             <p style={{ color: 'var(--gray-600)', marginBottom: '28px', fontSize: '0.9rem' }}>
-                {results.length} खबरें मिलीं
+                {results.length} {t.found}
             </p>
 
             {results.length === 0 ? (
                 <div className="empty-state">
                     <div className="empty-state-icon">🔍</div>
-                    <h3>कोई खबर नहीं मिली</h3>
-                    <p style={{ color: 'var(--gray-600)', fontSize: '0.85rem' }}>दूसरे शब्दों से खोजें</p>
-                    <Link to="/" className="btn btn-primary" style={{ marginTop: '12px' }}>होम पर जाएं</Link>
+                    <h3>{t.noResults}</h3>
+                    <p style={{ color: 'var(--gray-600)', fontSize: '0.85rem' }}>{t.tryOther}</p>
+                    <Link to="/" className="btn btn-primary" style={{ marginTop: '12px' }}>{t.goHome}</Link>
                 </div>
             ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
