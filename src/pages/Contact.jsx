@@ -102,7 +102,7 @@ export default function Contact() {
                             <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                                 {[
                                     { name: '😊 Facebook', color: '#4267B2', url: 'https://facebook.com' },
-                                    { name: '▶ YouTube', color: '#FF0000', url: 'https://youtube.com' },
+                                    { name: '▶ YouTube', color: '#FF0000', url: 'https://www.youtube.com/@MANOJ-1974-JG' },
                                     { name: '🐦 Twitter', color: '#1DA1F2', url: 'https://twitter.com' },
                                     { name: '📷 Instagram', color: '#E1306C', url: 'https://instagram.com' },
                                 ].map(s => (

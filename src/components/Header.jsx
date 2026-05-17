@@ -65,7 +65,7 @@ export default function Header() {
                             onMouseLeave={e => { e.currentTarget.style.color = 'rgba(255,255,255,0.8)'; e.currentTarget.style.background = 'transparent'; }}>
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.259 5.63L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
                         </a>
-                        <a href="https://www.youtube.com/@JGNewsPlus" target="_blank" rel="noreferrer" aria-label="YouTube"
+                        <a href="https://www.youtube.com/@MANOJ-1974-JG" target="_blank" rel="noreferrer" aria-label="YouTube"
                             style={{ color: 'rgba(255,255,255,0.8)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '26px', height: '26px', borderRadius: '50%', transition: 'all 0.2s' }}
                             onMouseEnter={e => { e.currentTarget.style.color = '#FF0000'; e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; }}
                             onMouseLeave={e => { e.currentTarget.style.color = 'rgba(255,255,255,0.8)'; e.currentTarget.style.background = 'transparent'; }}>
