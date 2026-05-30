@@ -34,5 +34,7 @@ articleSchema.index({ isFeatured: 1, date: -1 });
 articleSchema.index({ isBreaking: 1, date: -1 });
 articleSchema.index({ views: -1 });
 articleSchema.index({ 'shares.total': -1 });
+// Full-text search index (supports Hindi + English)
+articleSchema.index({ title: 'text', excerpt: 'text', tags: 'text' }, { weights: { title: 10, tags: 5, excerpt: 1 }, default_language: 'none' });
 
 export default mongoose.model('Article', articleSchema);

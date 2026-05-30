@@ -7,6 +7,7 @@ import { LangProvider } from './context/LangContext';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import SubscribePopup from './components/SubscribePopup';
+import BackToTop from './components/BackToTop';
 
 // Lazy loading pages and admin components
 const Home = lazy(() => import('./pages/Home'));
@@ -20,6 +21,7 @@ const Contact = lazy(() => import('./pages/Contact'));
 const SearchResults = lazy(() => import('./pages/SearchResults'));
 const EPaper = lazy(() => import('./pages/EPaper'));
 const PublicDocs = lazy(() => import('./pages/PublicDocs'));
+const NotFound = lazy(() => import('./pages/NotFound'));
 
 const AdminLayout = lazy(() => import('./admin/AdminLayout'));
 const AdminLogin = lazy(() => import('./admin/AdminLogin'));
@@ -42,6 +44,7 @@ function PublicLayout({ children }) {
             <main style={{ minHeight: '60vh' }}>{children}</main>
             <Footer />
             <SubscribePopup />
+            <BackToTop />
         </>
     );
 }
@@ -72,6 +75,7 @@ export default function App() {
                             <Route path="/search" element={<PublicLayout><SearchResults /></PublicLayout>} />
                             <Route path="/epaper" element={<PublicLayout><EPaper /></PublicLayout>} />
                             <Route path="/public" element={<PublicLayout><PublicDocs /></PublicLayout>} />
+                            <Route path="*" element={<PublicLayout><NotFound /></PublicLayout>} />
 
                             {/* Admin */}
                             <Route path="/admin" element={<AdminLogin />} />

@@ -73,6 +73,43 @@ router.get('/', async (req, res) => {
 });
 
 // Get a single article — accepts MongoDB _id OR slug
+// Full-text search — GET /api/articles/search?q=query&page=1&limit=12
+router.get('/search', async (req, res) => {
+    try {
+        const { q = '', page = 1, limit = 12, category } = req.query;
+        const query = q.trim();
+        if (!query) return res.json({ articles: [], total: 0, page: 1, pages: 0 });
+
+        const p = Math.max(1, parseInt(page));
+        const l = Math.min(30, Math.max(1, parseInt(limit)));
+        const filter = { isHidden: { $ne: true } };
+        if (category && category !== 'all') filter.category = category;
+
+        let articles, total;
+        // Try MongoDB full-text search first
+        try {
+            const textFilter = { ...filter, $text: { $search: query } };
+            const proj = { title: 1, slug: 1, excerpt: 1, category: 1, location: 1, image: 1, date: 1, score: { $meta: 'textScore' } };
+            [articles, total] = await Promise.all([
+                Article.find(textFilter, proj).sort({ score: { $meta: 'textScore' }, date: -1 }).skip((p - 1) * l).limit(l).lean(),
+                Article.countDocuments(textFilter),
+            ]);
+        } catch {
+            // Fallback to regex if text index not yet built
+            const re = { $regex: query.split(/\s+/).join('|'), $options: 'i' };
+            const regexFilter = { ...filter, $or: [{ title: re }, { excerpt: re }, { tags: re }] };
+            [articles, total] = await Promise.all([
+                Article.find(regexFilter, { title: 1, slug: 1, excerpt: 1, category: 1, location: 1, image: 1, date: 1 }).sort({ date: -1 }).skip((p - 1) * l).limit(l).lean(),
+                Article.countDocuments(regexFilter),
+            ]);
+        }
+        res.set('Cache-Control', 'public, max-age=30');
+        res.json({ articles: articles.map(a => ({ ...a, id: a._id })), total, page: p, pages: Math.ceil(total / l) });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
 router.get('/:idOrSlug', async (req, res) => {
     try {
         const { idOrSlug } = req.params;
