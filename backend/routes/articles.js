@@ -217,7 +217,9 @@ router.post('/recategorize', requireAdmin, async (req, res) => {
 router.post('/auto-categorize', requireAdmin, async (req, res) => {
     try {
         const { dryRun } = req.body || {};
-        const articles = await Article.find({}, { _id: 1, title: 1, content: 1, excerpt: 1, category: 1 }).lean();
+        // Only process articles in the default catch-all category to avoid
+        // overwriting hand-curated categories like राजनीति, व्यापार, स्वास्थ्य, etc.
+        const articles = await Article.find({ category: 'राजस्थान' }, { _id: 1, title: 1, content: 1, excerpt: 1, category: 1 }).lean();
         let scanned = 0, updated = 0;
         const changes = [];
 
