@@ -295,24 +295,30 @@ router.delete('/:id', requireAdmin, async (req, res) => {
 });
 
 // Track article view (fire-and-forget from client)
+// Accepts both MongoDB ObjectId AND slug in :id param
 router.post('/:id/view', async (req, res) => {
     try {
+        const { id } = req.params;
         const now = new Date();
-        const today = now.toISOString().slice(0, 10); // YYYY-MM-DD
-        const hour = now.toISOString().slice(0, 13); // YYYY-MM-DDTHH (e.g. '2026-05-04T18')
-        await Article.findByIdAndUpdate(
-            req.params.id,
-            {
-                $inc: {
-                    views: 1,
-                    [`viewsByDay.${today}`]: 1,
-                    [`viewsByHour.${hour}`]: 1,
-                },
-            },
-            { new: false }
-        );
+        const today = now.toISOString().slice(0, 10);
+        const hour = now.toISOString().slice(0, 13);
+        const inc = {
+            views: 1,
+            [`viewsByDay.${today}`]: 1,
+            [`viewsByHour.${hour}`]: 1,
+        };
+
+        // Try ObjectId first, fall back to slug
+        let result;
+        if (/^[0-9a-fA-F]{24}$/.test(id)) {
+            result = await Article.findByIdAndUpdate(id, { $inc: inc }, { new: false });
+        }
+        if (!result) {
+            result = await Article.findOneAndUpdate({ slug: id }, { $inc: inc }, { new: false });
+        }
+
         res.set('Cache-Control', 'no-store');
-        res.json({ ok: true });
+        res.json({ ok: !!result });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
