@@ -109,8 +109,8 @@ export default function ArticlePage() {
             <div className="container section-gap">
                 <div className="empty-state">
                     <div className="empty-state-icon">😔</div>
-                    <h3>खबर नहीं मिली</h3>
-                    <Link to="/" className="btn btn-primary" style={{ marginTop: '8px' }}>होम पर जाएं</Link>
+                    <h3>{t.articleNotFound}</h3>
+                    <Link to="/" className="btn btn-primary" style={{ marginTop: '8px' }}>{t.goHome}</Link>
                 </div>
             </div>
         );
