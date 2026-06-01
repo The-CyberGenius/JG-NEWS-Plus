@@ -44,6 +44,19 @@ api.interceptors.response.use(
 );
 
 // ─── Articles CRUD ────────────────────────────────────────────────────────────
+// Full-text server-side search
+export const searchArticles = async ({ q, page = 1, limit = 12, category } = {}) => {
+    try {
+        const params = { q, page, limit };
+        if (category && category !== 'all') params.category = category;
+        const response = await api.get('/articles/search', { params });
+        return response.data;
+    } catch (error) {
+        console.error('Search error', error);
+        return { articles: [], total: 0, page: 1, pages: 0 };
+    }
+};
+
 export const getArticles = async ({ page, limit, fields, includeHidden, category, location } = {}) => {
     try {
         const params = {};

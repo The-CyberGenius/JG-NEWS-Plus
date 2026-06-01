@@ -951,6 +951,10 @@ ol {
   display: none;
 }
 
+.location-pills-strip::-webkit-scrollbar {
+  display: none;
+}
+
 .cat-pill {
   padding: 6px 16px;
   border-radius: 100px;

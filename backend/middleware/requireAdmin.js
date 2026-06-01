@@ -1,14 +1,17 @@
-// Lightweight admin auth — single string compare per request.
-// Frontend sends `Authorization: Bearer <ADMIN_PASSWORD>` after successful /admin/login.
-// No DB hit, no JWT, no session store — fast and stateless.
+import jwt from 'jsonwebtoken';
 
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'jgnews@shiva';
+const JWT_SECRET = process.env.JWT_SECRET || process.env.ADMIN_PASSWORD || 'jgnews_jwt_secret_change_me';
 
 export const requireAdmin = (req, res, next) => {
     const auth = req.headers.authorization || '';
     const token = auth.startsWith('Bearer ') ? auth.slice(7) : '';
-    if (!token || token !== ADMIN_PASSWORD) {
+    if (!token) return res.status(401).json({ message: 'Unauthorized' });
+
+    try {
+        const payload = jwt.verify(token, JWT_SECRET);
+        if (payload.role !== 'admin') throw new Error('Not admin');
+        next();
+    } catch {
         return res.status(401).json({ message: 'Unauthorized' });
     }
-    next();
 };

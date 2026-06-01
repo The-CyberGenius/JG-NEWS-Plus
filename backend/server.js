@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import compression from 'compression';
+import rateLimit from 'express-rate-limit';
 import connectDB from './config/db.js';
 
 // Route imports
@@ -24,15 +25,27 @@ dotenv.config();
 
 const app = express();
 
+// Rate limiters
+const loginLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 10, message: { message: 'Too many login attempts, try after 15 minutes' }, standardHeaders: true, legacyHeaders: false });
+const contactLimiter = rateLimit({ windowMs: 60 * 60 * 1000, max: 5, message: { message: 'Too many messages sent, try after an hour' }, standardHeaders: true, legacyHeaders: false });
+const subscribeLimiter = rateLimit({ windowMs: 60 * 60 * 1000, max: 10, message: { message: 'Too many subscribe attempts' }, standardHeaders: true, legacyHeaders: false });
+const apiLimiter = rateLimit({ windowMs: 60 * 1000, max: 300, standardHeaders: true, legacyHeaders: false });
+
 // Middleware
 app.use(cors());
 app.use(compression());
-app.use(express.json());
+app.use(express.json({ limit: '2mb' }));
+app.set('trust proxy', 1);
 
 // Connect to Database
 connectDB();
 
-// API Routes
+// API Routes — sensitive endpoints get dedicated rate limiters
+app.use('/api/admin/login', loginLimiter);
+app.use('/api/messages', contactLimiter);
+app.use('/api/subscribers', subscribeLimiter);
+app.use('/api', apiLimiter);
+
 app.use('/api/articles', articleRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/settings', settingRoutes);

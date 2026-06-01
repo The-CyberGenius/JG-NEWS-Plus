@@ -182,7 +182,7 @@ export default function Header() {
                 <div className="ticker-wrap">
                     <div className="ticker-label">
                         <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24" style={{ marginRight: '6px' }}><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" /></svg>
-                        {lang === 'hi' ? 'ब्रेकिंग' : 'Breaking'}
+                        {t.breaking}
                     </div>
                     <div className="ticker-content">
                         <div className="ticker-inner" style={{ '--ticker-speed': `${Math.max(24, breakingArticles.length * 3.6)}s` }}>
