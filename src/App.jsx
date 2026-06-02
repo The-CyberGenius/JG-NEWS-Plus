@@ -22,6 +22,8 @@ const SearchResults = lazy(() => import('./pages/SearchResults'));
 const EPaper = lazy(() => import('./pages/EPaper'));
 const PublicDocs = lazy(() => import('./pages/PublicDocs'));
 const NotFound = lazy(() => import('./pages/NotFound'));
+const Terms = lazy(() => import('./pages/Terms'));
+const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
 
 const AdminLayout = lazy(() => import('./admin/AdminLayout'));
 const AdminLogin = lazy(() => import('./admin/AdminLogin'));
@@ -75,6 +77,8 @@ export default function App() {
                             <Route path="/search" element={<PublicLayout><SearchResults /></PublicLayout>} />
                             <Route path="/epaper" element={<PublicLayout><EPaper /></PublicLayout>} />
                             <Route path="/public" element={<PublicLayout><PublicDocs /></PublicLayout>} />
+                            <Route path="/terms" element={<PublicLayout><Terms /></PublicLayout>} />
+                            <Route path="/privacy" element={<PublicLayout><PrivacyPolicy /></PublicLayout>} />
                             <Route path="*" element={<PublicLayout><NotFound /></PublicLayout>} />
 
                             {/* Admin */}
