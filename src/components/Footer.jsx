@@ -15,9 +15,13 @@ export default function Footer() {
         { label: t.videos, path: '/videos' },
         { label: t.photos, path: '/photos' },
         { label: t.about, path: '/about' },
-        { label: t.contactUs, path: '/contact' },
         { label: '⚙️ Admin Panel', path: '/admin' },
     ];
+
+    const WA_NUMBER = '917240116211';
+    const WA_MSG = encodeURIComponent(lang === 'hi'
+        ? 'नमस्ते JG News Plus,\nमैं आपसे संपर्क करना चाहता/चाहती हूं।\nनाम:\nविषय:\nसंदेश:'
+        : 'Hello JG News Plus,\nI would like to get in touch.\nName:\nSubject:\nMessage:');
 
     return (
         <footer style={{ background: 'var(--navy)', color: 'rgba(255,255,255,0.8)', marginTop: '48px' }}>
@@ -117,6 +121,30 @@ export default function Footer() {
                                 >› {l.label}</Link>
                             ))}
                         </div>
+
+                        {/* Contact Us CTA */}
+                        <Link
+                            to="/contact"
+                            style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '7px',
+                                marginTop: '18px',
+                                background: 'linear-gradient(135deg, var(--saffron), #e65c00)',
+                                color: 'white',
+                                padding: '10px 18px',
+                                borderRadius: '100px',
+                                fontWeight: 800,
+                                fontSize: '0.85rem',
+                                textDecoration: 'none',
+                                boxShadow: '0 4px 14px rgba(255,140,0,0.35)',
+                                transition: 'transform 0.2s, box-shadow 0.2s',
+                            }}
+                            onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 20px rgba(255,140,0,0.5)'; }}
+                            onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '0 4px 14px rgba(255,140,0,0.35)'; }}
+                        >
+                            📞 {t.contactUs}
+                        </Link>
                     </div>
 
                     {/* Contact */}
@@ -127,6 +155,33 @@ export default function Footer() {
                             <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}><span>📞</span><span>+91 7240116211</span></div>
                             <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}><span>✉️</span><span>manoj@jgnews.live</span></div>
                         </div>
+                        {/* WhatsApp CTA */}
+                        <a
+                            href={`https://wa.me/${WA_NUMBER}?text=${WA_MSG}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                marginTop: '16px',
+                                background: '#25D366',
+                                color: 'white',
+                                padding: '10px 20px',
+                                borderRadius: '100px',
+                                fontWeight: 800,
+                                fontSize: '0.88rem',
+                                textDecoration: 'none',
+                                boxShadow: '0 4px 14px rgba(37,211,102,0.35)',
+                                transition: 'transform 0.2s, box-shadow 0.2s',
+                            }}
+                            onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 20px rgba(37,211,102,0.5)'; }}
+                            onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '0 4px 14px rgba(37,211,102,0.35)'; }}
+                        >
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                            {lang === 'hi' ? 'WhatsApp पर संपर्क करें' : 'Chat on WhatsApp'}
+                        </a>
+
                         <div style={{ display: 'flex', gap: '10px', marginTop: '16px', flexWrap: 'wrap' }}>
                             {[
                                 {
@@ -170,8 +225,16 @@ export default function Footer() {
                 <div className="container" style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '8px' }}>
                     <span>© {new Date().getFullYear()} JG News Plus Rajasthan. {lang === 'hi' ? 'सर्वाधिकार सुरक्षित।' : 'All rights reserved.'}</span>
                     <div style={{ display: 'flex', gap: '16px' }}>
-                        <Link to="/privacy" style={{ color: 'rgba(255,255,255,0.5)' }}>Privacy Policy</Link>
-                        <Link to="/terms" style={{ color: 'rgba(255,255,255,0.5)' }}>Terms</Link>
+                        <Link to="/privacy"
+                            style={{ color: 'rgba(255,255,255,0.5)', transition: 'color 0.2s' }}
+                            onMouseEnter={e => e.target.style.color = 'var(--teal)'}
+                            onMouseLeave={e => e.target.style.color = 'rgba(255,255,255,0.5)'}
+                        >{lang === 'hi' ? 'गोपनीयता नीति' : 'Privacy Policy'}</Link>
+                        <Link to="/terms"
+                            style={{ color: 'rgba(255,255,255,0.5)', transition: 'color 0.2s' }}
+                            onMouseEnter={e => e.target.style.color = 'var(--teal)'}
+                            onMouseLeave={e => e.target.style.color = 'rgba(255,255,255,0.5)'}
+                        >{lang === 'hi' ? 'नियम और शर्तें' : 'Terms'}</Link>
                     </div>
                 </div>
             </div>
