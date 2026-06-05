@@ -57,15 +57,15 @@ export const searchArticles = async ({ q, page = 1, limit = 12, category } = {})
     }
 };
 
-export const getArticles = async ({ page, limit, fields, includeHidden, category, location } = {}) => {
+export const getArticles = async ({ page, limit, fields, includeHidden, category, district } = {}) => {
     try {
         const params = {};
         if (page) params.page = page;
         if (limit) params.limit = limit;
         if (fields) params.fields = fields;
         if (includeHidden) params.includeHidden = 'true';
-        if (category) params.category = category;
-        if (location) params.location = location;
+        if (category && category !== 'all') params.category = category;
+        if (district) params.district = district;
 
         const response = await api.get('/articles', { params });
 
@@ -199,10 +199,10 @@ export const updateSettings = async (updates) => {
 };
 
 // Fetch distinct locations (with counts) for the location filter pills
-export const getLocations = async () => {
+export const fetchMetaDistricts = async () => {
     try {
-        const response = await api.get('/articles/meta/locations');
-        return response.data || [];
+        const { data } = await api.get('/articles/meta/districts');
+        return data;
     } catch (error) {
         console.error('Error fetching locations', error);
         return [];

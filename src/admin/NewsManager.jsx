@@ -27,7 +27,7 @@ export default function NewsManager() {
             const q = searchQ.toLowerCase();
             list = list.filter(a =>
                 (a.title || '').toLowerCase().includes(q) ||
-                (a.location || '').toLowerCase().includes(q)
+                (a.district || '').toLowerCase().includes(q) || (a.localArea || '').toLowerCase().includes(q)
             );
         }
         if (dateFrom) {
@@ -300,7 +300,7 @@ export default function NewsManager() {
                                     </div>
                                 </td>
                                 <td style={{ padding: '8px 16px' }}><span className="badge badge-teal" style={{ fontSize: '0.7rem' }}>{a.category}</span></td>
-                                <td style={{ padding: '8px 16px', fontSize: '0.75rem', whiteSpace: 'nowrap' }}>📍 {a.location}</td>
+                                <td style={{ padding: '8px 16px', fontSize: '0.75rem', whiteSpace: 'nowrap' }}>📍 {a.localArea ? `${a.localArea}, ` : ''}{a.district}</td>
                                 <td style={{ padding: '8px 16px' }}>
                                     <button
                                         onClick={() => toggleBreaking(a)}

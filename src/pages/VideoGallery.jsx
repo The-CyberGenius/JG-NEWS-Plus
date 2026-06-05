@@ -35,7 +35,7 @@ export default function VideoGallery() {
                             <div className="news-card__body">
                                 <div className="news-card__category">{a.category}</div>
                                 <div className="news-card__title">{a.title}</div>
-                                <div className="news-card__meta"><span>📍 {a.location}</span><span>•</span><span>{timeAgo(a.date)}</span></div>
+                                <div className="news-card__meta"><span>📍 {a.localArea ? `${a.localArea}, ` : ''}{a.district}</span><span>•</span><span>{timeAgo(a.date)}</span></div>
                             </div>
                         </Link>
                     ))}
@@ -52,7 +52,7 @@ export default function VideoGallery() {
                         <div className="news-card__body">
                             <div className="news-card__category">{a.category}</div>
                             <div className="news-card__title">{a.title}</div>
-                            <div className="news-card__meta"><span>📍 {a.location}</span><span>•</span><span>{timeAgo(a.date)}</span></div>
+                            <div className="news-card__meta"><span>📍 {a.localArea ? `${a.localArea}, ` : ''}{a.district}</span><span>•</span><span>{timeAgo(a.date)}</span></div>
                         </div>
                     </Link>
                 ))}

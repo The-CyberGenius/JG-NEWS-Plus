@@ -211,7 +211,8 @@ export default function NewsSyncManager() {
                 excerpt: makeExcerpt(previewItem.fullContent, 180),
                 content: `${cleanedContent}<p><br/>Source: <a href="${previewItem.link}" target="_blank">${previewItem.source}</a></p>`,
                 category: previewItem.assignedCat,
-                location: previewItem.location,
+                district: previewItem.location,
+                localArea: '',
                 image: heroImg,
                 author: 'AI Sync',
                 isBreaking: false,
@@ -251,7 +252,8 @@ export default function NewsSyncManager() {
                     excerpt: makeExcerpt(item.fullContent, 180),
                     content: `${cleanedContent}<p><br/>Source: <a href="${item.link}" target="_blank">${item.source}</a></p>`,
                     category: assignedCat,
-                    location: location,
+                    district: location,
+                    localArea: '',
                     image: heroImg,
                     author: 'AI Sync',
                     isBreaking: false,
@@ -492,7 +494,7 @@ export default function NewsSyncManager() {
 
                                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '20px' }}>
                                     <div className="form-group">
-                                        <label style={{ fontSize: '0.75rem', fontWeight: 900, color: 'var(--gray-500)', textTransform: 'uppercase' }}>City / Location</label>
+                                        <label style={{ fontSize: '0.75rem', fontWeight: 900, color: 'var(--gray-500)', textTransform: 'uppercase' }}>District</label>
                                         <select className="form-control" value={previewItem.location} onChange={e => setPreviewItem({ ...previewItem, location: e.target.value })} style={{ borderRadius: '10px' }}>
                                             {RAJASTHAN_DISTRICTS.map(c => <option key={c} value={c}>{c}</option>)}
                                         </select>

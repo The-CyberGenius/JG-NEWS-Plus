@@ -88,7 +88,7 @@ export default function SearchResults() {
                                                 <span className="badge badge-teal">{a.category}</span>
                                             </div>
                                             <div style={{ fontWeight: 700, color: 'var(--navy)', fontSize: '0.95rem', lineHeight: 1.4, marginBottom: '6px' }}>{a.title}</div>
-                                            <div style={{ fontSize: '0.8rem', color: 'var(--gray-600)' }}>📍 {a.location} • {timeAgo(a.date)}</div>
+                                            <div style={{ fontSize: '0.8rem', color: 'var(--gray-600)' }}>📍 {a.localArea ? `${a.localArea}, ` : ''}{a.district} • {timeAgo(a.date)}</div>
                                         </div>
                                     </div>
                                 </Link>

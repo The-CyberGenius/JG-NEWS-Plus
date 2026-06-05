@@ -65,7 +65,7 @@ function NewsCard({ article }) {
                 {hasImage && <div className="news-card__category">{article.category}</div>}
                 {hasImage && <div className="news-card__title">{article.title}</div>}
                 <div className="news-card__meta">
-                    <span className="news-card__location">📍 {article.location}</span>
+                    <span className="news-card__location">📍 {article.localArea ? `${article.localArea}, ` : ''}{article.district}</span>
                     <span>•</span>
                     <span>{timeAgo(article.date)}</span>
                 </div>
@@ -165,8 +165,8 @@ export default function Home() {
 
     useEffect(() => {
         let cancelled = false;
-        import('../store/newsStore').then(({ getLocations }) => {
-            getLocations().then(data => {
+        import('../store/newsStore').then(({ fetchMetaDistricts }) => {
+            fetchMetaDistricts().then(data => {
                 if (!cancelled) setLocations(data);
             });
         });
@@ -200,7 +200,7 @@ export default function Home() {
         setFilterLoading(true);
         const params = { limit: 100, fields: 'summary' };
         if (filterCat !== 'all') params.category = filterCat;
-        if (filterLoc !== 'all') params.location = filterLoc;
+        if (filterLoc !== 'all') params.district = filterLoc;
         const { dateFrom, dateTo } = getDateRange(filterRange);
         if (dateFrom) params.dateFrom = dateFrom;
         if (dateTo) params.dateTo = dateTo;
@@ -411,7 +411,7 @@ export default function Home() {
                                             </span>
                                             <div className="hero-slide__title">{a.title}</div>
                                             <div className="hero-slide__meta">
-                                                📍 {a.location} • {timeAgo(a.date)}
+                                                📍 {a.localArea ? `${a.localArea}, ` : ''}{a.district} • {timeAgo(a.date)}
                                             </div>
                                         </div>
                                     </Link>
@@ -555,11 +555,11 @@ export default function Home() {
                             >सभी</button>
                             {locations.slice(0, 10).map(l => (
                                 <button
-                                    key={l.location}
-                                    onClick={() => setFilterLoc(l.location)}
-                                    className={`news-filter__chip${filterLoc === l.location ? ' is-active' : ''}`}
+                                    key={l.district}
+                                    onClick={() => setFilterLoc(l.district)}
+                                    className={`news-filter__chip${filterLoc === l.district ? ' is-active' : ''}`}
                                     title={`${l.count} खबरें`}
-                                >{l.location}</button>
+                                >{l.district}</button>
                             ))}
                         </div>
                     )}
@@ -699,7 +699,7 @@ export default function Home() {
                                     <div className="news-card__category">{a.category}</div>
                                     <div className="news-card__title">{a.title}</div>
                                     <div className="news-card__meta">
-                                        <span>📍 {a.location}</span>
+                                        <span>📍 {a.localArea ? `${a.localArea}, ` : ''}{a.district}</span>
                                         <span>•</span>
                                         <span>{timeAgo(a.date)}</span>
                                     </div>

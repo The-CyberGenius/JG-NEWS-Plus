@@ -26,13 +26,14 @@ const sanitizeDate = (raw) => {
 // Get articles with optional pagination, category filter & field projection
 router.get('/', async (req, res) => {
     try {
-        const { page, limit, fields, includeHidden, category, location, dateFrom, dateTo } = req.query;
+        const { page, limit, fields, includeHidden, category, district, localArea, dateFrom, dateTo } = req.query;
 
         // Public site: filter out hidden. Admin passes ?includeHidden=true to see all.
         const filter = includeHidden === 'true' ? {} : { isHidden: { $ne: true } };
         // राजस्थान acts as "All" — show every article regardless of category
         if (category && category !== 'राजस्थान') filter.category = category;
-        if (location && location !== 'all') filter.location = location;
+        if (district && district !== 'all') filter.district = district;
+        if (localArea) filter.localArea = localArea;
         if (dateFrom || dateTo) {
             filter.date = {};
             if (dateFrom) filter.date.$gte = new Date(dateFrom);
@@ -51,7 +52,7 @@ router.get('/', async (req, res) => {
 
             // Lightweight projection for list views (exclude heavy content field)
             const projection = fields === 'summary'
-                ? { title: 1, slug: 1, excerpt: 1, category: 1, location: 1, image: 1, videoUrl: 1, isBreaking: 1, isFeatured: 1, author: 1, tags: 1, date: 1, createdAt: 1, isHidden: 1 }
+                ? { title: 1, slug: 1, excerpt: 1, category: 1, district: 1, localArea: 1, image: 1, videoUrl: 1, isBreaking: 1, isFeatured: 1, author: 1, tags: 1, date: 1, createdAt: 1, isHidden: 1 }
                 : {};
 
             const [articles, total] = await Promise.all([
@@ -89,7 +90,7 @@ router.get('/search', async (req, res) => {
         // Try MongoDB full-text search first
         try {
             const textFilter = { ...filter, $text: { $search: query } };
-            const proj = { title: 1, slug: 1, excerpt: 1, category: 1, location: 1, image: 1, date: 1, score: { $meta: 'textScore' } };
+            const proj = { title: 1, slug: 1, excerpt: 1, category: 1, district: 1, localArea: 1, image: 1, date: 1, score: { $meta: 'textScore' } };
             [articles, total] = await Promise.all([
                 Article.find(textFilter, proj).sort({ score: { $meta: 'textScore' }, date: -1 }).skip((p - 1) * l).limit(l).lean(),
                 Article.countDocuments(textFilter),
@@ -99,7 +100,7 @@ router.get('/search', async (req, res) => {
             const re = { $regex: query.split(/\s+/).join('|'), $options: 'i' };
             const regexFilter = { ...filter, $or: [{ title: re }, { excerpt: re }, { tags: re }] };
             [articles, total] = await Promise.all([
-                Article.find(regexFilter, { title: 1, slug: 1, excerpt: 1, category: 1, location: 1, image: 1, date: 1 }).sort({ date: -1 }).skip((p - 1) * l).limit(l).lean(),
+                Article.find(regexFilter, { title: 1, slug: 1, excerpt: 1, category: 1, district: 1, localArea: 1, image: 1, date: 1 }).sort({ date: -1 }).skip((p - 1) * l).limit(l).lean(),
                 Article.countDocuments(regexFilter),
             ]);
         }
@@ -175,17 +176,17 @@ router.put('/:id', requireAdmin, async (req, res) => {
     }
 });
 
-// Get distinct locations with article counts (for location filter pills)
-router.get('/meta/locations', async (req, res) => {
+// Get distinct districts with article counts (for location filter pills)
+router.get('/meta/districts', async (req, res) => {
     try {
         const rows = await Article.aggregate([
-            { $match: { isHidden: { $ne: true }, location: { $ne: '' } } },
-            { $group: { _id: '$location', count: { $sum: 1 } } },
+            { $match: { isHidden: { $ne: true }, district: { $ne: '' }, district: { $exists: true } } },
+            { $group: { _id: '$district', count: { $sum: 1 } } },
             { $sort: { count: -1 } },
             { $limit: 50 },
         ]);
         res.set('Cache-Control', 'public, max-age=120');
-        res.json(rows.map(r => ({ location: r._id, count: r.count })));
+        res.json(rows.map(r => ({ district: r._id, count: r.count })));
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -405,7 +406,7 @@ router.get('/trending/now', async (req, res) => {
         // Pull articles with any view in last N hours (exclude hidden)
         const candidates = await Article.find(
             { views: { $gt: 0 }, isHidden: { $ne: true } },
-            { title: 1, image: 1, category: 1, location: 1, date: 1, views: 1, viewsByHour: 1 }
+            { title: 1, image: 1, category: 1, district: 1, localArea: 1, date: 1, views: 1, viewsByHour: 1 }
         ).sort({ views: -1 }).limit(200).lean();
 
         const ranked = candidates.map(a => {

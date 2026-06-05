@@ -63,7 +63,7 @@ export default function Dashboard() {
                                 <div style={{ fontSize: '0.75rem', color: 'var(--gray-600)', marginTop: '2px' }}>
                                     <span className="badge badge-teal" style={{ fontSize: '0.65rem', marginRight: '6px' }}>{a.category}</span>
                                     {a.isBreaking && <span className="badge badge-red" style={{ fontSize: '0.65rem', marginRight: '6px' }}>ब्रेकिंग</span>}
-                                    📍 {a.location}
+                                    📍 {a.localArea ? `${a.localArea}, ` : ''}{a.district}
                                 </div>
                             </div>
                             <Link to={`/admin/news/edit/${a.id}`} className="btn btn-sm btn-outline" style={{ flexShrink: 0 }}>✏️</Link>

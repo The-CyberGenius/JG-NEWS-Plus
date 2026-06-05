@@ -4,7 +4,7 @@ import { useParams, Link } from 'react-router-dom';
 import { timeAgo } from '../utils/helpers';
 import { NewsCardSkeleton } from '../components/Skeletons';
 import { SEO } from '../utils/seo';
-import { getArticles, getLocations } from '../store/newsStore';
+import { getArticles, fetchMetaDistricts } from '../store/newsStore';
 import { optimizeImage, srcSet } from '../utils/imageUrl';
 import { useLang } from '../context/LangContext';
 
@@ -43,7 +43,7 @@ function NewsCard({ article }) {
                 {hasImage && <div className="news-card__category">{article.category}</div>}
                 {hasImage && <div className="news-card__title">{article.title}</div>}
                 <div className="news-card__meta">
-                    <span>📍 {article.location}</span>
+                    <span>📍 {article.localArea ? `${article.localArea}, ` : ''}{article.district}</span>
                     <span>•</span>
                     <span>{timeAgo(article.date)}</span>
                 </div>
@@ -72,7 +72,7 @@ export default function CategoryPage() {
     // Fetch locations once when on राजस्थान page
     useEffect(() => {
         if (!isRajasthan) return;
-        getLocations().then(data => setLocations(data || []));
+        fetchMetaDistricts().then(data => setLocations(data || []));
     }, [isRajasthan]);
 
     // Reset location filter when category changes
@@ -90,7 +90,7 @@ export default function CategoryPage() {
                 limit: PAGE_SIZE,
                 fields: 'summary',
                 category,
-                location: loc !== 'all' ? loc : undefined,
+                district: loc !== 'all' ? loc : undefined,
             });
             const newList = result.articles || [];
             setArticles(prev => append ? [...prev, ...newList] : newList);
@@ -193,19 +193,19 @@ export default function CategoryPage() {
                         सभी जिले
                     </button>
 
-                    {locations.map(({ location, count }) => (
+                    {locations.map(({ district, count }) => (
                         <button
-                            key={location}
-                            onClick={() => handleLocationPill(location)}
+                            key={district}
+                            onClick={() => handleLocationPill(district)}
                             style={{
                                 flexShrink: 0,
                                 padding: '6px 16px',
                                 borderRadius: '20px',
                                 border: '2px solid',
-                                borderColor: selectedLocation === location ? 'var(--teal)' : 'var(--gray-300)',
-                                background: selectedLocation === location ? 'var(--teal)' : 'white',
-                                color: selectedLocation === location ? 'white' : 'var(--gray-700)',
-                                fontWeight: selectedLocation === location ? 700 : 500,
+                                borderColor: selectedLocation === district ? 'var(--teal)' : 'var(--gray-300)',
+                                background: selectedLocation === district ? 'var(--teal)' : 'white',
+                                color: selectedLocation === district ? 'white' : 'var(--gray-700)',
+                                fontWeight: selectedLocation === district ? 700 : 500,
                                 fontSize: '0.85rem',
                                 cursor: 'pointer',
                                 transition: 'all 0.18s',
@@ -215,10 +215,10 @@ export default function CategoryPage() {
                                 gap: '5px',
                             }}
                         >
-                            📍 {location}
+                            📍 {district}
                             <span style={{
-                                background: selectedLocation === location ? 'rgba(255,255,255,0.25)' : 'var(--gray-100)',
-                                color: selectedLocation === location ? 'white' : 'var(--gray-500)',
+                                background: selectedLocation === district ? 'rgba(255,255,255,0.25)' : 'var(--gray-100)',
+                                color: selectedLocation === district ? 'white' : 'var(--gray-500)',
                                 borderRadius: '10px',
                                 padding: '1px 7px',
                                 fontSize: '0.75rem',

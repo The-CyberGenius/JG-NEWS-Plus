@@ -14,7 +14,8 @@ const EMPTY_FORM = {
     excerpt: '',
     content: '',
     category: '',
-    location: '',
+    district: '',
+    localArea: '',
     image: '',
     videoUrl: '',
     author: '',
@@ -101,7 +102,8 @@ export default function ArticleForm() {
                     excerpt: art.excerpt || '',
                     content: art.content || '',
                     category: art.category || '',
-                    location: art.location || '',
+                    district: art.district || '',
+                    localArea: art.localArea || '',
                     image: art.image || '',
                     videoUrl: art.videoUrl || '',
                     author: art.author || '',
@@ -119,7 +121,8 @@ export default function ArticleForm() {
                 excerpt: aiPrefill.excerpt || '',
                 content: aiPrefill.content || '',
                 category: aiPrefill.category || '',
-                location: aiPrefill.location || '',
+                district: aiPrefill.district || '',
+                localArea: aiPrefill.localArea || '',
                 image: aiPrefill.image || '',
                 videoUrl: aiPrefill.videoUrl || '',
                 author: aiPrefill.author || '',
@@ -331,21 +334,26 @@ export default function ArticleForm() {
                                     {categories.map(c => <option key={c} value={c}>{c}</option>)}
                                 </select>
                                 <div>
+                                    <label style={{ fontSize: '0.78rem', color: 'var(--gray-600)', fontWeight: 700, marginBottom: '4px', display: 'block' }}>ज़िला (District) *</label>
+                                    <select
+                                        className="form-control"
+                                        value={form.district}
+                                        onChange={e => set('district', e.target.value)}
+                                        required
+                                    >
+                                        <option value="">-- ज़िला चुनें --</option>
+                                        {RAJASTHAN_DISTRICTS.map(d => <option key={d} value={d}>{d}</option>)}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label style={{ fontSize: '0.78rem', color: 'var(--gray-600)', fontWeight: 700, marginBottom: '4px', display: 'block' }}>शहर / तहसील (Local Area)</label>
                                     <input
                                         className="form-control"
-                                        list="rajasthan-districts-list"
-                                        value={form.location}
-                                        onChange={e => set('location', e.target.value)}
-                                        placeholder="शहर चुनें या टाइप करें..."
-                                        required
+                                        value={form.localArea}
+                                        onChange={e => set('localArea', e.target.value)}
+                                        placeholder="वैकल्पिक (Optional)..."
                                         autoComplete="off"
                                     />
-                                    <datalist id="rajasthan-districts-list">
-                                        {RAJASTHAN_DISTRICTS.map(c => <option key={c} value={c} />)}
-                                    </datalist>
-                                    <p style={{ fontSize: '0.7rem', color: 'var(--gray-500)', marginTop: '4px' }}>
-                                        💡 list mein से चुनें या अपना custom location टाइप करें
-                                    </p>
                                 </div>
                                 <input className="form-control" value={form.author} onChange={e => set('author', e.target.value)} placeholder="लेखक का नाम" />
                                 <div>
