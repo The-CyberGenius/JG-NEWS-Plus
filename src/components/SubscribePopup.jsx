@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useEffect, useState, useRef } from 'react';
 import { api } from '../store/newsStore';
 
@@ -17,6 +19,7 @@ export default function SubscribePopup() {
 
     useEffect(() => {
         // Don't show if already subscribed
+        if (typeof window === 'undefined') return;
         if (localStorage.getItem(SUBSCRIBED_KEY)) return;
         // Don't show if dismissed within last 7 days
         const dismissedAt = parseInt(localStorage.getItem(DISMISSED_KEY) || '0');

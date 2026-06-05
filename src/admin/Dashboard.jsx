@@ -1,5 +1,8 @@
+'use client';
+
 import React from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
+
 import { useNews } from '../context/NewsContext';
 
 export default function Dashboard() {
@@ -40,19 +43,19 @@ export default function Dashboard() {
 
             {/* Quick Actions */}
             <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '32px' }}>
-                <Link to="/admin/news/add" className="btn btn-primary">➕ खबर जोड़ें</Link>
-                <Link to="/admin/sync" className="btn" style={{ background: 'var(--teal)', color: 'white' }}>🤖 AI News Sync (MCP)</Link>
-                <Link to="/admin/messages" className="btn" style={{ background: '#4a90e2', color: 'white' }}>📩 संदेश</Link>
-                <Link to="/admin/news" className="btn btn-navy">📰 सभी खबरें</Link>
-                <Link to="/admin/live" className="btn" style={{ background: 'var(--red)', color: 'white' }}>📺 Live TV</Link>
-                <Link to="/admin/categories" className="btn" style={{ background: 'var(--saffron)', color: 'white' }}>🏷️ श्रेणियाँ</Link>
+                <Link href="/admin/news/add" className="btn btn-primary">➕ खबर जोड़ें</Link>
+                <Link href="/admin/sync" className="btn" style={{ background: 'var(--teal)', color: 'white' }}>🤖 AI News Sync (MCP)</Link>
+                <Link href="/admin/messages" className="btn" style={{ background: '#4a90e2', color: 'white' }}>📩 संदेश</Link>
+                <Link href="/admin/news" className="btn btn-navy">📰 सभी खबरें</Link>
+                <Link href="/admin/live" className="btn" style={{ background: 'var(--red)', color: 'white' }}>📺 Live TV</Link>
+                <Link href="/admin/categories" className="btn" style={{ background: 'var(--saffron)', color: 'white' }}>🏷️ श्रेणियाँ</Link>
             </div>
 
             {/* Recent Articles */}
             <div style={{ background: 'white', borderRadius: 'var(--radius-md)', boxShadow: 'var(--card-shadow)', overflow: 'hidden' }}>
                 <div style={{ padding: '20px 20px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--gray-200)' }}>
                     <h2 style={{ fontWeight: 800, color: 'var(--navy)', fontSize: '1rem' }}>🕐 हाल की खबरें</h2>
-                    <Link to="/admin/news" style={{ color: 'var(--teal)', fontSize: '0.82rem', fontWeight: 700 }}>सभी देखें →</Link>
+                    <Link href="/admin/news" style={{ color: 'var(--teal)', fontSize: '0.82rem', fontWeight: 700 }}>सभी देखें →</Link>
                 </div>
                 <div>
                     {recent.map((a, i) => (
@@ -66,7 +69,7 @@ export default function Dashboard() {
                                     📍 {a.localArea ? `${a.localArea}, ` : ''}{a.district}
                                 </div>
                             </div>
-                            <Link to={`/admin/news/edit/${a.id}`} className="btn btn-sm btn-outline" style={{ flexShrink: 0 }}>✏️</Link>
+                            <Link href={`/admin/news/edit/${a.id}`} className="btn btn-sm btn-outline" style={{ flexShrink: 0 }}>✏️</Link>
                         </div>
                     ))}
                 </div>
@@ -81,7 +84,7 @@ export default function Dashboard() {
                             {settings.liveUrl ? `✅ Active: ${settings.liveUrl.substring(0, 50)}...` : '❌ कोई URL सेट नहीं है'}
                         </p>
                     </div>
-                    <Link to="/admin/live" className="btn btn-sm btn-outline">🔧 बदलें</Link>
+                    <Link href="/admin/live" className="btn btn-sm btn-outline">🔧 बदलें</Link>
                 </div>
             </div>
         </div>

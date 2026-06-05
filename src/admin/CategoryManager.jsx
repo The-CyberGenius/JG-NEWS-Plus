@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState } from 'react';
 import { useNews } from '../context/NewsContext';
 import { recategorizeArticles, reorderCategories } from '../store/newsStore';

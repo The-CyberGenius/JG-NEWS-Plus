@@ -1,5 +1,8 @@
+'use client';
+
 import React, { useState } from 'react';
-import { Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
+import Link from 'next/link';
+import { Routes, Route, useRouter, usePathname } from 'next/navigation';
 import { useNews } from '../context/NewsContext';
 import { getAdminRole } from '../store/newsStore';
 
@@ -19,8 +22,8 @@ const NAV_ITEMS = [
 export default function AdminLayout({ children }) {
     const { logout } = useNews();
     const [sidebarOpen, setSidebarOpen] = useState(true);
-    const navigate = useNavigate();
-    const location = useLocation();
+    const navigate = useRouter();
+    const location = usePathname();
 
     const handleLogout = () => {
         logout();
@@ -64,7 +67,7 @@ export default function AdminLayout({ children }) {
                         return (
                             <Link
                                 key={item.path}
-                                to={item.path}
+                                href={item.path}
                                 className={`sidebar-nav-item ${location.pathname === item.path ? 'active' : ''}`}
                             >
                                 <span style={{ fontSize: '1.1rem' }}>{item.icon}</span>

@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Get base URL for backend APIs (auto-switches for Vercel Production)
-const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5001/api' : '/api');
+const API_URL = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV !== 'production' ? 'http://localhost:5001/api' : '/api');
 
 // Create a configured axios instance
 export const api = axios.create({
@@ -248,10 +248,10 @@ export const adminLogout = () => {
 };
 
 export const isAdminLoggedIn = () =>
-    localStorage.getItem(KEYS.ADMIN) === 'true';
+    typeof window !== 'undefined' && localStorage.getItem(KEYS.ADMIN) === 'true';
 
 export const getAdminRole = () =>
-    localStorage.getItem(KEYS.ROLE) || 'admin';
+    (typeof window !== 'undefined' ? localStorage.getItem(KEYS.ROLE) : null) || 'admin';
 
 // ─── E-Newspaper ──────────────────────────────────────────────────────────────
 export const getNewspapers = async () => {

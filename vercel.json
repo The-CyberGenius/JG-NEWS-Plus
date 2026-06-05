@@ -1,62 +1,13 @@
 {
     "$schema": "https://openapi.vercel.sh/vercel.json",
-    "buildCommand": "npm run build",
-    "outputDirectory": "dist",
-    "framework": null,
-    "functions": {
-        "api/index.js": {
-            "includeFiles": "dist/index.html"
-        }
-    },
     "rewrites": [
         {
             "source": "/sitemap.xml",
             "destination": "/api"
         },
         {
-            "source": "/article/:slug",
+            "source": "/api/(.*)",
             "destination": "/api"
-        },
-        {
-            "source": "/category/:name",
-            "destination": "/api"
-        },
-        {
-            "source": "/api/:path*",
-            "destination": "/api"
-        },
-        {
-            "source": "/(.*)",
-            "destination": "/index.html"
-        }
-    ],
-    "headers": [
-        {
-            "source": "/sitemap.xml",
-            "headers": [
-                {
-                    "key": "Content-Type",
-                    "value": "application/xml; charset=utf-8"
-                }
-            ]
-        },
-        {
-            "source": "/(.*)\\.(js|css|woff2|woff|ttf|otf|jpg|jpeg|png|webp|svg|ico|gif)",
-            "headers": [
-                {
-                    "key": "Cache-Control",
-                    "value": "public, max-age=31536000, immutable"
-                }
-            ]
-        },
-        {
-            "source": "/manifest.webmanifest",
-            "headers": [
-                {
-                    "key": "Cache-Control",
-                    "value": "public, max-age=86400"
-                }
-            ]
         }
     ]
 }

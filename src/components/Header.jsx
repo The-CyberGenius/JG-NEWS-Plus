@@ -1,6 +1,9 @@
+'use client';
+
 import React, { useState } from 'react';
 import { articleHref } from '../utils/articleHref';
-import { Link, useNavigate } from 'react-router-dom';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useNews } from '../context/NewsContext';
 import { useLang } from '../context/LangContext';
 
@@ -10,7 +13,7 @@ export default function Header() {
     const [menuOpen, setMenuOpen] = useState(false);
     const [searchOpen, setSearchOpen] = useState(false);
     const [searchQ, setSearchQ] = useState('');
-    const navigate = useNavigate();
+    const navigate = useRouter();
 
     // Show only categories that have at least one visible article — uses real counts
     // from backend (not just the 30 articles loaded in context). categoryDetails is
@@ -85,7 +88,7 @@ export default function Header() {
             <header style={{ background: 'white', boxShadow: '0 2px 16px rgba(10,22,40,0.12)', position: 'sticky', top: 0, zIndex: 80 }}>
                 <div className="container" style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 16px' }}>
                     {/* Logo */}
-                    <Link to="/" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} style={{ flex: '0 0 auto', display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none', cursor: 'pointer' }}>
+                    <Link href="/" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} style={{ flex: '0 0 auto', display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none', cursor: 'pointer' }}>
                         <img
                             src="/logo.png"
                             alt="JG News Plus"
@@ -127,7 +130,7 @@ export default function Header() {
                     </button>
 
                     {/* Live badge desktop */}
-                    <Link to="/live" className="hide-mobile">
+                    <Link href="/live" className="hide-mobile">
                         <span className="live-badge"><span className="live-dot"></span>{t.liveTV}</span>
                     </Link>
 
@@ -162,7 +165,7 @@ export default function Header() {
                 <nav className="desktop-nav-bar">
                     <div className="container" style={{ display: 'flex' }}>
                         {NAV_LINKS.map(link => (
-                            <Link key={link.path} to={link.path} style={{ padding: '10px 14px', color: 'rgba(255,255,255,0.85)', fontSize: '0.85rem', fontWeight: 600, transition: 'var(--transition)', borderBottom: '3px solid transparent', display: 'block' }}
+                            <Link key={link.path} href={link.path} style={{ padding: '10px 14px', color: 'rgba(255,255,255,0.85)', fontSize: '0.85rem', fontWeight: 600, transition: 'var(--transition)', borderBottom: '3px solid transparent', display: 'block' }}
                                 onMouseEnter={e => { e.target.style.color = 'white'; e.target.style.borderBottomColor = 'var(--teal)'; }}
                                 onMouseLeave={e => { e.target.style.color = 'rgba(255,255,255,0.85)'; e.target.style.borderBottomColor = 'transparent'; }}
                             >{link.label}</Link>
@@ -174,7 +177,7 @@ export default function Header() {
                 {menuOpen && (
                     <nav style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: 'var(--navy)', zIndex: 100, boxShadow: '0 8px 24px rgba(0,0,0,0.3)' }}>
                         {NAV_LINKS.map(link => (
-                            <Link key={link.path} to={link.path} onClick={() => setMenuOpen(false)}
+                            <Link key={link.path} href={link.path} onClick={() => setMenuOpen(false)}
                                 style={{ display: 'block', padding: '14px 20px', color: 'rgba(255,255,255,0.85)', fontWeight: 600, fontSize: '0.95rem', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
                                 {link.label}
                             </Link>
@@ -193,7 +196,7 @@ export default function Header() {
                     <div className="ticker-content">
                         <div className="ticker-inner" style={{ '--ticker-speed': `${Math.max(24, breakingArticles.length * 3.6)}s` }}>
                             {[...breakingArticles, ...breakingArticles].map((a, i) => (
-                                <Link key={`${a.id}-${i}`} to={articleHref(a)} className="ticker-item">
+                                <Link key={`${a.id}-${i}`} href={articleHref(a)} className="ticker-item">
                                     <span className="ticker-dot">●</span>{a.title}
                                 </Link>
                             ))}

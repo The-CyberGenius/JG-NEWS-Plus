@@ -1,5 +1,7 @@
+'use client';
+
 import React, { useEffect, useRef } from 'react';
-import { Navigate } from 'react-router-dom';
+import { redirect } from 'next/navigation';
 import { useNews } from '../context/NewsContext';
 
 export default function AdminGuard({ children }) {
@@ -14,6 +16,12 @@ export default function AdminGuard({ children }) {
         }
     }, [adminAuth, refresh]);
 
-    if (!adminAuth) return <Navigate to="/admin" replace />;
+    useEffect(() => {
+        if (!adminAuth) {
+            redirect('/admin');
+        }
+    }, [adminAuth]);
+
+    if (!adminAuth) return null;
     return children;
 }

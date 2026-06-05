@@ -1,5 +1,7 @@
+'use client';
+
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import { useNews } from '../context/NewsContext';
 
 export default function AdminLogin() {
@@ -7,7 +9,7 @@ export default function AdminLogin() {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const { login, adminAuth } = useNews();
-    const navigate = useNavigate();
+    const navigate = useRouter();
 
     if (adminAuth) {
         navigate('/admin/dashboard');

@@ -1,5 +1,7 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import { useNews } from '../context/NewsContext';
 import { syncNews, getSyncSources, extractArticle, autoCategorizeArticles } from '../store/newsStore';
 import { timeAgo, getRandomFallbackImage } from '../utils/helpers';
@@ -95,7 +97,7 @@ const makeExcerpt = (html, max = 180) => {
 };
 
 export default function NewsSyncManager() {
-    const navigate = useNavigate();
+    const navigate = useRouter();
     const { addArticle, categories, refresh } = useNews();
     const [fetchedNews, setFetchedNews] = useState([]);
     const [sources, setSources] = useState([]);

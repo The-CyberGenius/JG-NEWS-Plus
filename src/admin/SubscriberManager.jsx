@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useEffect, useState, useMemo } from 'react';
 import { api } from '../store/newsStore';
 import { formatDate, timeAgo } from '../utils/helpers';

@@ -1,4 +1,6 @@
-import React, { createContext, useContext, useState } from 'react';
+'use client';
+
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
 // Hindi category name → English translation
 export const CATEGORY_EN = {
@@ -138,7 +140,14 @@ export const translations = {
 const LangContext = createContext(null);
 
 export const LangProvider = ({ children }) => {
-    const [lang, setLang] = useState(() => localStorage.getItem('jgnews_lang') || 'hi');
+    const [lang, setLang] = useState('hi');
+
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const saved = localStorage.getItem('jgnews_lang');
+            if (saved) setLang(saved);
+        }
+    }, []);
 
     const toggleLang = () => {
         const next = lang === 'hi' ? 'en' : 'hi';

@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useEffect, useRef } from 'react';
 import { getNewspapers, addNewspaper, updateNewspaper, deleteNewspaper, uploadPDF, uploadImage } from '../store/newsStore';
 

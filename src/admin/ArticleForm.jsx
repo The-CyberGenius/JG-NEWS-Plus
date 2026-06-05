@@ -1,5 +1,8 @@
+'use client';
+
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { useParams, useNavigate, useLocation, Link } from 'react-router-dom';
+import Link from 'next/link';
+import { useParams, useRouter, usePathname } from 'next/navigation';
 import { useNews } from '../context/NewsContext';
 import { uploadImage } from '../store/newsStore';
 import ReactQuill from 'react-quill';
@@ -38,9 +41,9 @@ const nowLocalInput = () => toLocalInput(new Date());
 
 export default function ArticleForm() {
     const { id } = useParams();
-    const location = useLocation();
+    const location = usePathname();
     const { articles, categories, addArticle, updateArticle } = useNews();
-    const navigate = useNavigate();
+    const navigate = useRouter();
     const isEdit = Boolean(id);
     const quillRef = useRef(null);
     const aiPrefill = location.state?.prefill || null;
@@ -206,7 +209,7 @@ export default function ArticleForm() {
             }}>{toast}</div>}
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '32px' }}>
-                <Link to="/admin/news" style={{
+                <Link href="/admin/news" style={{
                     width: '40px', height: '40px', borderRadius: '12px', background: 'white',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     textDecoration: 'none', boxShadow: '0 4px 10px rgba(0,0,0,0.05)', fontSize: '1.2rem'

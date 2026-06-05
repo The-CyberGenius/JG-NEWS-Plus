@@ -1,5 +1,8 @@
+'use client';
+
 import React from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
+
 import { useLang, CATEGORY_EN } from '../context/LangContext';
 
 export default function Footer() {
@@ -100,7 +103,7 @@ export default function Footer() {
                         <h3 style={{ color: 'white', fontWeight: 800, marginBottom: '16px', fontSize: '1rem' }}>{t.categories}</h3>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                             {FOOTER_CATS.map(cat => (
-                                <Link key={cat.path} to={cat.path}
+                                <Link key={cat.path} href={cat.path}
                                     style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.7)', transition: 'var(--transition)' }}
                                     onMouseEnter={e => e.target.style.color = 'var(--teal)'}
                                     onMouseLeave={e => e.target.style.color = 'rgba(255,255,255,0.7)'}
@@ -114,7 +117,7 @@ export default function Footer() {
                         <h3 style={{ color: 'white', fontWeight: 800, marginBottom: '16px', fontSize: '1rem' }}>{t.quickLinks}</h3>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                             {QUICK_LINKS.map(l => (
-                                <Link key={l.path} to={l.path}
+                                <Link key={l.path} href={l.path}
                                     style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.7)', transition: 'var(--transition)' }}
                                     onMouseEnter={e => e.target.style.color = 'var(--teal)'}
                                     onMouseLeave={e => e.target.style.color = 'rgba(255,255,255,0.7)'}
@@ -124,7 +127,7 @@ export default function Footer() {
 
                         {/* Contact Us CTA */}
                         <Link
-                            to="/contact"
+                            href="/contact"
                             style={{
                                 display: 'inline-flex',
                                 alignItems: 'center',
@@ -225,12 +228,12 @@ export default function Footer() {
                 <div className="container" style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '8px' }}>
                     <span>© {new Date().getFullYear()} JG News Plus Rajasthan. {lang === 'hi' ? 'सर्वाधिकार सुरक्षित।' : 'All rights reserved.'}</span>
                     <div style={{ display: 'flex', gap: '16px' }}>
-                        <Link to="/privacy"
+                        <Link href="/privacy"
                             style={{ color: 'rgba(255,255,255,0.5)', transition: 'color 0.2s' }}
                             onMouseEnter={e => e.target.style.color = 'var(--teal)'}
                             onMouseLeave={e => e.target.style.color = 'rgba(255,255,255,0.5)'}
                         >{lang === 'hi' ? 'गोपनीयता नीति' : 'Privacy Policy'}</Link>
-                        <Link to="/terms"
+                        <Link href="/terms"
                             style={{ color: 'rgba(255,255,255,0.5)', transition: 'color 0.2s' }}
                             onMouseEnter={e => e.target.style.color = 'var(--teal)'}
                             onMouseLeave={e => e.target.style.color = 'rgba(255,255,255,0.5)'}

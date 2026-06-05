@@ -1,5 +1,8 @@
+'use client';
+
 import React, { useEffect, useState, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
+
 import { api } from '../store/newsStore';
 import { timeAgo } from '../utils/helpers';
 
@@ -174,7 +177,7 @@ export default function AnalyticsPage() {
                         <p style={{ color: 'var(--gray-500)', fontSize: '0.85rem' }}>No views recorded yet — share articles to see analytics.</p>
                     )}
                     {(data?.topArticles || []).map((a, i) => (
-                        <Link key={a._id} to={`/article/${a._id}`} target="_blank" style={{ display: 'flex', gap: '10px', padding: '10px 0', borderBottom: i < 9 ? '1px solid var(--gray-100)' : 'none', textDecoration: 'none', alignItems: 'center' }}>
+                        <Link key={a._id} href={`/article/${a._id}`} target="_blank" style={{ display: 'flex', gap: '10px', padding: '10px 0', borderBottom: i < 9 ? '1px solid var(--gray-100)' : 'none', textDecoration: 'none', alignItems: 'center' }}>
                             <span style={{ fontWeight: 900, color: 'var(--teal)', minWidth: '24px', fontSize: '0.9rem' }}>#{i + 1}</span>
                             <img src={a.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=100'} alt="" style={{ width: '44px', height: '34px', objectFit: 'cover', borderRadius: '4px', flexShrink: 0 }} loading="lazy" />
                             <div style={{ flex: 1, minWidth: 0 }}>
@@ -196,7 +199,7 @@ export default function AnalyticsPage() {
                         <p style={{ color: 'var(--gray-500)', fontSize: '0.85rem' }}>No shares recorded yet — share buttons will track once readers use them.</p>
                     )}
                     {(data?.topShared || []).map((a, i) => (
-                        <Link key={a._id} to={`/article/${a._id}`} target="_blank" style={{ display: 'flex', gap: '10px', padding: '10px 0', borderBottom: i < 9 ? '1px solid var(--gray-100)' : 'none', textDecoration: 'none', alignItems: 'center' }}>
+                        <Link key={a._id} href={`/article/${a._id}`} target="_blank" style={{ display: 'flex', gap: '10px', padding: '10px 0', borderBottom: i < 9 ? '1px solid var(--gray-100)' : 'none', textDecoration: 'none', alignItems: 'center' }}>
                             <span style={{ fontWeight: 900, color: '#10b981', minWidth: '24px', fontSize: '0.9rem' }}>#{i + 1}</span>
                             <img src={a.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=100'} alt="" style={{ width: '44px', height: '34px', objectFit: 'cover', borderRadius: '4px', flexShrink: 0 }} loading="lazy" />
                             <div style={{ flex: 1, minWidth: 0 }}>
@@ -243,7 +246,7 @@ export default function AnalyticsPage() {
             <div style={{ background: 'white', borderRadius: '14px', padding: '20px', boxShadow: '0 2px 12px rgba(0,0,0,0.05)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
                     <h2 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--navy)' }}>🕐 Recent Articles</h2>
-                    <Link to="/admin/news" style={{ color: 'var(--teal)', fontSize: '0.82rem', fontWeight: 700 }}>View all →</Link>
+                    <Link href="/admin/news" style={{ color: 'var(--teal)', fontSize: '0.82rem', fontWeight: 700 }}>View all →</Link>
                 </div>
                 <div style={{ overflowX: 'auto' }}>
                     <table className="data-table" style={{ width: '100%', fontSize: '0.85rem' }}>

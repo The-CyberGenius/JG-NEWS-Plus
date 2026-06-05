@@ -1,5 +1,8 @@
+'use client';
+
 import React, { useState, useMemo } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useNews } from '../context/NewsContext';
 import { timeAgo, formatDate } from '../utils/helpers';
 import { bulkArticleAction, getAdminRole } from '../store/newsStore';
@@ -19,7 +22,7 @@ export default function NewsManager() {
     const [bulkLoading, setBulkLoading] = useState(false);
     const [dateFrom, setDateFrom] = useState('');
     const [dateTo, setDateTo] = useState('');
-    const navigate = useNavigate();
+    const navigate = useRouter();
 
     const filtered = useMemo(() => {
         let list = filterCat ? articles.filter(a => a.category === filterCat) : [...articles];
@@ -140,7 +143,7 @@ export default function NewsManager() {
                     <h1 style={{ fontSize: '1.5rem', fontWeight: 900, color: 'var(--navy)' }}>📰 खबरें प्रबंधन</h1>
                     <p style={{ color: 'var(--gray-600)', fontSize: '0.85rem' }}>{filtered.length} खबरें</p>
                 </div>
-                <Link to="/admin/news/add" className="btn btn-primary">➕ नई खबर जोड़ें</Link>
+                <Link href="/admin/news/add" className="btn btn-primary">➕ नई खबर जोड़ें</Link>
             </div>
 
             {/* Search + Sort */}
@@ -356,7 +359,7 @@ export default function NewsManager() {
                                 </td>
                                 <td style={{ padding: '8px 16px' }}>
                                     <div style={{ display: 'flex', gap: '5px' }}>
-                                        <Link to={`/admin/news/edit/${a.id}`} className="btn btn-sm" style={{ padding: '4px 8px', fontSize: '0.75rem', background: 'var(--teal)', color: 'white' }}>✏️</Link>
+                                        <Link href={`/admin/news/edit/${a.id}`} className="btn btn-sm" style={{ padding: '4px 8px', fontSize: '0.75rem', background: 'var(--teal)', color: 'white' }}>✏️</Link>
                                         {role === 'admin' && (
                                             <button className="btn btn-sm" style={{ padding: '4px 8px', fontSize: '0.75rem', background: 'var(--red)', color: 'white' }} onClick={() => setConfirm(a.id)}>🗑️</button>
                                         )}
