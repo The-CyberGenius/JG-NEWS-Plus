@@ -162,7 +162,7 @@ export default function ArticlePage() {
                         <div className="article-meta-item"><span>✍️</span> {article.author}</div>
                         <div className="article-meta-item"><span>📅</span> {formatDate(article.date)}</div>
                         <div className="article-meta-item"><span>⏱️</span> {timeAgo(article.date)}</div>
-                        <div className="article-meta-item"><span>📍</span> {article.location ? (article.location.includes(' > ') ? article.location.split(' > ').pop() : article.location) : ''}</div>
+                        <div className="article-meta-item"><span>📍</span> {article.location}</div>
                     </div>
 
                     {/* Excerpt */}
@@ -203,7 +203,7 @@ export default function ArticlePage() {
                             display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end',
                         }}>
                             <span style={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.78rem' }}>
-                                📍 {article.location ? (article.location.includes(' > ') ? article.location.split(' > ').pop() : article.location) : ''}
+                                📍 {article.location}
                             </span>
                             <span style={{ color: 'var(--teal)', fontSize: '0.75rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px' }}>
                                 <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" /><path d="M11 8v6M8 11h6" /></svg>
@@ -395,7 +395,7 @@ export default function ArticlePage() {
                                             {article.title}
                                         </div>
                                         <div style={{ color: 'var(--teal)', fontSize: '0.72rem' }}>
-                                            📍 {article.location ? (article.location.includes(' > ') ? article.location.split(' > ').pop() : article.location) : ''} &nbsp;•&nbsp; {article.category}
+                                            📍 {article.location} &nbsp;•&nbsp; {article.category}
                                         </div>
                                     </div>
                                 </div>

@@ -65,7 +65,7 @@ function NewsCard({ article }) {
                 {hasImage && <div className="news-card__category">{article.category}</div>}
                 {hasImage && <div className="news-card__title">{article.title}</div>}
                 <div className="news-card__meta">
-                    <span className="news-card__location">📍 {article.location ? (article.location.includes(' > ') ? article.location.split(' > ').pop() : article.location) : ''}</span>
+                    <span className="news-card__location">📍 {article.location}</span>
                     <span>•</span>
                     <span>{timeAgo(article.date)}</span>
                 </div>

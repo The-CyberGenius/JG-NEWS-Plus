@@ -4,7 +4,7 @@ import { recategorizeArticles, reorderCategories } from '../store/newsStore';
 
 // Standard professional news categories (preset names — no auto-classification)
 const SUGGESTED_DEFAULT_CATEGORIES = [
-    'अपराध', 'राजनीति', 'खेल', 'मनोरंजन', 'व्यापार', 'शिक्षा', 'स्वास्थ्य', 'तकनीक', 'भारत', 'दुनिया', 'स्थानीय खबरें'
+    'अपराध', 'राजनीति', 'खेल', 'मनोरंजन', 'व्यापार', 'शिक्षा', 'स्वास्थ्य', 'तकनीक', 'भारत', 'दुनिया'
 ];
 
 export default function CategoryManager() {
