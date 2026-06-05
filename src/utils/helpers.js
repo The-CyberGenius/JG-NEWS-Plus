@@ -29,3 +29,28 @@ export function getRandomFallbackImage() {
     const idx = Math.floor(Math.random() * FALLBACK_IMAGES.length);
     return FALLBACK_IMAGES[idx];
 }
+
+export function getEmbedUrl(url) {
+    if (!url) return null;
+    try {
+        if (url.includes('youtube.com/shorts/')) {
+            const id = url.split('youtube.com/shorts/')[1].split(/[?#]/)[0];
+            return `https://www.youtube.com/embed/${id}`;
+        }
+        if (url.includes('youtu.be/')) {
+            const id = url.split('youtu.be/')[1].split(/[?#]/)[0];
+            return `https://www.youtube.com/embed/${id}`;
+        }
+        if (url.includes('youtube.com/watch')) {
+            const urlObj = new URL(url);
+            const id = urlObj.searchParams.get('v');
+            if (id) return `https://www.youtube.com/embed/${id}`;
+        }
+        if (url.includes('youtube.com/embed/')) {
+            return url;
+        }
+    } catch (e) {
+        console.error("Error parsing video URL", e);
+    }
+    return null;
+}

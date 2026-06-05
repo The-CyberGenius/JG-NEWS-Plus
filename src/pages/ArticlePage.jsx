@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useNews } from '../context/NewsContext';
 import { useLang } from '../context/LangContext';
-import { timeAgo, formatDate } from '../utils/helpers';
+import { timeAgo, formatDate, getEmbedUrl } from '../utils/helpers';
 import { api } from '../store/newsStore';
 import { SEO, articleStructuredData } from '../utils/seo';
 import { optimizeImage } from '../utils/imageUrl';
@@ -259,14 +259,14 @@ export default function ArticlePage() {
                     )}
 
                     {/* Video Embed */}
-                    {article.videoUrl && (
+                    {article.videoUrl && getEmbedUrl(article.videoUrl) && (
                         <div>
                             <h3 style={{ fontWeight: 700, color: 'var(--navy)', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                                 <span>🎬</span> वीडियो रिपोर्ट
                             </h3>
                             <div className="video-embed">
                                 <iframe
-                                    src={article.videoUrl}
+                                    src={getEmbedUrl(article.videoUrl)}
                                     title="Video Report"
                                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                     allowFullScreen
