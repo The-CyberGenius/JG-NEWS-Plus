@@ -1,7 +1,7 @@
 import express from 'express';
 import Category from '../models/Category.js';
 import Article from '../models/Article.js';
-import { requireAdmin } from '../middleware/requireAdmin.js';
+import { requireSuperAdmin } from '../middleware/requireAdmin.js';
 
 const router = express.Router();
 
@@ -40,7 +40,7 @@ router.get('/details', async (req, res) => {
 });
 
 // Reorder categories — admin sends ordered list of names
-router.put('/reorder', requireAdmin, async (req, res) => {
+router.put('/reorder', requireSuperAdmin, async (req, res) => {
     try {
         const { names } = req.body || {};
         if (!Array.isArray(names)) return res.status(400).json({ message: 'names[] required' });
@@ -54,7 +54,7 @@ router.put('/reorder', requireAdmin, async (req, res) => {
 });
 
 // Create category — append to end (highest order)
-router.post('/', requireAdmin, async (req, res) => {
+router.post('/', requireSuperAdmin, async (req, res) => {
     try {
         const last = await Category.findOne().sort({ order: -1 }).lean();
         const nextOrder = (last?.order ?? -1) + 1;
@@ -67,7 +67,7 @@ router.post('/', requireAdmin, async (req, res) => {
 });
 
 // Delete category
-router.delete('/:name', requireAdmin, async (req, res) => {
+router.delete('/:name', requireSuperAdmin, async (req, res) => {
     try {
         await Category.findOneAndDelete({ name: req.params.name });
         res.json({ message: 'Category deleted' });

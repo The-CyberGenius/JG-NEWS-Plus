@@ -15,12 +15,13 @@ export const api = axios.create({
 const KEYS = {
     ADMIN: 'jgnews_admin_session',
     TOKEN: 'jgnews_admin_token',
+    ROLE: 'jgnews_admin_role',
 };
 
 // Auto-attach admin bearer token (if logged in) to every request.
 // Backend ignores it on public routes, requires it on admin-protected routes.
 api.interceptors.request.use((config) => {
-    const token = sessionStorage.getItem(KEYS.TOKEN);
+    const token = localStorage.getItem(KEYS.TOKEN);
     if (token) {
         config.headers = config.headers || {};
         config.headers.Authorization = `Bearer ${token}`;
@@ -33,8 +34,8 @@ api.interceptors.response.use(
     (res) => res,
     (err) => {
         if (err?.response?.status === 401) {
-            sessionStorage.removeItem(KEYS.TOKEN);
-            sessionStorage.removeItem(KEYS.ADMIN);
+            localStorage.removeItem(KEYS.TOKEN);
+            localStorage.removeItem(KEYS.ADMIN);
             if (typeof window !== 'undefined' && window.location.pathname.startsWith('/admin')) {
                 window.location.href = '/admin';
             }
@@ -226,8 +227,11 @@ export const adminLogin = async (password) => {
     try {
         const response = await api.post('/admin/login', { password });
         if (response.data.success && response.data.token) {
-            sessionStorage.setItem(KEYS.ADMIN, 'true');
-            sessionStorage.setItem(KEYS.TOKEN, response.data.token);
+            localStorage.setItem(KEYS.ADMIN, 'true');
+            localStorage.setItem(KEYS.TOKEN, response.data.token);
+            if (response.data.role) {
+                localStorage.setItem(KEYS.ROLE, response.data.role);
+            }
             return true;
         }
         return false;
@@ -238,12 +242,16 @@ export const adminLogin = async (password) => {
 };
 
 export const adminLogout = () => {
-    sessionStorage.removeItem(KEYS.ADMIN);
-    sessionStorage.removeItem(KEYS.TOKEN);
+    localStorage.removeItem(KEYS.ADMIN);
+    localStorage.removeItem(KEYS.TOKEN);
+    localStorage.removeItem(KEYS.ROLE);
 };
 
 export const isAdminLoggedIn = () =>
-    sessionStorage.getItem(KEYS.ADMIN) === 'true';
+    localStorage.getItem(KEYS.ADMIN) === 'true';
+
+export const getAdminRole = () =>
+    localStorage.getItem(KEYS.ROLE) || 'admin';
 
 // ─── E-Newspaper ──────────────────────────────────────────────────────────────
 export const getNewspapers = async () => {

@@ -1,6 +1,6 @@
 import express from 'express';
 import Newspaper from '../models/Newspaper.js';
-import { requireAdmin } from '../middleware/requireAdmin.js';
+import { requireSuperAdmin } from '../middleware/requireAdmin.js';
 
 const router = express.Router();
 
@@ -25,19 +25,19 @@ router.get('/:id', async (req, res) => {
     }
 });
 
-// POST create new newspaper edition (admin)
-router.post('/', requireAdmin, async (req, res) => {
-    const newspaper = new Newspaper(req.body);
+// POST create new newspaper// Add new e-paper
+router.post('/', requireSuperAdmin, async (req, res) => {
     try {
-        const saved = await newspaper.save();
-        res.status(201).json(saved);
+        const newspaper = new Newspaper(req.body);
+        const newNewspaper = await newspaper.save();
+        res.status(201).json(newNewspaper);
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
 });
 
-// PUT update newspaper edition (admin)
-router.put('/:id', requireAdmin, async (req, res) => {
+// Update e-paper
+router.put('/:id', requireSuperAdmin, async (req, res) => {
     try {
         const updated = await Newspaper.findByIdAndUpdate(req.params.id, req.body, { new: true });
         res.json(updated);
@@ -46,8 +46,8 @@ router.put('/:id', requireAdmin, async (req, res) => {
     }
 });
 
-// DELETE newspaper edition (admin)
-router.delete('/:id', requireAdmin, async (req, res) => {
+// Delete e-paper
+router.delete('/:id', requireSuperAdmin, async (req, res) => {
     try {
         await Newspaper.findByIdAndDelete(req.params.id);
         res.json({ message: 'Edition deleted' });

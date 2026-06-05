@@ -1,7 +1,7 @@
 import express from 'express';
 import Article from '../models/Article.js';
 import { slugify, uniqueSlug } from '../utils/slugify.js';
-import { requireAdmin } from '../middleware/requireAdmin.js';
+import { requireAdmin, requireSuperAdmin } from '../middleware/requireAdmin.js';
 import { detectCategory } from '../utils/categoryDetector.js';
 
 const router = express.Router();
@@ -296,6 +296,9 @@ router.post('/bulk', requireAdmin, async (req, res) => {
         let result;
         switch (action) {
             case 'delete':
+                if (req.userRole !== 'admin') {
+                    return res.status(403).json({ message: 'Only admin can delete articles' });
+                }
                 result = await Article.deleteMany({ _id: { $in: ids } });
                 return res.json({ ok: true, count: result.deletedCount });
             case 'hide':
@@ -325,7 +328,7 @@ router.post('/bulk', requireAdmin, async (req, res) => {
 });
 
 // Delete article
-router.delete('/:id', requireAdmin, async (req, res) => {
+router.delete('/:id', requireSuperAdmin, async (req, res) => {
     try {
         await Article.findByIdAndDelete(req.params.id);
         res.json({ message: 'Article deleted' });

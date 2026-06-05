@@ -1,7 +1,7 @@
 import express from 'express';
 import { OAuth2Client } from 'google-auth-library';
 import Subscriber from '../models/Subscriber.js';
-import { requireAdmin } from '../middleware/requireAdmin.js';
+import { requireSuperAdmin } from '../middleware/requireAdmin.js';
 
 const router = express.Router();
 
@@ -141,7 +141,7 @@ router.post('/google', async (req, res) => {
 
 // Admin: list all subscribers
 // GET /api/subscribers?page=&limit=&search=&status=
-router.get('/', requireAdmin, async (req, res) => {
+router.get('/', requireSuperAdmin, async (req, res) => {
     try {
         const page = Math.max(1, parseInt(req.query.page) || 1);
         const limit = Math.min(200, Math.max(1, parseInt(req.query.limit) || 50));
@@ -187,7 +187,7 @@ router.get('/', requireAdmin, async (req, res) => {
 });
 
 // Admin: get one subscriber
-router.get('/:id', requireAdmin, async (req, res) => {
+router.get('/:id', requireSuperAdmin, async (req, res) => {
     try {
         const sub = await Subscriber.findById(req.params.id).lean();
         if (!sub) return res.status(404).json({ message: 'Not found' });
@@ -198,7 +198,7 @@ router.get('/:id', requireAdmin, async (req, res) => {
 });
 
 // Admin: delete subscriber
-router.delete('/:id', requireAdmin, async (req, res) => {
+router.delete('/:id', requireSuperAdmin, async (req, res) => {
     try {
         await Subscriber.findByIdAndDelete(req.params.id);
         res.json({ ok: true });
@@ -208,7 +208,7 @@ router.delete('/:id', requireAdmin, async (req, res) => {
 });
 
 // Admin: bulk delete
-router.post('/bulk-delete', requireAdmin, async (req, res) => {
+router.post('/bulk-delete', requireSuperAdmin, async (req, res) => {
     try {
         const { ids } = req.body;
         if (!Array.isArray(ids) || ids.length === 0) {
@@ -223,7 +223,7 @@ router.post('/bulk-delete', requireAdmin, async (req, res) => {
 
 // Admin: export CSV
 // GET /api/subscribers/export/csv
-router.get('/export/csv', requireAdmin, async (req, res) => {
+router.get('/export/csv', requireSuperAdmin, async (req, res) => {
     try {
         const subs = await Subscriber.find().sort({ createdAt: -1 }).lean();
         const rows = [

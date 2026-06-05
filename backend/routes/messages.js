@@ -1,6 +1,6 @@
 import express from 'express';
 import Message from '../models/Message.js';
-import { requireAdmin } from '../middleware/requireAdmin.js';
+import { requireSuperAdmin } from '../middleware/requireAdmin.js';
 
 const router = express.Router();
 
@@ -30,41 +30,48 @@ router.post('/', async (req, res) => {
     }
 });
 
-// @desc    Get all messages
-// @route   GET /api/messages
-// @access  Private/Admin
-router.get('/', requireAdmin, async (req, res) => {
+// Admin: List all messages
+// GET /api/messages?page=&limit=&status=
+router.get('/', requireSuperAdmin, async (req, res) => {
     try {
-        const messages = await Message.find({}).sort({ createdAt: -1 });
-        res.json(messages);
+        const page = Math.max(1, parseInt(req.query.page) || 1);
+        const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 20));
+        const status = req.query.status;
+
+        const filter = {};
+        if (status === 'unread') filter.read = false;
+        if (status === 'read') filter.read = true;
+
+        const [messages, total] = await Promise.all([
+            Message.find(filter).sort({ createdAt: -1 }).skip((page - 1) * limit).limit(limit).lean(),
+            Message.countDocuments(filter),
+        ]);
+
+        res.json({
+            messages,
+            total,
+            page,
+            pages: Math.ceil(total / limit),
+        });
     } catch (error) {
-        console.error('Error fetching messages:', error);
-        res.status(500).json({ message: 'Server Error', error: error.message });
+        res.status(500).json({ message: error.message });
     }
 });
 
-// @desc    Delete a message
-// @route   DELETE /api/messages/:id
-// @access  Private/Admin
-router.delete('/:id', requireAdmin, async (req, res) => {
+// Admin: Delete a message
+router.delete('/:id', requireSuperAdmin, async (req, res) => {
     try {
-        const message = await Message.findById(req.params.id);
-        if (message) {
-            await message.deleteOne();
-            res.json({ message: 'Message removed' });
-        } else {
-            res.status(404).json({ message: 'Message not found' });
-        }
+        await Message.findByIdAndDelete(req.params.id);
+        res.json({ ok: true });
     } catch (error) {
-        console.error('Error deleting message:', error);
-        res.status(500).json({ message: 'Server Error', error: error.message });
+        res.status(500).json({ message: error.message });
     }
 });
 
-// @desc    Mark a message as read
-// @route   PUT /api/messages/:id/read
-// @access  Private/Admin
-router.put('/:id/read', requireAdmin, async (req, res) => {
+// Admin: Mark message as read/unread
+// PUT /api/messages/:id/read
+// body: { read: boolean }
+router.put('/:id/read', requireSuperAdmin, async (req, res) => {
     try {
         const message = await Message.findById(req.params.id);
         if (message) {

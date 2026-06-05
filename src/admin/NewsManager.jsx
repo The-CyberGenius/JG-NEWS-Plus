@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useNews } from '../context/NewsContext';
 import { timeAgo, formatDate } from '../utils/helpers';
-import { bulkArticleAction } from '../store/newsStore';
+import { bulkArticleAction, getAdminRole } from '../store/newsStore';
 
 const PER_PAGE = 50;
 
@@ -128,6 +128,7 @@ export default function NewsManager() {
     };
 
     const categories = [...new Set(articles.map(a => a.category))];
+    const role = getAdminRole();
 
     return (
         <div>
@@ -226,11 +227,13 @@ export default function NewsManager() {
                     <span style={{ fontWeight: 800, fontSize: '0.9rem' }}>
                         ✅ {selected.size} selected
                     </span>
-                    <button
-                        onClick={() => setBulkConfirm({ action: 'delete', label: 'Delete', count: selected.size })}
-                        disabled={bulkLoading}
-                        style={{ background: 'var(--red)', color: 'white', border: 'none', padding: '6px 14px', borderRadius: '6px', cursor: 'pointer', fontWeight: 700, fontSize: '0.8rem' }}
-                    >🗑️ Delete</button>
+                    {role === 'admin' && (
+                        <button
+                            onClick={() => setBulkConfirm({ action: 'delete', label: 'Delete', count: selected.size })}
+                            disabled={bulkLoading}
+                            style={{ background: 'var(--red)', color: 'white', border: 'none', padding: '6px 14px', borderRadius: '6px', cursor: 'pointer', fontWeight: 700, fontSize: '0.8rem' }}
+                        >🗑️ Delete</button>
+                    )}
                     <button
                         onClick={() => runBulkAction('hide', '👁️ Hidden')}
                         disabled={bulkLoading}
@@ -354,7 +357,9 @@ export default function NewsManager() {
                                 <td style={{ padding: '8px 16px' }}>
                                     <div style={{ display: 'flex', gap: '5px' }}>
                                         <Link to={`/admin/news/edit/${a.id}`} className="btn btn-sm" style={{ padding: '4px 8px', fontSize: '0.75rem', background: 'var(--teal)', color: 'white' }}>✏️</Link>
-                                        <button className="btn btn-sm" style={{ padding: '4px 8px', fontSize: '0.75rem', background: 'var(--red)', color: 'white' }} onClick={() => setConfirm(a.id)}>🗑️</button>
+                                        {role === 'admin' && (
+                                            <button className="btn btn-sm" style={{ padding: '4px 8px', fontSize: '0.75rem', background: 'var(--red)', color: 'white' }} onClick={() => setConfirm(a.id)}>🗑️</button>
+                                        )}
                                     </div>
                                 </td>
                             </tr>

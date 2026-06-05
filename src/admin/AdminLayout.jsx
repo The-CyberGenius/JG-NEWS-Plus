@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useNews } from '../context/NewsContext';
+import { getAdminRole } from '../store/newsStore';
 
 const NAV_ITEMS = [
     { path: '/admin/dashboard', icon: '📊', label: 'Dashboard' },
@@ -55,16 +56,22 @@ export default function AdminLayout({ children }) {
                     </div>
                 </div>
                 <nav className="sidebar-nav">
-                    {NAV_ITEMS.map(item => (
-                        <Link
-                            key={item.path}
-                            to={item.path}
-                            className={`sidebar-nav-item ${location.pathname === item.path ? 'active' : ''}`}
-                        >
-                            <span style={{ fontSize: '1.1rem' }}>{item.icon}</span>
-                            {item.label}
-                        </Link>
-                    ))}
+                    {NAV_ITEMS.map(item => {
+                        const role = getAdminRole();
+                        if (role === 'subadmin' && ['/admin/categories', '/admin/epaper', '/admin/messages', '/admin/subscribers'].includes(item.path)) {
+                            return null;
+                        }
+                        return (
+                            <Link
+                                key={item.path}
+                                to={item.path}
+                                className={`sidebar-nav-item ${location.pathname === item.path ? 'active' : ''}`}
+                            >
+                                <span style={{ fontSize: '1.1rem' }}>{item.icon}</span>
+                                {item.label}
+                            </Link>
+                        );
+                    })}
                 </nav>
 
                 <div style={{ marginTop: 'auto', padding: '16px', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
