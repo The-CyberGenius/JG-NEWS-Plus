@@ -330,23 +330,48 @@ export default function ArticleForm() {
                                     <option value="">-- श्रेणी --</option>
                                     {categories.map(c => <option key={c} value={c}>{c}</option>)}
                                 </select>
-                                <div>
-                                    <input
-                                        className="form-control"
-                                        list="rajasthan-districts-list"
-                                        value={form.location}
-                                        onChange={e => set('location', e.target.value)}
-                                        placeholder="शहर चुनें या टाइप करें..."
-                                        required
-                                        autoComplete="off"
-                                    />
-                                    <datalist id="rajasthan-districts-list">
-                                        {RAJASTHAN_DISTRICTS.map(c => <option key={c} value={c} />)}
-                                    </datalist>
-                                    <p style={{ fontSize: '0.7rem', color: 'var(--gray-500)', marginTop: '4px' }}>
-                                        💡 list mein से चुनें या अपना custom location टाइप करें
-                                    </p>
-                                </div>
+                                {(() => {
+                                    const locParts = form.location ? (form.location.includes(' > ') ? form.location.split(' > ') : ['राजस्थान', 'अन्य', form.location]) : ['राजस्थान', '', ''];
+                                    const locState = locParts[0] || 'राजस्थान';
+                                    const locDist = locParts[1] || '';
+                                    const locCity = locParts[2] || '';
+                                    return (
+                                        <div>
+                                            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                                                <select 
+                                                    className="form-control" 
+                                                    value={locState}
+                                                    onChange={e => set('location', `${e.target.value} > ${locDist} > ${locCity}`)}
+                                                    style={{ flex: 1, minWidth: '100px', fontSize: '0.85rem' }}
+                                                >
+                                                    <option value="राजस्थान">राजस्थान</option>
+                                                    <option value="अन्य राज्य">अन्य राज्य</option>
+                                                </select>
+                                                <select 
+                                                    className="form-control" 
+                                                    value={locDist}
+                                                    onChange={e => set('location', `${locState} > ${e.target.value} > ${locCity}`)}
+                                                    required
+                                                    style={{ flex: 1, minWidth: '120px', fontSize: '0.85rem' }}
+                                                >
+                                                    <option value="">-- ज़िला --</option>
+                                                    {RAJASTHAN_DISTRICTS.map(c => <option key={c} value={c}>{c}</option>)}
+                                                </select>
+                                                <input
+                                                    className="form-control"
+                                                    value={locCity}
+                                                    onChange={e => set('location', `${locState} > ${locDist} > ${e.target.value}`)}
+                                                    placeholder="शहर/गाँव"
+                                                    required
+                                                    style={{ flex: 1, minWidth: '120px', fontSize: '0.85rem' }}
+                                                />
+                                            </div>
+                                            <p style={{ fontSize: '0.7rem', color: 'var(--gray-500)', marginTop: '4px' }}>
+                                                💡 खबर का सही स्थान चुनें: राज्य {'>'} ज़िला {'>'} शहर/गाँव
+                                            </p>
+                                        </div>
+                                    );
+                                })()}
                                 <input className="form-control" value={form.author} onChange={e => set('author', e.target.value)} placeholder="लेखक का नाम" />
                                 <div>
                                     <label style={{ fontSize: '0.78rem', color: 'var(--gray-600)', fontWeight: 700, marginBottom: '4px', display: 'block' }}>

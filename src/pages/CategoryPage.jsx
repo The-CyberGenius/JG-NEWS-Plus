@@ -43,7 +43,7 @@ function NewsCard({ article }) {
                 {hasImage && <div className="news-card__category">{article.category}</div>}
                 {hasImage && <div className="news-card__title">{article.title}</div>}
                 <div className="news-card__meta">
-                    <span>📍 {article.location}</span>
+                    <span>📍 {article.location ? (article.location.includes(' > ') ? article.location.split(' > ').pop() : article.location) : ''}</span>
                     <span>•</span>
                     <span>{timeAgo(article.date)}</span>
                 </div>
@@ -141,7 +141,7 @@ export default function CategoryPage() {
                 {selectedLocation !== 'all' && (
                     <>
                         <span>›</span>
-                        <span style={{ fontWeight: 700, color: 'var(--navy)' }}>{selectedLocation}</span>
+                        <span style={{ fontWeight: 700, color: 'var(--navy)' }}>{selectedLocation.includes(' > ') ? selectedLocation.split(' > ').pop() : selectedLocation}</span>
                     </>
                 )}
             </div>
@@ -150,7 +150,7 @@ export default function CategoryPage() {
                 <span style={{ background: 'var(--teal)', width: '4px', borderRadius: '2px', alignSelf: 'stretch' }} />
                 <div>
                     <h1 style={{ fontSize: '1.8rem', fontWeight: 900, color: 'var(--navy)' }}>
-                        {selectedLocation !== 'all' ? selectedLocation : tCat(category)}
+                        {selectedLocation !== 'all' ? (selectedLocation.includes(' > ') ? selectedLocation.split(' > ').pop() : selectedLocation) : tCat(category)}
                     </h1>
                     <p style={{ color: 'var(--gray-600)', fontSize: '0.85rem' }}>{total} {t.found}</p>
                 </div>
@@ -215,7 +215,7 @@ export default function CategoryPage() {
                                 gap: '5px',
                             }}
                         >
-                            📍 {location}
+                            📍 {location.includes(' > ') ? location.split(' > ').pop() : location}
                             <span style={{
                                 background: selectedLocation === location ? 'rgba(255,255,255,0.25)' : 'var(--gray-100)',
                                 color: selectedLocation === location ? 'white' : 'var(--gray-500)',
