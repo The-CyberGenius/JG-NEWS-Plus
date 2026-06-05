@@ -14,7 +14,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
     return (
-        <html lang="hi">
+        <html lang="hi" data-scroll-behavior="smooth">
             <body>
                 <Providers>
                     <Header />
