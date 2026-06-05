@@ -1,22 +1,23 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap');
+
 /* ═══════════════════════════════════════════════════════════
-   JG NEWS PLUS — Global Design System
-   Professional news palette: Deep Navy, Signal Red,
-   Gold accent, Teal secondary, refined neutrals
+   JG NEWS PLUS — Premium Global Design System
+   Professional news palette: Glossy Blue, Vibrant Red
 ═══════════════════════════════════════════════════════════ */
 
 :root {
-  /* Primary brand — deep navy (trust, authority) */
-  --navy: #0b1e3f;
-  --navy-light: #16294f;
-  --navy-mid: #25406b;
+  /* Primary brand — Glossy Blue (from new logo) */
+  --navy: #0033a0;
+  --navy-light: #0044cc;
+  --navy-mid: #002277;
 
-  /* Signal red — breaking news, live, alerts */
-  --red: #d32f2f;
-  --red-dark: #b71c1c;
+  /* Vibrant Red — breaking news, live, alerts */
+  --red: #d50000;
+  --red-dark: #b20000;
 
-  /* Secondary action — teal (links, focus, hover) */
-  --teal: #0891b2;
-  --teal-dark: #0e7490;
+  /* Secondary action — Bright Blue */
+  --teal: #005ce6;
+  --teal-dark: #0033a0;
 
   /* Accent — refined gold (highlights, premium) */
   --saffron: #f59e0b;
@@ -33,14 +34,14 @@
   --text-primary: #0f172a;
   --text-secondary: #334155;
 
-  --card-shadow: 0 2px 8px rgba(11, 30, 63, 0.06), 0 4px 16px rgba(11, 30, 63, 0.08);
-  --card-shadow-hover: 0 8px 24px rgba(11, 30, 63, 0.14), 0 16px 40px rgba(11, 30, 63, 0.16);
-  --radius-sm: 6px;
-  --radius-md: 12px;
-  --radius-lg: 20px;
+  --card-shadow: 0 4px 20px rgba(0, 51, 160, 0.06);
+  --card-shadow-hover: 0 12px 30px rgba(0, 51, 160, 0.12);
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
   --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  --font-hindi: 'Noto Sans Devanagari', 'Inter', sans-serif;
-  --font-english: 'Inter', sans-serif;
+  --font-hindi: 'Noto Sans Devanagari', sans-serif;
+  --font-english: 'Poppins', sans-serif;
 }
 
 *,
@@ -263,15 +264,17 @@ ol {
   background: var(--white);
   border-radius: var(--radius-md);
   overflow: hidden;
-  box-shadow: var(--card-shadow);
-  transition: var(--transition);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   display: flex;
   flex-direction: column;
+  border: 1px solid rgba(0, 0, 0, 0.03);
 }
 
 .news-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--card-shadow-hover);
+  transform: translateY(-5px);
+  box-shadow: 0 12px 25px rgba(0, 51, 160, 0.12);
+  border-color: rgba(0, 51, 160, 0.1);
 }
 
 .news-card__img {

@@ -51,20 +51,17 @@ export default function Footer() {
                 <div className="jg-footer-grid">
                     {/* Brand */}
                     <div className="jg-span-2">
-                        <div style={{ fontWeight: 900, fontSize: '1.4rem', color: 'white', marginBottom: '4px' }}>
-                            JG <span style={{ color: 'var(--teal)' }}>NEWS</span> <span style={{ color: 'var(--saffron)' }}>Plus</span>
+                        <div style={{ fontWeight: 900, fontSize: '1.8rem', color: 'white', marginBottom: '6px', letterSpacing: '-0.5px' }}>
+                            JG <span style={{ color: 'var(--red)' }}>NEWS</span>
                         </div>
-                        <div style={{ fontSize: '0.8rem', color: 'var(--teal)', marginBottom: '12px', fontWeight: 600 }}>
-                            {t.tagline}
+                        <div style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.8)', marginBottom: '16px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px' }}>
+                            {t.motto}
                         </div>
-                        <p style={{ fontSize: '0.85rem', lineHeight: 1.7, marginBottom: '16px' }}>
+                        <p style={{ fontSize: '0.88rem', lineHeight: 1.8, marginBottom: '18px', color: 'rgba(255,255,255,0.85)' }}>
                             {lang === 'hi'
                                 ? 'राजस्थान की सबसे विश्वसनीय 24x7 समाचार सेवा। हम लाते हैं आपके लिए सच्ची, निष्पक्ष और ताज़ी खबरें।'
                                 : 'Rajasthan\'s most trusted 24x7 news service. We bring you accurate, unbiased and latest news.'}
                         </p>
-                        <div style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--saffron)', letterSpacing: '1px' }}>
-                            {t.motto}
-                        </div>
 
                         {/* Subscribe button — opens popup via global event */}
                         <button

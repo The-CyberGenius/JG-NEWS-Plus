@@ -85,21 +85,21 @@ export default function Header() {
             </div>
 
             {/* Main Header */}
-            <header style={{ background: 'white', boxShadow: '0 2px 16px rgba(10,22,40,0.12)', position: 'sticky', top: 0, zIndex: 80 }}>
-                <div className="container" style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 16px' }}>
+            <header style={{ background: 'rgba(255, 255, 255, 0.9)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', boxShadow: '0 4px 30px rgba(0,51,160,0.08)', position: 'sticky', top: 0, zIndex: 80, borderBottom: '1px solid rgba(255,255,255,0.4)' }}>
+                <div className="container" style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '14px 16px' }}>
                     {/* Logo */}
-                    <Link href="/" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} style={{ flex: '0 0 auto', display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none', cursor: 'pointer' }}>
+                    <Link href="/" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} style={{ flex: '0 0 auto', display: 'flex', alignItems: 'center', gap: '12px', textDecoration: 'none', cursor: 'pointer' }}>
                         <img
                             src="/logo.png"
                             alt="JG News Plus"
-                            style={{ height: '54px', width: 'auto', objectFit: 'contain' }}
+                            style={{ height: '70px', width: 'auto', objectFit: 'contain', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }}
                             onError={e => { e.target.style.display = 'none'; }}
                         />
-                        <div style={{ flex: '0 0 auto' }}>
-                            <div style={{ fontWeight: 900, fontSize: '1.2rem', color: 'var(--navy)', letterSpacing: '-0.5px' }}>
-                                JG <span style={{ color: 'var(--teal)' }}>NEWS</span> <span style={{ color: 'var(--saffron)' }}>Plus</span>
+                        <div className="hide-mobile" style={{ flex: '0 0 auto', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                            <div style={{ fontWeight: 900, fontSize: '1.4rem', color: 'var(--navy)', letterSpacing: '-0.5px', lineHeight: 1.1 }}>
+                                JG <span style={{ color: 'var(--red)' }}>NEWS</span>
                             </div>
-                            <div style={{ fontSize: '0.62rem', color: 'var(--gray-600)', fontWeight: 600 }}>{t.motto}</div>
+                            <div style={{ fontSize: '0.65rem', color: 'var(--gray-600)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px' }}>{t.motto}</div>
                         </div>
                     </Link>
 
@@ -107,10 +107,10 @@ export default function Header() {
 
                     {/* Search bar desktop */}
                     <div className="hide-mobile">
-                        <form className="search-bar" onSubmit={handleSearch} style={{ width: '220px' }}>
-                            <input value={searchQ} onChange={e => setSearchQ(e.target.value)} placeholder={t.searchPlaceholder} aria-label="Search news" />
-                            <button type="submit" aria-label="Search">
-                                <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="11" cy="11" r="8" strokeWidth="2" /><path d="M21 21l-4.35-4.35" strokeWidth="2" /></svg>
+                        <form className="search-bar" onSubmit={handleSearch} style={{ width: '240px', background: 'var(--gray-100)', borderRadius: '24px', overflow: 'hidden', border: '1px solid var(--gray-200)', transition: 'var(--transition)' }}>
+                            <input value={searchQ} onChange={e => setSearchQ(e.target.value)} placeholder={t.searchPlaceholder} aria-label="Search news" style={{ background: 'transparent' }} />
+                            <button type="submit" aria-label="Search" style={{ color: 'var(--navy)' }}>
+                                <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="11" cy="11" r="8" strokeWidth="2.5" /><path d="M21 21l-4.35-4.35" strokeWidth="2.5" strokeLinecap="round" /></svg>
                             </button>
                         </form>
                     </div>
@@ -119,29 +119,31 @@ export default function Header() {
                     <button
                         onClick={toggleLang}
                         style={{
-                            background: 'var(--navy)', color: 'white', border: 'none',
-                            borderRadius: '6px', padding: '6px 12px', fontWeight: 800,
-                            fontSize: '0.82rem', cursor: 'pointer', transition: 'var(--transition)',
-                            letterSpacing: '0.5px', flexShrink: 0,
+                            background: 'linear-gradient(135deg, var(--navy), var(--navy-light))', color: 'white', border: 'none',
+                            borderRadius: '8px', padding: '8px 16px', fontWeight: 700,
+                            fontSize: '0.85rem', cursor: 'pointer', transition: 'var(--transition)',
+                            boxShadow: '0 2px 10px rgba(0,51,160,0.2)', flexShrink: 0,
                         }}
                         title={`Switch to ${t.langLabel}`}
+                        onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
+                        onMouseLeave={e => e.currentTarget.style.transform = 'none'}
                     >
                         {t.lang === 'EN' ? '🌐 EN' : '🌐 हि'}
                     </button>
 
                     {/* Live badge desktop */}
-                    <Link href="/live" className="hide-mobile">
-                        <span className="live-badge"><span className="live-dot"></span>{t.liveTV}</span>
+                    <Link href="/live" className="hide-mobile" style={{ textDecoration: 'none' }}>
+                        <span className="live-badge" style={{ background: 'var(--red)', padding: '8px 16px', borderRadius: '8px', fontWeight: 800, letterSpacing: '0.5px', boxShadow: '0 2px 10px rgba(213,0,0,0.25)' }}><span className="live-dot" style={{ background: 'white' }}></span>{t.liveTV}</span>
                     </Link>
 
                     {/* Mobile search toggle */}
-                    <button className="hide-desktop" onClick={() => setSearchOpen(!searchOpen)} style={{ background: 'none', padding: '6px', color: 'var(--navy)' }} aria-label="Search">
-                        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="11" cy="11" r="8" strokeWidth="2" /><path d="M21 21l-4.35-4.35" strokeWidth="2" /></svg>
+                    <button className="hide-desktop" onClick={() => setSearchOpen(!searchOpen)} style={{ background: 'var(--gray-100)', padding: '10px', borderRadius: '50%', color: 'var(--navy)' }} aria-label="Search">
+                        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="11" cy="11" r="8" strokeWidth="2.5" /><path d="M21 21l-4.35-4.35" strokeWidth="2.5" strokeLinecap="round" /></svg>
                     </button>
 
                     {/* Hamburger */}
-                    <button className="hide-desktop" onClick={() => setMenuOpen(!menuOpen)} style={{ background: 'var(--navy)', color: 'white', padding: '8px', borderRadius: '8px' }} aria-label="Open menu">
-                        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                    <button className="hide-desktop" onClick={() => setMenuOpen(!menuOpen)} style={{ background: 'var(--navy)', color: 'white', padding: '10px', borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,51,160,0.2)' }} aria-label="Open menu">
+                        <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
                             {menuOpen ? <path d="M6 18L18 6M6 6l12 12" /> : <path d="M4 6h16M4 12h16M4 18h16" />}
                         </svg>
                     </button>
@@ -149,25 +151,25 @@ export default function Header() {
 
                 {/* Mobile search bar */}
                 {searchOpen && (
-                    <div className="container" style={{ paddingBottom: '10px' }}>
-                        <form className="search-bar" onSubmit={handleSearch}>
-                            <input value={searchQ} onChange={e => setSearchQ(e.target.value)} placeholder={t.searchPlaceholder} autoFocus />
-                            <button type="submit"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="11" cy="11" r="8" strokeWidth="2" /><path d="M21 21l-4.35-4.35" strokeWidth="2" /></svg></button>
+                    <div className="container" style={{ paddingBottom: '14px' }}>
+                        <form className="search-bar" onSubmit={handleSearch} style={{ background: 'var(--gray-100)', borderRadius: '24px', border: '1px solid var(--gray-200)' }}>
+                            <input value={searchQ} onChange={e => setSearchQ(e.target.value)} placeholder={t.searchPlaceholder} autoFocus style={{ background: 'transparent' }} />
+                            <button type="submit" style={{ color: 'var(--navy)' }}><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="11" cy="11" r="8" strokeWidth="2.5" /><path d="M21 21l-4.35-4.35" strokeWidth="2.5" strokeLinecap="round" /></svg></button>
                         </form>
                     </div>
                 )}
 
                 {/* Desktop Nav */}
                 <style>{`
-                    .desktop-nav-bar { display: none; background: var(--navy); }
+                    .desktop-nav-bar { display: none; background: linear-gradient(to right, var(--navy), var(--navy-mid)); }
                     @media (min-width: 768px) { .desktop-nav-bar { display: block; } }
                 `}</style>
                 <nav className="desktop-nav-bar">
                     <div className="container" style={{ display: 'flex' }}>
                         {NAV_LINKS.map(link => (
-                            <Link key={link.path} href={link.path} style={{ padding: '10px 14px', color: 'rgba(255,255,255,0.85)', fontSize: '0.85rem', fontWeight: 600, transition: 'var(--transition)', borderBottom: '3px solid transparent', display: 'block' }}
-                                onMouseEnter={e => { e.target.style.color = 'white'; e.target.style.borderBottomColor = 'var(--teal)'; }}
-                                onMouseLeave={e => { e.target.style.color = 'rgba(255,255,255,0.85)'; e.target.style.borderBottomColor = 'transparent'; }}
+                            <Link key={link.path} href={link.path} style={{ padding: '12px 18px', color: 'rgba(255,255,255,0.9)', fontSize: '0.9rem', fontWeight: 600, transition: 'var(--transition)', borderBottom: '3px solid transparent', display: 'block' }}
+                                onMouseEnter={e => { e.target.style.color = 'white'; e.target.style.borderBottomColor = 'var(--saffron)'; e.target.style.background = 'rgba(255,255,255,0.05)'; }}
+                                onMouseLeave={e => { e.target.style.color = 'rgba(255,255,255,0.9)'; e.target.style.borderBottomColor = 'transparent'; e.target.style.background = 'transparent'; }}
                             >{link.label}</Link>
                         ))}
                     </div>
@@ -175,10 +177,10 @@ export default function Header() {
 
                 {/* Mobile Nav Drawer */}
                 {menuOpen && (
-                    <nav style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: 'var(--navy)', zIndex: 100, boxShadow: '0 8px 24px rgba(0,0,0,0.3)' }}>
+                    <nav style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: 'rgba(255,255,255,0.98)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', zIndex: 100, boxShadow: '0 10px 30px rgba(0,51,160,0.15)', borderBottom: '1px solid var(--gray-200)' }}>
                         {NAV_LINKS.map(link => (
                             <Link key={link.path} href={link.path} onClick={() => setMenuOpen(false)}
-                                style={{ display: 'block', padding: '14px 20px', color: 'rgba(255,255,255,0.85)', fontWeight: 600, fontSize: '0.95rem', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                                style={{ display: 'block', padding: '16px 24px', color: 'var(--navy)', fontWeight: 700, fontSize: '1rem', borderBottom: '1px solid var(--gray-100)' }}>
                                 {link.label}
                             </Link>
                         ))}
