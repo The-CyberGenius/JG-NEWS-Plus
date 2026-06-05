@@ -212,7 +212,7 @@ export default function Contact() {
                                 {[
                                     { name: 'Facebook', color: '#4267B2', url: 'https://www.facebook.com/profile.php?id=61590175844898' },
                                     { name: 'YouTube', color: '#FF0000', url: 'https://www.youtube.com/@MANOJ-1974-JG' },
-                                    { name: 'Instagram', color: '#E1306C', url: 'https://www.instagram.com/jgnewsrajasthan/' },
+                                    { name: 'Instagram', color: '#E1306C', url: 'https://www.instagram.com/jgnews.live/?hl=en' },
                                     { name: 'X (Twitter)', color: '#000', url: 'https://x.com/jgnewslive' },
                                 ].map(s => (
                                     <a key={s.name} href={s.url} target="_blank" rel="noreferrer"

@@ -98,7 +98,8 @@ export function organizationStructuredData() {
         url: SITE_URL,
         logo: `${SITE_URL}/logo.png`,
         sameAs: [
-            'https://www.instagram.com/jgnewsrajasthan/',
+            'https://www.facebook.com/profile.php?id=61590175844898',
+            'https://www.instagram.com/jgnews.live/?hl=en',
             'https://x.com/jgnewslive',
             'https://www.youtube.com/@MANOJ-1974-JG',
         ],
