@@ -49,7 +49,7 @@ export default function ArticlePage() {
         return () => { cancelled = true; };
     }, [id]);
 
-    const related = articles.filter(a => a.id !== id && a.category === article?.category).slice(0, 4);
+    const related = articles.filter(a => a.id !== id && a.category === article?.category).slice(0, 8);
 
     useEffect(() => { window.scrollTo(0, 0); }, [id]);
 
