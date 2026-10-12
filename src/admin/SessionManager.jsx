@@ -8,6 +8,7 @@ export default function SessionManager() {
     const [search, setSearch] = useState('');
     const [filterActive, setFilterActive] = useState('all'); // 'all' | 'active' | 'inactive'
     const [message, setMessage] = useState(null);
+    const [inspectedSession, setInspectedSession] = useState(null);
 
     const loadSessions = useCallback(async () => {
         setLoading(true);
@@ -25,12 +26,12 @@ export default function SessionManager() {
 
     useEffect(() => {
         loadSessions();
-        const interval = setInterval(loadSessions, 30000); // 30s auto-refresh
+        const interval = setInterval(loadSessions, 15000); // 15s auto-refresh
         return () => clearInterval(interval);
     }, [loadSessions]);
 
     const handleForceLogout = async (session) => {
-        if (!window.confirm(`क्या आप वाकई इस डिवाइस (${session.device} - IP: ${session.ip}) को तुरंत लॉगआउट करना चाहते हैं?`)) {
+        if (!window.confirm(`क्या आप वाकई इस डिवाइस (${session.device} - IP: ${session.ip}) को तुरंत बाहर निकालना (Logout) चाहते हैं?`)) {
             return;
         }
 
@@ -39,7 +40,9 @@ export default function SessionManager() {
         try {
             const res = await forceLogoutSession(session.id);
             if (res.success) {
-                setMessage({ type: 'success', text: `डिवाइस (${session.ip}) को सफलतापूर्वक लॉगआउट कर दिया गया!` });
+                setMessage({ type: 'success', text: `डिवाइस (${session.ip}) को तुरंत लॉगआउट कर दिया गया!` });
+                // Optimistic instant state update
+                setSessions(prev => prev.map(s => s.id === session.id ? { ...s, isActive: false, logoutReason: 'force_logout_by_super_admin' } : s));
                 await loadSessions();
             } else {
                 setMessage({ type: 'error', text: res.message || 'लॉगआउट करने में विफल।' });
@@ -52,7 +55,7 @@ export default function SessionManager() {
     };
 
     const handleLogoutAllOthers = async () => {
-        if (!window.confirm('चेतावनी: क्या आप वर्तमान डिवाइस को छोड़कर अन्य सभी एक्टिव डिवाइसेस को तुरंत लॉगआउट करना चाहते हैं?')) {
+        if (!window.confirm('⚠️ चेतावनी: क्या आप वर्तमान डिवाइस को छोड़कर अन्य सभी एक्टिव डिवाइसेस को तुरंत लॉगआउट करना चाहते हैं?')) {
             return;
         }
 
@@ -62,6 +65,7 @@ export default function SessionManager() {
             const res = await forceLogoutAllOthers();
             if (res.success) {
                 setMessage({ type: 'success', text: res.message });
+                setSessions(prev => prev.map(s => s.isCurrent ? s : { ...s, isActive: false, logoutReason: 'force_logout_by_super_admin' }));
                 await loadSessions();
             } else {
                 setMessage({ type: 'error', text: res.message || 'कार्रवाई विफल।' });
@@ -92,6 +96,11 @@ export default function SessionManager() {
         return { label: '👤 Subadmin', bg: '#f1f5f9', color: '#475569', border: '#e2e8f0' };
     };
 
+    const copyToClipboard = (text) => {
+        navigator.clipboard?.writeText(text);
+        setMessage({ type: 'success', text: `IP पता "${text}" क्लिपबोर्ड में कॉपी हो गया!` });
+    };
+
     // Filtered list
     const filteredSessions = sessions.filter(s => {
         if (filterActive === 'active' && !s.isActive) return false;
@@ -100,14 +109,16 @@ export default function SessionManager() {
             const q = search.toLowerCase();
             return (s.ip && s.ip.toLowerCase().includes(q)) ||
                    (s.device && s.device.toLowerCase().includes(q)) ||
+                   (s.os && s.os.toLowerCase().includes(q)) ||
+                   (s.browser && s.browser.toLowerCase().includes(q)) ||
                    (s.role && s.role.toLowerCase().includes(q));
         }
         return true;
     });
 
     const activeCount = sessions.filter(s => s.isActive).length;
-    const mobileCount = sessions.filter(s => s.device && (s.device.includes('Mobile') || s.device.includes('iPhone') || s.device.includes('Android'))).length;
-    const desktopCount = sessions.filter(s => s.device && (s.device.includes('PC') || s.device.includes('Mac') || s.device.includes('Linux'))).length;
+    const mobileCount = sessions.filter(s => s.deviceType === 'Mobile').length;
+    const desktopCount = sessions.filter(s => s.deviceType === 'Desktop').length;
 
     return (
         <div style={{ padding: '4px 0 40px' }}>
@@ -115,10 +126,10 @@ export default function SessionManager() {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px', marginBottom: '24px' }}>
                 <div>
                     <h2 style={{ margin: '0 0 6px', fontSize: '1.6rem', fontWeight: 900, color: 'var(--navy)' }}>
-                        🛡️ लॉगिन डिवाइसेस व सेशन नियंत्रण
+                        🛡️ सुपर एडमिन — संपूर्ण डिवाइस व लॉगिन मॉनिटर
                     </h2>
                     <p style={{ margin: 0, color: 'var(--gray-600)', fontSize: '0.9rem' }}>
-                        यहाँ आप सभी लॉगिन हुए डिवाइसेस, उनका IP पता, लॉगिन समय देख सकते हैं और किसी भी डिवाइस को तुरंत लॉगआउट कर सकते हैं।
+                        यहाँ प्रत्येक लॉगिन डिवाइस की अधिकतम जानकारी (IP, OS, Browser, Screen, Timezone) उपलब्ध है और आप किसी भी डिवाइस को <strong>तुरंत बाहर निकाल सकते हैं</strong>।
                     </p>
                 </div>
                 <div style={{ display: 'flex', gap: '10px' }}>
@@ -126,7 +137,7 @@ export default function SessionManager() {
                         onClick={loadSessions}
                         disabled={loading || actionLoading}
                         className="btn btn-outline"
-                        style={{ background: 'white', padding: '10px 16px', borderRadius: '12px', fontWeight: 700 }}
+                        style={{ background: 'white', padding: '10px 16px', borderRadius: '12px', fontWeight: 800 }}
                     >
                         🔄 {loading ? 'लोड हो रहा...' : 'रीफ्रेश करें'}
                     </button>
@@ -136,10 +147,10 @@ export default function SessionManager() {
                         className="btn"
                         style={{
                             background: '#dc2626', color: 'white', padding: '10px 18px',
-                            borderRadius: '12px', fontWeight: 800, boxShadow: '0 4px 14px rgba(220,38,38,0.25)'
+                            borderRadius: '12px', fontWeight: 900, boxShadow: '0 4px 14px rgba(220,38,38,0.25)'
                         }}
                     >
-                        ⚠️ अन्य सभी डिवाइस लॉगआउट करें
+                        ⚠️ अन्य सभी डिवाइस तुरंत लॉगआउट करें
                     </button>
                 </div>
             </div>
@@ -161,19 +172,19 @@ export default function SessionManager() {
             {/* Stats Cards */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: '24px' }}>
                 <div style={{ background: 'white', padding: '18px 22px', borderRadius: '18px', border: '1px solid var(--gray-200)', boxShadow: '0 4px 15px rgba(0,0,0,0.02)' }}>
-                    <div style={{ fontSize: '0.8rem', color: 'var(--gray-600)', fontWeight: 700, textTransform: 'uppercase' }}>सक्रिय डिवाइसेस (Active)</div>
+                    <div style={{ fontSize: '0.78rem', color: 'var(--gray-600)', fontWeight: 800, textTransform: 'uppercase' }}>🟢 एक्टिव डिवाइसेस (Online)</div>
                     <div style={{ fontSize: '2rem', fontWeight: 900, color: '#059669', marginTop: '6px' }}>{activeCount}</div>
                 </div>
                 <div style={{ background: 'white', padding: '18px 22px', borderRadius: '18px', border: '1px solid var(--gray-200)', boxShadow: '0 4px 15px rgba(0,0,0,0.02)' }}>
-                    <div style={{ fontSize: '0.8rem', color: 'var(--gray-600)', fontWeight: 700, textTransform: 'uppercase' }}>📱 मोबाइल डिवाइसेस</div>
+                    <div style={{ fontSize: '0.78rem', color: 'var(--gray-600)', fontWeight: 800, textTransform: 'uppercase' }}>📱 मोबाइल डिवाइसेस</div>
                     <div style={{ fontSize: '2rem', fontWeight: 900, color: 'var(--teal)', marginTop: '6px' }}>{mobileCount}</div>
                 </div>
                 <div style={{ background: 'white', padding: '18px 22px', borderRadius: '18px', border: '1px solid var(--gray-200)', boxShadow: '0 4px 15px rgba(0,0,0,0.02)' }}>
-                    <div style={{ fontSize: '0.8rem', color: 'var(--gray-600)', fontWeight: 700, textTransform: 'uppercase' }}>💻 कंप्यूटर / डेस्कटॉप</div>
+                    <div style={{ fontSize: '0.78rem', color: 'var(--gray-600)', fontWeight: 800, textTransform: 'uppercase' }}>💻 कंप्यूटर / डेस्कटॉप</div>
                     <div style={{ fontSize: '2rem', fontWeight: 900, color: 'var(--navy)', marginTop: '6px' }}>{desktopCount}</div>
                 </div>
                 <div style={{ background: 'white', padding: '18px 22px', borderRadius: '18px', border: '1px solid var(--gray-200)', boxShadow: '0 4px 15px rgba(0,0,0,0.02)' }}>
-                    <div style={{ fontSize: '0.8rem', color: 'var(--gray-600)', fontWeight: 700, textTransform: 'uppercase' }}>कुल रिकॉर्डेड सेशन्स</div>
+                    <div style={{ fontSize: '0.78rem', color: 'var(--gray-600)', fontWeight: 800, textTransform: 'uppercase' }}>कुल रिकॉर्डेड सेशन्स</div>
                     <div style={{ fontSize: '2rem', fontWeight: 900, color: 'var(--gray-800)', marginTop: '6px' }}>{sessions.length}</div>
                 </div>
             </div>
@@ -182,16 +193,16 @@ export default function SessionManager() {
             <div style={{ background: 'white', padding: '16px 20px', borderRadius: '18px', border: '1px solid var(--gray-200)', marginBottom: '20px', display: 'flex', gap: '14px', flexWrap: 'wrap', alignItems: 'center' }}>
                 <input
                     type="text"
-                    placeholder="🔍 IP पता, डिवाइस या रोल खोजें..."
+                    placeholder="🔍 IP पता, ब्राउज़र, OS या रोल खोजें..."
                     value={search}
                     onChange={e => setSearch(e.target.value)}
-                    style={{ flex: 1, minWidth: '220px', padding: '10px 16px', borderRadius: '12px', border: '1px solid var(--gray-300)', fontSize: '0.9rem' }}
+                    style={{ flex: 1, minWidth: '240px', padding: '12px 16px', borderRadius: '12px', border: '1px solid var(--gray-300)', fontSize: '0.92rem' }}
                 />
                 <div style={{ display: 'flex', gap: '8px' }}>
                     <button
                         onClick={() => setFilterActive('all')}
                         style={{
-                            padding: '8px 16px', borderRadius: '10px', border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: '0.85rem',
+                            padding: '8px 16px', borderRadius: '10px', border: 'none', cursor: 'pointer', fontWeight: 800, fontSize: '0.85rem',
                             background: filterActive === 'all' ? 'var(--navy)' : 'var(--gray-100)',
                             color: filterActive === 'all' ? 'white' : 'var(--gray-700)'
                         }}
@@ -201,7 +212,7 @@ export default function SessionManager() {
                     <button
                         onClick={() => setFilterActive('active')}
                         style={{
-                            padding: '8px 16px', borderRadius: '10px', border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: '0.85rem',
+                            padding: '8px 16px', borderRadius: '10px', border: 'none', cursor: 'pointer', fontWeight: 800, fontSize: '0.85rem',
                             background: filterActive === 'active' ? '#059669' : 'var(--gray-100)',
                             color: filterActive === 'active' ? 'white' : 'var(--gray-700)'
                         }}
@@ -211,7 +222,7 @@ export default function SessionManager() {
                     <button
                         onClick={() => setFilterActive('inactive')}
                         style={{
-                            padding: '8px 16px', borderRadius: '10px', border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: '0.85rem',
+                            padding: '8px 16px', borderRadius: '10px', border: 'none', cursor: 'pointer', fontWeight: 800, fontSize: '0.85rem',
                             background: filterActive === 'inactive' ? '#dc2626' : 'var(--gray-100)',
                             color: filterActive === 'inactive' ? 'white' : 'var(--gray-700)'
                         }}
@@ -221,17 +232,17 @@ export default function SessionManager() {
                 </div>
             </div>
 
-            {/* Sessions Table */}
+            {/* Sessions Detailed Table */}
             <div style={{ background: 'white', borderRadius: '20px', border: '1px solid var(--gray-200)', overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
                 <div style={{ overflowX: 'auto' }}>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.9rem' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.88rem' }}>
                         <thead>
                             <tr style={{ background: 'var(--gray-50)', borderBottom: '2px solid var(--gray-200)', color: 'var(--navy)', fontWeight: 800 }}>
                                 <th style={{ padding: '16px 20px' }}>डिवाइस व स्थिति</th>
-                                <th style={{ padding: '16px 20px' }}>रोल (Role)</th>
                                 <th style={{ padding: '16px 20px' }}>IP एड्रेस</th>
-                                <th style={{ padding: '16px 20px' }}>लॉगिन समय</th>
-                                <th style={{ padding: '16px 20px' }}>अंतिम सक्रियता / लॉगआउट</th>
+                                <th style={{ padding: '16px 20px' }}>सिस्टम व स्क्रीन विवरण</th>
+                                <th style={{ padding: '16px 20px' }}>लॉगिन व अंतिम गतिविधि</th>
+                                <th style={{ padding: '16px 20px' }}>रोल</th>
                                 <th style={{ padding: '16px 20px', textAlign: 'center' }}>एक्शन</th>
                             </tr>
                         </thead>
@@ -245,78 +256,115 @@ export default function SessionManager() {
                             ) : (
                                 filteredSessions.map(session => {
                                     const roleBadge = getRoleBadge(session.role);
-                                    const isMobile = session.device && (session.device.includes('Mobile') || session.device.includes('iPhone') || session.device.includes('Android'));
+                                    const isMobile = session.deviceType === 'Mobile';
+                                    const isTablet = session.deviceType === 'Tablet';
 
                                     return (
                                         <tr key={session.id} style={{ borderBottom: '1px solid var(--gray-100)', background: session.isCurrent ? '#f8fafc' : 'white' }}>
-                                            <td style={{ padding: '16px 20px' }}>
+                                            {/* Device Info */}
+                                            <td style={{ padding: '16px 20px', minWidth: '220px' }}>
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                                                     <div style={{
-                                                        fontSize: '1.4rem', width: '42px', height: '42px', borderRadius: '12px',
-                                                        background: 'var(--gray-100)', display: 'flex', alignItems: 'center', justifyContent: 'center'
+                                                        fontSize: '1.5rem', width: '44px', height: '44px', borderRadius: '12px',
+                                                        background: 'var(--gray-100)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0
                                                     }}>
-                                                        {isMobile ? '📱' : '💻'}
+                                                        {isMobile ? '📱' : isTablet ? '📟' : '💻'}
                                                     </div>
                                                     <div>
-                                                        <div style={{ fontWeight: 800, color: 'var(--navy)' }}>
-                                                            {session.device || 'Unknown Device'}
-                                                            {session.isCurrent && (
-                                                                <span style={{
-                                                                    marginLeft: '8px', background: 'var(--navy)', color: 'white',
-                                                                    fontSize: '0.7rem', padding: '2px 8px', borderRadius: '6px', fontWeight: 700
-                                                                }}>
-                                                                    यह डिवाइस (Current)
-                                                                </span>
-                                                            )}
+                                                        <div style={{ fontWeight: 900, color: 'var(--navy)', fontSize: '0.92rem' }}>
+                                                            {session.browser || 'Browser'}
+                                                        </div>
+                                                        <div style={{ color: 'var(--gray-600)', fontSize: '0.78rem', fontWeight: 700 }}>
+                                                            {session.os || 'OS'} ({session.deviceType || 'PC'})
                                                         </div>
                                                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '4px' }}>
                                                             <span style={{
                                                                 display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%',
                                                                 background: session.isActive ? '#10b981' : '#ef4444'
                                                             }} />
-                                                            <span style={{ fontSize: '0.78rem', color: session.isActive ? '#059669' : '#dc2626', fontWeight: 700 }}>
-                                                                {session.isActive ? 'सक्रिय (Online / Active)' : 'सत्र समाप्त (Offline)'}
+                                                            <span style={{ fontSize: '0.75rem', color: session.isActive ? '#059669' : '#dc2626', fontWeight: 800 }}>
+                                                                {session.isActive ? 'ऑनलाइन (सक्रिय)' : 'ऑफ़लाइन (लॉगआउट)'}
                                                             </span>
+                                                            {session.isCurrent && (
+                                                                <span style={{
+                                                                    marginLeft: '4px', background: 'var(--navy)', color: 'white',
+                                                                    fontSize: '0.68rem', padding: '1px 6px', borderRadius: '6px', fontWeight: 800
+                                                                }}>
+                                                                    यह डिवाइस
+                                                                </span>
+                                                            )}
                                                         </div>
                                                     </div>
                                                 </div>
                                             </td>
 
+                                            {/* IP Address */}
+                                            <td style={{ padding: '16px 20px' }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                                    <code style={{
+                                                        background: 'var(--gray-100)', padding: '4px 8px', borderRadius: '6px',
+                                                        color: 'var(--navy)', fontWeight: 800, fontSize: '0.85rem'
+                                                    }}>
+                                                        {session.ip}
+                                                    </code>
+                                                    <button
+                                                        onClick={() => copyToClipboard(session.ip)}
+                                                        style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '0.9rem' }}
+                                                        title="IP कॉपी करें"
+                                                    >
+                                                        📋
+                                                    </button>
+                                                </div>
+                                                <div style={{ fontSize: '0.75rem', color: 'var(--gray-500)', marginTop: '4px' }}>
+                                                    {session.timezone !== '—' && session.timezone !== 'Unknown' ? `🌐 ${session.timezone}` : ''}
+                                                </div>
+                                            </td>
+
+                                            {/* System & Screen */}
+                                            <td style={{ padding: '16px 20px', fontSize: '0.8rem', color: 'var(--gray-700)' }}>
+                                                <div><strong>स्क्रीन:</strong> {session.screenResolution}</div>
+                                                <div><strong>भाषा:</strong> {session.language}</div>
+                                                {session.hardware !== '—' && (
+                                                    <div style={{ fontSize: '0.74rem', color: 'var(--gray-500)', marginTop: '2px' }}>
+                                                        ⚙️ {session.hardware}
+                                                    </div>
+                                                )}
+                                                <button
+                                                    onClick={() => setInspectedSession(session)}
+                                                    style={{ background: 'transparent', border: 'none', color: 'var(--teal)', padding: 0, marginTop: '4px', fontSize: '0.75rem', fontWeight: 800, cursor: 'pointer', textDecoration: 'underline' }}
+                                                >
+                                                    🔍 संपूर्ण डिवाइस डेटा देखें
+                                                </button>
+                                            </td>
+
+                                            {/* Timestamps */}
+                                            <td style={{ padding: '16px 20px', fontSize: '0.82rem' }}>
+                                                <div style={{ color: 'var(--navy)', fontWeight: 700 }}>
+                                                    लॉगिन: {formatDateTime(session.loginTime)}
+                                                </div>
+                                                {session.isActive ? (
+                                                    <div style={{ color: '#059669', fontSize: '0.76rem', fontWeight: 700, marginTop: '3px' }}>
+                                                        🟢 अभी सक्रिय
+                                                    </div>
+                                                ) : (
+                                                    <div style={{ color: '#dc2626', fontSize: '0.76rem', fontWeight: 700, marginTop: '3px' }}>
+                                                        लॉगआउट: {formatDateTime(session.loggedOutAt)}
+                                                        {session.logoutReason === 'force_logout_by_super_admin' && ' (सुपर एडमिन द्वारा)'}
+                                                    </div>
+                                                )}
+                                            </td>
+
+                                            {/* Role */}
                                             <td style={{ padding: '16px 20px' }}>
                                                 <span style={{
                                                     background: roleBadge.bg, color: roleBadge.color, border: `1px solid ${roleBadge.border}`,
-                                                    padding: '4px 10px', borderRadius: '8px', fontSize: '0.78rem', fontWeight: 800
+                                                    padding: '4px 10px', borderRadius: '8px', fontSize: '0.76rem', fontWeight: 800
                                                 }}>
                                                     {roleBadge.label}
                                                 </span>
                                             </td>
 
-                                            <td style={{ padding: '16px 20px' }}>
-                                                <code style={{
-                                                    background: 'var(--gray-100)', padding: '4px 8px', borderRadius: '6px',
-                                                    color: 'var(--navy)', fontWeight: 700, fontSize: '0.85rem'
-                                                }}>
-                                                    {session.ip}
-                                                </code>
-                                            </td>
-
-                                            <td style={{ padding: '16px 20px', color: 'var(--gray-700)', fontWeight: 600, fontSize: '0.85rem' }}>
-                                                {formatDateTime(session.loginTime)}
-                                            </td>
-
-                                            <td style={{ padding: '16px 20px', fontSize: '0.85rem' }}>
-                                                {session.isActive ? (
-                                                    <span style={{ color: '#059669', fontWeight: 600 }}>सक्रिय सत्र चल रहा है</span>
-                                                ) : (
-                                                    <div>
-                                                        <div style={{ color: 'var(--gray-600)' }}>{formatDateTime(session.loggedOutAt)}</div>
-                                                        <div style={{ fontSize: '0.75rem', color: '#dc2626', fontWeight: 700 }}>
-                                                            {session.logoutReason === 'force_logout_by_super_admin' ? '🛡️ सुपर एडमिन द्वारा लॉगआउट' : 'यूजर द्वारा लॉगआउट'}
-                                                        </div>
-                                                    </div>
-                                                )}
-                                            </td>
-
+                                            {/* Action */}
                                             <td style={{ padding: '16px 20px', textAlign: 'center' }}>
                                                 {session.isActive ? (
                                                     <button
@@ -324,18 +372,18 @@ export default function SessionManager() {
                                                         disabled={actionLoading || session.isCurrent}
                                                         className="btn btn-sm"
                                                         style={{
-                                                            background: session.isCurrent ? 'var(--gray-200)' : '#fee2e2',
-                                                            color: session.isCurrent ? 'var(--gray-500)' : '#dc2626',
-                                                            border: session.isCurrent ? 'none' : '1px solid #fecaca',
-                                                            padding: '6px 14px', borderRadius: '10px', fontWeight: 800,
-                                                            cursor: session.isCurrent ? 'not-allowed' : 'pointer'
+                                                            background: session.isCurrent ? 'var(--gray-200)' : '#dc2626',
+                                                            color: session.isCurrent ? 'var(--gray-500)' : 'white',
+                                                            border: 'none', padding: '8px 14px', borderRadius: '10px', fontWeight: 800,
+                                                            cursor: session.isCurrent ? 'not-allowed' : 'pointer',
+                                                            boxShadow: session.isCurrent ? 'none' : '0 4px 12px rgba(220,38,38,0.25)'
                                                         }}
-                                                        title={session.isCurrent ? 'वर्तमान डिवाइस को टॉपबार लॉगआउट से बंद करें' : 'इस डिवाइस को तुरंत लॉगआउट करें'}
+                                                        title={session.isCurrent ? 'वर्तमान डिवाइस को टॉपबार लॉगआउट से बंद करें' : 'इस डिवाइस को तुरंत बाहर फेंकें'}
                                                     >
-                                                        🚪 {session.isCurrent ? 'वर्तमान डिवाइस' : 'फोर्स लॉगआउट'}
+                                                        {session.isCurrent ? 'वर्तमान डिवाइस' : '🚪 तुरंत लॉगआउट'}
                                                     </button>
                                                 ) : (
-                                                    <span style={{ color: 'var(--gray-400)', fontSize: '0.8rem', fontWeight: 700 }}>
+                                                    <span style={{ color: 'var(--gray-400)', fontSize: '0.78rem', fontWeight: 800 }}>
                                                         लॉगआउट हो चुका
                                                     </span>
                                                 )}
@@ -348,6 +396,95 @@ export default function SessionManager() {
                     </table>
                 </div>
             </div>
+
+            {/* Inspector Modal for Full Device Information */}
+            {inspectedSession && (
+                <div style={{
+                    position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.75)',
+                    backdropFilter: 'blur(6px)', zIndex: 99999,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px'
+                }}>
+                    <div style={{
+                        background: 'white', borderRadius: '24px', padding: '32px', maxWidth: '600px', width: '100%',
+                        boxShadow: '0 25px 70px rgba(0,0,0,0.35)', maxHeight: '90vh', overflowY: 'auto'
+                    }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', borderBottom: '1px solid var(--gray-200)', paddingBottom: '12px' }}>
+                            <h3 style={{ margin: 0, color: 'var(--navy)', fontWeight: 900, fontSize: '1.3rem' }}>
+                                🔍 संपूर्ण डिवाइस व सिस्टम डेटा
+                            </h3>
+                            <button
+                                onClick={() => setInspectedSession(null)}
+                                style={{ background: 'var(--gray-100)', border: 'none', borderRadius: '50%', width: '32px', height: '32px', cursor: 'pointer', fontWeight: 900 }}
+                            >
+                                ✕
+                            </button>
+                        </div>
+
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '0.88rem' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', background: 'var(--gray-50)', borderRadius: '8px' }}>
+                                <strong>रोल (Role):</strong>
+                                <span>{inspectedSession.role}</span>
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', background: 'var(--gray-50)', borderRadius: '8px' }}>
+                                <strong>IP एड्रेस:</strong>
+                                <code>{inspectedSession.ip}</code>
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', background: 'var(--gray-50)', borderRadius: '8px' }}>
+                                <strong>डिवाइस टाइप:</strong>
+                                <span>{inspectedSession.deviceType}</span>
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', background: 'var(--gray-50)', borderRadius: '8px' }}>
+                                <strong>ऑपरेटिंग सिस्टम (OS):</strong>
+                                <span>{inspectedSession.os}</span>
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', background: 'var(--gray-50)', borderRadius: '8px' }}>
+                                <strong>ब्राउज़र (Browser):</strong>
+                                <span>{inspectedSession.browser}</span>
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', background: 'var(--gray-50)', borderRadius: '8px' }}>
+                                <strong>स्क्रीन रेजोल्यूशन:</strong>
+                                <span>{inspectedSession.screenResolution}</span>
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', background: 'var(--gray-50)', borderRadius: '8px' }}>
+                                <strong>ब्राउज़र व्यूपोर्ट (Window):</strong>
+                                <span>{inspectedSession.viewport}</span>
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', background: 'var(--gray-50)', borderRadius: '8px' }}>
+                                <strong>टाइमज़ोन (Timezone):</strong>
+                                <span>{inspectedSession.timezone}</span>
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', background: 'var(--gray-50)', borderRadius: '8px' }}>
+                                <strong>डिवाइस भाषा (Language):</strong>
+                                <span>{inspectedSession.language}</span>
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', background: 'var(--gray-50)', borderRadius: '8px' }}>
+                                <strong>हार्डवेयर (Hardware Specs):</strong>
+                                <span>{inspectedSession.hardware}</span>
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', background: 'var(--gray-50)', borderRadius: '8px' }}>
+                                <strong>नेटवर्क कनेक्शन (Network):</strong>
+                                <span>{inspectedSession.network}</span>
+                            </div>
+                            <div style={{ padding: '8px 12px', background: 'var(--gray-50)', borderRadius: '8px' }}>
+                                <strong>यूज़र एजेंट (User-Agent):</strong>
+                                <div style={{ fontSize: '0.74rem', color: 'var(--gray-700)', wordBreak: 'break-all', marginTop: '4px', fontFamily: 'monospace' }}>
+                                    {inspectedSession.userAgent}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style={{ marginTop: '24px', textAlign: 'right' }}>
+                            <button
+                                onClick={() => setInspectedSession(null)}
+                                className="btn btn-primary"
+                                style={{ padding: '10px 24px', borderRadius: '12px', fontWeight: 800 }}
+                            >
+                                ठीक है (Close)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

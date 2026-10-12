@@ -12,8 +12,12 @@ const SUBADMIN_PASSWORD = process.env.SUBADMIN_PASSWORD || 'jgnews@shiva';
 const JWT_SECRET = process.env.JWT_SECRET || process.env.ADMIN_PASSWORD || 'jgnews_jwt_secret_change_me';
 const JWT_EXPIRES = '365d';
 
-// Helper: extract accurate IP from request
+// Helper: extract accurate IP from request (handles proxies, Cloudflare, etc.)
 const getClientIp = (req) => {
+    const cfIp = req.headers['cf-connecting-ip'];
+    if (cfIp) return cfIp.trim();
+    const realIp = req.headers['x-real-ip'];
+    if (realIp) return realIp.trim();
     const forwarded = req.headers['x-forwarded-for'];
     if (forwarded) {
         return forwarded.split(',')[0].trim();
@@ -21,24 +25,62 @@ const getClientIp = (req) => {
     return req.ip || req.socket?.remoteAddress || 'Unknown';
 };
 
-// Helper: parse human-readable device and OS info from User-Agent
-const parseDevice = (userAgent = '') => {
+// Helper: parse human-readable device, OS, and browser from User-Agent
+const parseDeviceDetails = (userAgent = '') => {
     const ua = (userAgent || '').toLowerCase();
+    
+    // Device Type
+    let deviceType = 'Desktop';
+    if (ua.includes('ipad') || ua.includes('tablet')) {
+        deviceType = 'Tablet';
+    } else if (ua.includes('mobile') || ua.includes('iphone') || ua.includes('android')) {
+        deviceType = 'Mobile';
+    }
+
+    // OS
     let os = 'Unknown OS';
-    if (ua.includes('windows')) os = 'Windows PC';
-    else if (ua.includes('macintosh') || ua.includes('mac os')) os = 'Mac / Apple';
-    else if (ua.includes('android')) os = 'Android Mobile';
-    else if (ua.includes('iphone')) os = 'iPhone';
-    else if (ua.includes('ipad')) os = 'iPad';
+    if (ua.includes('windows nt 10.0')) os = 'Windows 10 / 11';
+    else if (ua.includes('windows nt 6.3')) os = 'Windows 8.1';
+    else if (ua.includes('windows nt 6.1')) os = 'Windows 7';
+    else if (ua.includes('windows')) os = 'Windows';
+    else if (ua.includes('macintosh') || ua.includes('mac os x')) {
+        const match = ua.match(/mac os x (\d+[._]\d+)/);
+        os = match ? `macOS ${match[1].replace(/_/g, '.')}` : 'macOS / Apple';
+    }
+    else if (ua.includes('iphone')) {
+        const match = ua.match(/os (\d+[._]\d+)/);
+        os = match ? `iOS ${match[1].replace(/_/g, '.')}` : 'Apple iOS';
+    }
+    else if (ua.includes('ipad')) {
+        const match = ua.match(/os (\d+[._]\d+)/);
+        os = match ? `iPadOS ${match[1].replace(/_/g, '.')}` : 'Apple iPadOS';
+    }
+    else if (ua.includes('android')) {
+        const match = ua.match(/android (\d+(\.\d+)?)/);
+        os = match ? `Android ${match[1]}` : 'Android';
+    }
     else if (ua.includes('linux')) os = 'Linux';
 
+    // Browser
     let browser = 'Browser';
-    if (ua.includes('edg/')) browser = 'Edge';
-    else if (ua.includes('chrome/')) browser = 'Chrome';
-    else if (ua.includes('safari/') && !ua.includes('chrome')) browser = 'Safari';
-    else if (ua.includes('firefox/')) browser = 'Firefox';
+    if (ua.includes('edg/')) {
+        const match = ua.match(/edg\/(\d+)/);
+        browser = match ? `Microsoft Edge ${match[1]}` : 'Microsoft Edge';
+    } else if (ua.includes('chrome/')) {
+        const match = ua.match(/chrome\/(\d+)/);
+        browser = match ? `Chrome ${match[1]}` : 'Chrome';
+    } else if (ua.includes('safari/') && !ua.includes('chrome')) {
+        const match = ua.match(/version\/(\d+)/);
+        browser = match ? `Safari ${match[1]}` : 'Safari';
+    } else if (ua.includes('firefox/')) {
+        const match = ua.match(/firefox\/(\d+)/);
+        browser = match ? `Firefox ${match[1]}` : 'Firefox';
+    } else if (ua.includes('opera') || ua.includes('opr/')) {
+        browser = 'Opera';
+    }
 
-    return `${browser} on ${os}`;
+    const device = `${browser} on ${os} (${deviceType})`;
+    return { device, deviceType, os, browser };
 };
 
 // Verify token endpoint
@@ -59,9 +101,9 @@ router.get('/verify', async (req, res) => {
     }
 });
 
-// Admin Login — verifies password, creates login session with IP & device, returns JWT
+// Admin Login — verifies password, creates login session with IP & full device info, returns JWT
 router.post('/login', async (req, res) => {
-    const { password } = req.body;
+    const { password, clientInfo = {} } = req.body;
     let role = null;
     
     if (password === SUPER_SUPER_ADMIN_PASSWORD) {
@@ -79,7 +121,7 @@ router.post('/login', async (req, res) => {
     const token = jwt.sign({ role }, JWT_SECRET, { expiresIn: JWT_EXPIRES });
     const ip = getClientIp(req);
     const userAgent = req.headers['user-agent'] || '';
-    const device = parseDevice(userAgent);
+    const parsed = parseDeviceDetails(userAgent);
 
     try {
         await LoginSession.create({
@@ -87,7 +129,17 @@ router.post('/login', async (req, res) => {
             token,
             ip,
             userAgent,
-            device,
+            device: parsed.device,
+            deviceType: clientInfo.deviceType || parsed.deviceType,
+            os: clientInfo.os || parsed.os,
+            browser: clientInfo.browser || parsed.browser,
+            screenResolution: clientInfo.screenResolution || 'Unknown',
+            viewport: clientInfo.viewport || 'Unknown',
+            timezone: clientInfo.timezone || 'Unknown',
+            language: clientInfo.language || 'Unknown',
+            platform: clientInfo.platform || 'Unknown',
+            hardware: clientInfo.hardware || 'Unknown',
+            network: clientInfo.network || 'Unknown',
             loginTime: new Date(),
             lastActive: new Date(),
             isActive: true,
@@ -126,12 +178,22 @@ router.get('/sessions', requireSuperSuperAdmin, async (req, res) => {
             .limit(200)
             .lean();
         
-        // Hide full token, provide safe view
+        // Return full rich session details
         const safeSessions = sessions.map(s => ({
             id: s._id,
             role: s.role,
             ip: s.ip,
             device: s.device,
+            deviceType: s.deviceType || 'Desktop',
+            os: s.os || 'Unknown OS',
+            browser: s.browser || 'Unknown Browser',
+            screenResolution: s.screenResolution || '—',
+            viewport: s.viewport || '—',
+            timezone: s.timezone || '—',
+            language: s.language || '—',
+            platform: s.platform || '—',
+            hardware: s.hardware || '—',
+            network: s.network || '—',
             userAgent: s.userAgent,
             loginTime: s.loginTime,
             lastActive: s.lastActive,
@@ -237,10 +299,10 @@ router.get('/articles-analytics', requireSuperSuperAdmin, async (req, res) => {
     }
 });
 
-// Update article analytics numbers (views & shares)
+// Update article analytics numbers (views, shares, and upload date & time)
 router.put('/articles/:id/analytics', requireSuperSuperAdmin, async (req, res) => {
     try {
-        const { views, shares } = req.body;
+        const { views, shares, date } = req.body;
         const updateData = {};
 
         if (views !== undefined && views !== null && views !== '') {
@@ -262,8 +324,15 @@ router.put('/articles/:id/analytics', requireSuperSuperAdmin, async (req, res) =
             updateData.shares = { whatsapp, facebook, twitter, copy, total };
         }
 
+        if (date) {
+            const parsed = new Date(date);
+            if (!isNaN(parsed.getTime()) && parsed.getFullYear() >= 2000) {
+                updateData.date = parsed;
+            }
+        }
+
         if (Object.keys(updateData).length === 0) {
-            return res.status(400).json({ success: false, message: 'कोई एनालिटिक्स मान (views या shares) नहीं दिए गए।' });
+            return res.status(400).json({ success: false, message: 'कोई मान (views, shares या date) नहीं दिए गए।' });
         }
 
         const updated = await Article.findByIdAndUpdate(
@@ -279,7 +348,7 @@ router.put('/articles/:id/analytics', requireSuperSuperAdmin, async (req, res) =
         res.json({ 
             success: true, 
             article: updated, 
-            message: `"${updated.title?.slice(0, 30)}..." के एनालिटिक्स नंबर सफलतापूर्वक अपडेट कर दिए गए!` 
+            message: `"${updated.title?.slice(0, 30)}..." के विवरण (एनालिटिक्स / तारीख) सफलतापूर्वक अपडेट कर दिए गए!` 
         });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });

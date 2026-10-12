@@ -5,7 +5,12 @@ import { getAdminRole } from '../store/newsStore';
 
 export default function AdminLogin() {
     const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
+    const [error, setError] = useState(() => {
+        if (typeof window !== 'undefined' && window.location.search.includes('reason=revoked')) {
+            return 'आपका लॉगिन सत्र सुपर एडमिन द्वारा समाप्त कर दिया गया है।';
+        }
+        return '';
+    });
     const [loading, setLoading] = useState(false);
     const { login, adminAuth } = useNews();
     const navigate = useNavigate();

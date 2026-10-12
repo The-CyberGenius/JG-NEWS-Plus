@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useNews } from '../context/NewsContext';
-import { isAdminLoggedIn, getAdminRole } from '../store/newsStore';
+import { isAdminLoggedIn, getAdminRole, verifyAdminSession } from '../store/newsStore';
 
 export default function AdminGuard({ children }) {
     const { adminAuth, refresh, logout } = useNews();
@@ -22,6 +22,28 @@ export default function AdminGuard({ children }) {
             }
         }
     }, [adminAuth, isTokenFresh, logout, refresh, role]);
+
+    // Active session heartbeat: check every 10s and on focus
+    // If Super Super Admin clicked force-logout, this will instantly kick the user out!
+    useEffect(() => {
+        if (!isTokenFresh) return;
+
+        const checkLiveness = async () => {
+            const valid = await verifyAdminSession();
+            if (!valid) {
+                logout();
+                window.location.href = '/admin?reason=revoked';
+            }
+        };
+
+        const interval = setInterval(checkLiveness, 10000);
+        window.addEventListener('focus', checkLiveness);
+
+        return () => {
+            clearInterval(interval);
+            window.removeEventListener('focus', checkLiveness);
+        };
+    }, [isTokenFresh, logout]);
 
     if (!isTokenFresh) return <Navigate to="/admin" replace />;
 

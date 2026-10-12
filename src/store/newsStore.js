@@ -34,15 +34,17 @@ api.interceptors.response.use(
     (res) => res,
     (err) => {
         if (err?.response?.status === 401) {
+            const isTerminated = err?.response?.data?.sessionTerminated === true;
             const isEditing = typeof window !== 'undefined' &&
                 (window.location.pathname.includes('/admin/news/add') || window.location.pathname.includes('/admin/news/edit'));
 
-            // Do NOT force page redirect if editing news to avoid wiping out written content!
-            if (!isEditing) {
+            // If session was specifically terminated by Super Admin, force logout immediately everywhere!
+            if (isTerminated || !isEditing) {
                 localStorage.removeItem(KEYS.TOKEN);
                 localStorage.removeItem(KEYS.ADMIN);
-                if (typeof window !== 'undefined' && window.location.pathname.startsWith('/admin')) {
-                    window.location.href = '/admin';
+                localStorage.removeItem(KEYS.ROLE);
+                if (typeof window !== 'undefined' && window.location.pathname.startsWith('/admin') && window.location.pathname !== '/admin') {
+                    window.location.href = '/admin?reason=revoked';
                 }
             }
         }
@@ -228,10 +230,42 @@ export const autoCategorizeArticles = async ({ dryRun = false } = {}) => {
     return response.data;
 };
 
+// ─── Browser Client Info Extractor ──────────────────────────────────────────
+const getBrowserClientInfo = () => {
+    if (typeof window === 'undefined') return {};
+    try {
+        const nav = window.navigator || {};
+        const screen = window.screen || {};
+
+        let deviceType = 'Desktop';
+        if (/ipad|tablet/i.test(nav.userAgent || '')) deviceType = 'Tablet';
+        else if (/mobile|iphone|android/i.test(nav.userAgent || '')) deviceType = 'Mobile';
+
+        const hardwareParts = [];
+        if (nav.hardwareConcurrency) hardwareParts.push(`${nav.hardwareConcurrency} Cores CPU`);
+        if (nav.deviceMemory) hardwareParts.push(`${nav.deviceMemory}GB RAM`);
+        if ('ontouchstart' in window || nav.maxTouchPoints > 0) hardwareParts.push('Touch Screen');
+
+        return {
+            deviceType,
+            screenResolution: `${screen.width || window.innerWidth}x${screen.height || window.innerHeight} (${screen.colorDepth || 24}-bit)`,
+            viewport: `${window.innerWidth}x${window.innerHeight}`,
+            timezone: Intl?.DateTimeFormat?.().resolvedOptions?.().timeZone || 'Asia/Kolkata',
+            language: nav.language || nav.languages?.[0] || 'hi-IN / en-US',
+            platform: nav.userAgentData?.platform || nav.platform || 'Unknown OS',
+            hardware: hardwareParts.join(' • ') || 'Standard PC',
+            network: nav.connection ? `${nav.connection.effectiveType?.toUpperCase() || ''} ${nav.connection.downlink ? `(${nav.connection.downlink} Mbps)` : ''}`.trim() : 'Broadband / WiFi'
+        };
+    } catch {
+        return {};
+    }
+};
+
 // ─── Admin Auth ───────────────────────────────────────────────────────────────
 export const adminLogin = async (password) => {
     try {
-        const response = await api.post('/admin/login', { password });
+        const clientInfo = getBrowserClientInfo();
+        const response = await api.post('/admin/login', { password, clientInfo });
         if (response.data.success && response.data.token) {
             localStorage.setItem(KEYS.ADMIN, 'true');
             localStorage.setItem(KEYS.TOKEN, response.data.token);
@@ -257,6 +291,20 @@ export const adminLogout = () => {
     localStorage.removeItem(KEYS.ADMIN);
     localStorage.removeItem(KEYS.TOKEN);
     localStorage.removeItem(KEYS.ROLE);
+};
+
+export const verifyAdminSession = async () => {
+    try {
+        const response = await api.get('/admin/verify');
+        if (!response.data?.valid) {
+            adminLogout();
+            return false;
+        }
+        return true;
+    } catch {
+        adminLogout();
+        return false;
+    }
 };
 
 export const isAdminLoggedIn = () => {
@@ -303,8 +351,8 @@ export const getArticlesForAnalytics = async (params = {}) => {
     return response.data;
 };
 
-export const updateArticleAnalytics = async (articleId, { views, shares }) => {
-    const response = await api.put(`/admin/articles/${articleId}/analytics`, { views, shares });
+export const updateArticleAnalytics = async (articleId, { views, shares, date }) => {
+    const response = await api.put(`/admin/articles/${articleId}/analytics`, { views, shares, date });
     return response.data;
 };
 

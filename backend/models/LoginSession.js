@@ -23,6 +23,46 @@ const loginSessionSchema = new mongoose.Schema({
         type: String, 
         default: 'Desktop' 
     },
+    deviceType: { 
+        type: String, 
+        default: 'Desktop' 
+    }, // Mobile | Tablet | Desktop
+    os: { 
+        type: String, 
+        default: 'Unknown OS' 
+    },
+    browser: { 
+        type: String, 
+        default: 'Unknown Browser' 
+    },
+    screenResolution: { 
+        type: String, 
+        default: 'Unknown' 
+    },
+    viewport: { 
+        type: String, 
+        default: 'Unknown' 
+    },
+    timezone: { 
+        type: String, 
+        default: 'Unknown' 
+    },
+    language: { 
+        type: String, 
+        default: 'Unknown' 
+    },
+    platform: { 
+        type: String, 
+        default: 'Unknown' 
+    },
+    hardware: { 
+        type: String, 
+        default: 'Unknown' 
+    },
+    network: { 
+        type: String, 
+        default: 'Unknown' 
+    },
     loginTime: { 
         type: Date, 
         default: Date.now,
