@@ -1,16 +1,23 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useNews } from '../context/NewsContext';
+import { getAdminRole } from '../store/newsStore';
 
 export default function AdminLogin() {
     const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
+    const [error, setError] = useState(() => {
+        if (typeof window !== 'undefined' && window.location.search.includes('reason=revoked')) {
+            return 'आपका लॉगिन सत्र सुपर एडमिन द्वारा समाप्त कर दिया गया है।';
+        }
+        return '';
+    });
     const [loading, setLoading] = useState(false);
     const { login, adminAuth } = useNews();
     const navigate = useNavigate();
 
     if (adminAuth) {
-        navigate('/admin/dashboard');
+        const target = getAdminRole() === 'super_super_admin' ? '/admin/sessions' : '/admin/dashboard';
+        navigate(target);
         return null;
     }
 
@@ -20,7 +27,8 @@ export default function AdminLogin() {
         try {
             const ok = await login(password);
             if (ok) {
-                navigate('/admin/dashboard');
+                const target = getAdminRole() === 'super_super_admin' ? '/admin/sessions' : '/admin/dashboard';
+                navigate(target);
             } else {
                 setError('गलत पासवर्ड। फिर से कोशिश करें।');
                 setLoading(false);

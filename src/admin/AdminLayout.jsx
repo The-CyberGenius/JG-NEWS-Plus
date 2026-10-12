@@ -6,6 +6,8 @@ import { getAdminRole } from '../store/newsStore';
 const NAV_ITEMS = [
     { path: '/admin/dashboard', icon: '📊', label: 'Dashboard' },
     { path: '/admin/analytics', icon: '📈', label: 'Analytics' },
+    { path: '/admin/sessions', icon: '🛡️', label: 'डिवाइस व सेशन्स', superSuperOnly: true },
+    { path: '/admin/news-analytics', icon: '⚡', label: 'व्यूज व एनालिटिक्स एडिटर', superSuperOnly: true },
     { path: '/admin/news', icon: '📰', label: 'खबरें प्रबंधन' },
     { path: '/admin/news/add', icon: '➕', label: 'खबर जोड़ें' },
     { path: '/admin/live', icon: '📺', label: 'Live TV' },
@@ -21,6 +23,7 @@ export default function AdminLayout({ children }) {
     const [sidebarOpen, setSidebarOpen] = useState(true);
     const navigate = useNavigate();
     const location = useLocation();
+    const role = getAdminRole();
 
     const handleLogout = () => {
         logout();
@@ -36,31 +39,45 @@ export default function AdminLayout({ children }) {
                         <path d="M4 6h16M4 12h16M4 18h16" />
                     </svg>
                 </button>
-                <div style={{ fontWeight: 900, fontSize: '1rem', flex: 1 }}>
-                    JG <span style={{ color: 'var(--teal)' }}>NEWS</span> <span style={{ color: 'var(--saffron)', fontSize: '0.8rem', marginLeft: '4px' }}>Admin Panel</span>
+                <div style={{ fontWeight: 900, fontSize: '1rem', flex: 1, display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                    <span>JG <span style={{ color: 'var(--teal)' }}>NEWS</span></span>
+                    {role === 'super_super_admin' ? (
+                        <span style={{ background: '#f59e0b', color: '#78350f', fontSize: '0.74rem', padding: '2px 10px', borderRadius: '20px', fontWeight: 900, letterSpacing: '0.5px' }}>
+                            👑 Super Super Admin
+                        </span>
+                    ) : (
+                        <span style={{ color: 'var(--saffron)', fontSize: '0.8rem' }}>Admin Panel</span>
+                    )}
                 </div>
                 <a href="/" target="_blank" rel="noreferrer" style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.82rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
                     🌐 <span className="hide-mobile">Site देखें</span>
                 </a>
-                <button onClick={handleLogout} className="btn btn-sm" style={{ background: 'rgba(229,57,53,0.8)', color: 'white' }}>
+                <button onClick={handleLogout} className="btn btn-sm" style={{ background: 'rgba(229,57,53,0.9)', color: 'white', fontWeight: 700 }}>
                     🚪 <span className="hide-mobile">Logout</span>
                 </button>
             </div>
-
 
             {/* Sidebar */}
             <div className={`admin-sidebar ${sidebarOpen ? '' : 'collapsed'}`} style={{ paddingTop: '60px' }}>
                 <div style={{ padding: '20px 16px 12px' }}>
                     <div style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.4)', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '8px' }}>
-                        Navigation
+                        {role === 'super_super_admin' ? 'Super Controls' : 'Navigation'}
                     </div>
                 </div>
                 <nav className="sidebar-nav">
                     {NAV_ITEMS.map(item => {
-                        const role = getAdminRole();
-                        if (role === 'subadmin' && ['/admin/categories', '/admin/epaper', '/admin/messages', '/admin/subscribers'].includes(item.path)) {
-                            return null;
+                        // If role is super_super_admin: only show dashboard, analytics, sessions, news-analytics
+                        if (role === 'super_super_admin') {
+                            const allowedPaths = ['/admin/sessions', '/admin/news-analytics', '/admin/dashboard', '/admin/analytics'];
+                            if (!allowedPaths.includes(item.path)) return null;
+                        } else {
+                            // Non-super_super_admin cannot see superSuperOnly items
+                            if (item.superSuperOnly) return null;
+                            if (role === 'subadmin' && ['/admin/categories', '/admin/epaper', '/admin/messages', '/admin/subscribers'].includes(item.path)) {
+                                return null;
+                            }
                         }
+
                         return (
                             <Link
                                 key={item.path}
