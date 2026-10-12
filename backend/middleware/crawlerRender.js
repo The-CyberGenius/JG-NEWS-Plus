@@ -67,14 +67,14 @@ const getSpaShell = async () => {
 };
 
 function articleBotHtml(article) {
-    const title = article.title || 'JG News Plus';
-    const description = article.excerpt || article.title || 'JG News Plus Rajasthan - 24x7 Latest News in Hindi.';
+    const title = article.title || 'JG News';
+    const description = article.excerpt || article.title || 'JG News Rajasthan - 24x7 Latest News in Hindi.';
     const image = article.image || DEFAULT_IMAGE;
     const slugOrId = article.slug || article._id;
     const canonical = `${SITE_URL}/article/${slugOrId}`;
     const published = (article.date || article.createdAt || new Date()).toISOString();
     const modified = (article.updatedAt || article.date || new Date()).toISOString();
-    const author = article.author || 'JG News Plus';
+    const author = article.author || 'JG News';
     const category = article.category || '';
 
     const jsonLd = {
@@ -87,7 +87,7 @@ function articleBotHtml(article) {
         author: [{ '@type': 'Person', name: author }],
         publisher: {
             '@type': 'Organization',
-            name: 'JG News Plus',
+            name: 'JG News',
             logo: { '@type': 'ImageObject', url: `${SITE_URL}/logo.png` },
         },
         description: stripTags(description),
@@ -103,7 +103,7 @@ function articleBotHtml(article) {
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>${htmlEsc(title)} | JG News Plus</title>
+<title>${htmlEsc(title)} | JG News</title>
 <meta name="description" content="${htmlEsc(stripTags(description))}" />
 <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
 <meta name="author" content="${htmlEsc(author)}" />
@@ -115,7 +115,7 @@ ${category ? `<meta name="news_keywords" content="${htmlEsc(category)}" />` : ''
 <meta property="og:description" content="${htmlEsc(stripTags(description))}" />
 <meta property="og:image" content="${htmlEsc(image)}" />
 <meta property="og:url" content="${htmlEsc(canonical)}" />
-<meta property="og:site_name" content="JG News Plus" />
+<meta property="og:site_name" content="JG News" />
 <meta property="og:locale" content="hi_IN" />
 <meta property="article:published_time" content="${published}" />
 <meta property="article:modified_time" content="${modified}" />
@@ -151,7 +151,7 @@ async function categoryBotHtml(categoryName) {
         .lean();
 
     const title = `${categoryName} समाचार`;
-    const description = `${categoryName} category की latest Hindi news — JG News Plus Rajasthan पर पढ़ें।`;
+    const description = `${categoryName} category की latest Hindi news — JG News Rajasthan पर पढ़ें।`;
     const canonical = `${SITE_URL}/category/${encodeURIComponent(categoryName)}`;
 
     return `<!DOCTYPE html>
@@ -159,19 +159,19 @@ async function categoryBotHtml(categoryName) {
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>${htmlEsc(title)} | JG News Plus</title>
+<title>${htmlEsc(title)} | JG News</title>
 <meta name="description" content="${htmlEsc(description)}" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <link rel="canonical" href="${htmlEsc(canonical)}" />
 <meta property="og:type" content="website" />
-<meta property="og:title" content="${htmlEsc(title)} | JG News Plus" />
+<meta property="og:title" content="${htmlEsc(title)} | JG News" />
 <meta property="og:description" content="${htmlEsc(description)}" />
 <meta property="og:url" content="${htmlEsc(canonical)}" />
 <meta property="og:image" content="${DEFAULT_IMAGE}" />
-<meta property="og:site_name" content="JG News Plus" />
+<meta property="og:site_name" content="JG News" />
 <meta property="og:locale" content="hi_IN" />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="${htmlEsc(title)} | JG News Plus" />
+<meta name="twitter:title" content="${htmlEsc(title)} | JG News" />
 <meta name="twitter:description" content="${htmlEsc(description)}" />
 <meta name="twitter:image" content="${DEFAULT_IMAGE}" />
 </head>

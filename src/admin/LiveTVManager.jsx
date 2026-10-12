@@ -7,10 +7,16 @@ export default function LiveTVManager() {
     const [saved, setSaved] = useState(false);
 
     const convertToEmbed = (input) => {
-        // Convert regular YouTube URL to embed
-        const match = input.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\s?]+)/);
+        if (!input) return '';
+        const trimmed = input.trim();
+        // Match youtube.com/live/ID, watch?v=ID, youtu.be/ID, embed/ID
+        const match = trimmed.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|live\/)|youtu\.be\/)([^&\s?#]+)/);
         if (match) return `https://www.youtube.com/embed/${match[1]}`;
-        return input;
+        // If user entered only 11-char video ID like nrk3hwlZ9eo
+        if (/^[a-zA-Z0-9_-]{11}$/.test(trimmed)) {
+            return `https://www.youtube.com/embed/${trimmed}`;
+        }
+        return trimmed;
     };
 
     const handleSave = () => {
@@ -60,7 +66,7 @@ export default function LiveTVManager() {
                         <h3 style={{ fontWeight: 800, color: 'var(--navy)', marginBottom: '12px' }}>👁️ Preview</h3>
                         <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '12px' }}>
                             <span className="live-badge"><span className="live-dot" /> LIVE ON AIR</span>
-                            <span style={{ fontSize: '0.82rem', color: 'var(--gray-600)' }}>JG News Plus Live</span>
+                            <span style={{ fontSize: '0.82rem', color: 'var(--gray-600)' }}>JG News Live</span>
                         </div>
                         <div className="video-embed" style={{ borderRadius: 'var(--radius-md)' }}>
                             <iframe

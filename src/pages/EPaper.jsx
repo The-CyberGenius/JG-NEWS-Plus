@@ -56,7 +56,7 @@ function NewspaperCard({ newspaper, onClick }) {
                         <div style={{ width: '100%', maxWidth: '160px' }}>
                             <div style={{ background: 'var(--saffron)', height: '4px', borderRadius: '2px', marginBottom: '10px' }} />
                             <div style={{ fontWeight: 900, color: 'white', fontSize: '1.1rem', textAlign: 'center', marginBottom: '6px', lineHeight: 1.2 }}>
-                                JG NEWS Plus
+                                JG NEWS
                             </div>
                             <div style={{ color: 'var(--teal)', fontSize: '0.7rem', textAlign: 'center', marginBottom: '12px' }}>
                                 {newspaper.edition || 'E-Newspaper'}
@@ -170,7 +170,7 @@ export default function EPaper() {
                         🗞️ E-NEWSPAPER
                     </div>
                     <h1 style={{ color: 'white', fontSize: '2.4rem', fontWeight: 900, lineHeight: 1.2, marginBottom: '14px' }}>
-                        JG News Plus<br />
+                        JG News<br />
                         <span style={{ color: 'var(--teal)' }}>ई-अखबार</span>
                     </h1>
                     <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: '1rem', maxWidth: '520px', lineHeight: 1.7 }}>

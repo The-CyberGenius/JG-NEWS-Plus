@@ -93,7 +93,7 @@ app.get('/sitemap.xml', async (req, res) => {
             const articleUrl = a.slug ? `${SITE_URL}/article/${a.slug}` : `${SITE_URL}/article/${a._id}`;
             xml += `  <url>\n    <loc>${articleUrl}</loc>\n    <lastmod>${lastmod}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.7</priority>\n`;
             if (isRecent) {
-                xml += `    <news:news>\n      <news:publication>\n        <news:name>JG News Plus</news:name>\n        <news:language>hi</news:language>\n      </news:publication>\n      <news:publication_date>${pubDate}</news:publication_date>\n      <news:title>${xmlEsc(a.title)}</news:title>\n    </news:news>\n`;
+                xml += `    <news:news>\n      <news:publication>\n        <news:name>JG News</news:name>\n        <news:language>hi</news:language>\n      </news:publication>\n      <news:publication_date>${pubDate}</news:publication_date>\n      <news:title>${xmlEsc(a.title)}</news:title>\n    </news:news>\n`;
             }
             if (a.image) {
                 xml += `    <image:image>\n      <image:loc>${xmlEsc(a.image)}</image:loc>\n      <image:title>${xmlEsc(a.title)}</image:title>\n    </image:image>\n`;
@@ -111,7 +111,7 @@ app.get('/sitemap.xml', async (req, res) => {
 });
 
 app.get('/api', (req, res) => {
-    res.send('JG NEWS PLUS API is running...');
+    res.send('JG NEWS API is running...');
 });
 
 // Crawler-only SSR for /article/:slug and /category/:name (bots get real meta,

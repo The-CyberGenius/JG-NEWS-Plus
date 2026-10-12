@@ -20,7 +20,7 @@ export default function Dashboard() {
         <div>
             <div style={{ marginBottom: '28px' }}>
                 <h1 style={{ fontSize: '1.6rem', fontWeight: 900, color: 'var(--navy)', marginBottom: '4px' }}>📊 Dashboard</h1>
-                <p style={{ color: 'var(--gray-600)', fontSize: '0.88rem' }}>JG News Plus — Admin Control Panel</p>
+                <p style={{ color: 'var(--gray-600)', fontSize: '0.88rem' }}>JG News — Admin Control Panel</p>
             </div>
 
             {/* Stats Grid */}

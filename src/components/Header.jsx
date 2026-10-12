@@ -84,20 +84,35 @@ export default function Header() {
             {/* Main Header */}
             <header style={{ background: 'white', boxShadow: '0 2px 16px rgba(10,22,40,0.12)', position: 'sticky', top: 0, zIndex: 80 }}>
                 <div className="container" style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 16px' }}>
-                    {/* Logo */}
-                    <Link to="/" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} style={{ flex: '0 0 auto', display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none', cursor: 'pointer' }}>
-                        <img
-                            src="/logo.png"
-                            alt="JG News Plus"
-                            style={{ height: '54px', width: 'auto', objectFit: 'contain' }}
-                            onError={e => { e.target.style.display = 'none'; }}
-                        />
-                        <div style={{ flex: '0 0 auto' }}>
-                            <div style={{ fontWeight: 900, fontSize: '1.2rem', color: 'var(--navy)', letterSpacing: '-0.5px' }}>
-                                JG <span style={{ color: 'var(--teal)' }}>NEWS</span> <span style={{ color: 'var(--saffron)' }}>Plus</span>
-                            </div>
-                            <div style={{ fontSize: '0.62rem', color: 'var(--gray-600)', fontWeight: 600 }}>{t.motto}</div>
-                        </div>
+                    {/* Official Brand Logo */}
+                    <Link
+                        to="/"
+                        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                        style={{
+                            flex: '0 0 auto',
+                            display: 'flex',
+                            alignItems: 'center',
+                            textDecoration: 'none',
+                            cursor: 'pointer',
+                        }}
+                        aria-label="JG News Home"
+                    >
+                        <picture>
+                            <source srcSet="/logo-nav.webp" type="image/webp" />
+                            <img
+                                src="/logo-nav.png"
+                                alt="JG News - निडर • निष्पक्ष • निर्भीक"
+                                className="navbar-brand-logo"
+                                width="78"
+                                height="58"
+                                fetchPriority="high"
+                                decoding="async"
+                                onError={(e) => {
+                                    e.currentTarget.onerror = null;
+                                    e.currentTarget.src = '/logo.png';
+                                }}
+                            />
+                        </picture>
                     </Link>
 
                     <div style={{ flex: 1 }} />
@@ -126,9 +141,17 @@ export default function Header() {
                         {t.lang === 'EN' ? '🌐 EN' : '🌐 हि'}
                     </button>
 
-                    {/* Live badge desktop */}
-                    <Link to="/live" className="hide-mobile">
-                        <span className="live-badge"><span className="live-dot"></span>{t.liveTV}</span>
+                    {/* Professional Broadcast LIVE Button */}
+                    <Link
+                        to="/live"
+                        style={{ textDecoration: 'none', flexShrink: 0 }}
+                        title="JG News 24x7 Live TV"
+                    >
+                        <span className="live-badge">
+                            <span className="live-dot" />
+                            <span className="hide-mobile">{t.liveTV}</span>
+                            <span className="hide-desktop">LIVE</span>
+                        </span>
                     </Link>
 
                     {/* Mobile search toggle */}
@@ -162,10 +185,15 @@ export default function Header() {
                 <nav className="desktop-nav-bar">
                     <div className="container" style={{ display: 'flex' }}>
                         {NAV_LINKS.map(link => (
-                            <Link key={link.path} to={link.path} style={{ padding: '10px 14px', color: 'rgba(255,255,255,0.85)', fontSize: '0.85rem', fontWeight: 600, transition: 'var(--transition)', borderBottom: '3px solid transparent', display: 'block' }}
-                                onMouseEnter={e => { e.target.style.color = 'white'; e.target.style.borderBottomColor = 'var(--teal)'; }}
-                                onMouseLeave={e => { e.target.style.color = 'rgba(255,255,255,0.85)'; e.target.style.borderBottomColor = 'transparent'; }}
-                            >{link.label}</Link>
+                            <Link key={link.path} to={link.path} style={{ padding: '10px 14px', color: 'rgba(255,255,255,0.85)', fontSize: '0.85rem', fontWeight: 600, transition: 'var(--transition)', borderBottom: '3px solid transparent', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                                onMouseEnter={e => { e.currentTarget.style.color = 'white'; e.currentTarget.style.borderBottomColor = 'var(--teal)'; }}
+                                onMouseLeave={e => { e.currentTarget.style.color = 'rgba(255,255,255,0.85)'; e.currentTarget.style.borderBottomColor = 'transparent'; }}
+                            >
+                                {link.path === '/live' && (
+                                    <span style={{ width: '7px', height: '7px', background: '#e50914', borderRadius: '50%', boxShadow: '0 0 6px #e50914' }} />
+                                )}
+                                {link.label}
+                            </Link>
                         ))}
                     </div>
                 </nav>

@@ -14,7 +14,7 @@ export default function SettingsManager() {
     useEffect(() => {
         if (settings) {
             setFormData({
-                siteTitle: settings.siteTitle || 'JG NEWS Plus',
+                siteTitle: settings.siteTitle || 'JG News',
                 breakingLabel: settings.breakingLabel || 'ब्रेकिंग न्यूज़',
                 liveUrl: settings.liveUrl || '',
             });
@@ -70,7 +70,7 @@ export default function SettingsManager() {
                             className="form-control"
                             value={formData.siteTitle}
                             onChange={handleChange}
-                            placeholder="जैसे: JG NEWS Plus"
+                            placeholder="जैसे: JG News"
                         />
                     </div>
 

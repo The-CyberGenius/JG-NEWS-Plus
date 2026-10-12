@@ -43,7 +43,7 @@ export default function SearchResults() {
     return (
         <>
             <Helmet>
-                <title>{q ? `"${q}" - खोज | JG News Plus` : 'खोज | JG News Plus'}</title>
+                <title>{q ? `"${q}" - खोज | JG News` : 'खोज | JG News'}</title>
             </Helmet>
             <div className="container section-gap">
                 <h1 style={{ fontSize: '1.5rem', fontWeight: 900, color: 'var(--navy)', marginBottom: '6px' }}>

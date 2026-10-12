@@ -8,11 +8,11 @@ const WA_NUMBER = '917240116211';
 function buildWAMsg(form, lang) {
     if (lang === 'hi') {
         return encodeURIComponent(
-            `नमस्ते JG News Plus 🙏\n\nनाम: ${form.name || '—'}\nफ़ोन: ${form.phone || '—'}\nईमेल: ${form.email || '—'}\nविषय: ${form.subject || '—'}\n\nसंदेश:\n${form.message || '—'}`
+            `नमस्ते JG News 🙏\n\nनाम: ${form.name || '—'}\nफ़ोन: ${form.phone || '—'}\nईमेल: ${form.email || '—'}\nविषय: ${form.subject || '—'}\n\nसंदेश:\n${form.message || '—'}`
         );
     }
     return encodeURIComponent(
-        `Hello JG News Plus 👋\n\nName: ${form.name || '—'}\nPhone: ${form.phone || '—'}\nEmail: ${form.email || '—'}\nSubject: ${form.subject || '—'}\n\nMessage:\n${form.message || '—'}`
+        `Hello JG News 👋\n\nName: ${form.name || '—'}\nPhone: ${form.phone || '—'}\nEmail: ${form.email || '—'}\nSubject: ${form.subject || '—'}\n\nMessage:\n${form.message || '—'}`
     );
 }
 
@@ -56,7 +56,7 @@ export default function Contact() {
     return (
         <>
             <Helmet>
-                <title>{isHi ? 'संपर्क करें | JG News Plus' : 'Contact Us | JG News Plus'}</title>
+                <title>{isHi ? 'संपर्क करें | JG News' : 'Contact Us | JG News'}</title>
             </Helmet>
             <div className="container section-gap">
                 <h1 style={{ fontSize: '1.8rem', fontWeight: 900, color: 'var(--navy)', marginBottom: '4px' }}>

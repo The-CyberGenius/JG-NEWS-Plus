@@ -74,7 +74,7 @@ router.get('/sitemap.xml', async (req, res) => {
             if (isRecent) {
                 xml += `    <news:news>\n`;
                 xml += `      <news:publication>\n`;
-                xml += `        <news:name>JG News Plus</news:name>\n`;
+                xml += `        <news:name>JG News</news:name>\n`;
                 xml += `        <news:language>hi</news:language>\n`;
                 xml += `      </news:publication>\n`;
                 xml += `      <news:publication_date>${pubDate}</news:publication_date>\n`;

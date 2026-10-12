@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 const settingSchema = new mongoose.Schema({
     liveUrl: { type: String, default: '' },
-    siteTitle: { type: String, default: 'JG News Plus' },
+    siteTitle: { type: String, default: 'JG News' },
     breakingLabel: { type: String, default: 'ब्रेकिंग न्यूज़' },
 });
 

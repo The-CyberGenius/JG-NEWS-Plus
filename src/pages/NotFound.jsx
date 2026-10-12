@@ -8,7 +8,7 @@ export default function NotFound() {
     return (
         <>
             <Helmet>
-                <title>404 - पेज नहीं मिला | JG News Plus</title>
+                <title>404 - पेज नहीं मिला | JG News</title>
             </Helmet>
             <div className="container section-gap" style={{ textAlign: 'center', padding: '80px 16px' }}>
                 <div style={{ fontSize: '6rem', lineHeight: 1, marginBottom: '16px' }}>📰</div>

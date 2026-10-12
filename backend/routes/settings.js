@@ -9,7 +9,7 @@ router.get('/', async (req, res) => {
     try {
         let settings = await Setting.findOne();
         if (!settings) {
-            settings = await Setting.create({ siteTitle: 'JG News Plus' });
+            settings = await Setting.create({ siteTitle: 'JG News' });
         }
         res.json(settings);
     } catch (error) {

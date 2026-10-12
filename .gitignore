@@ -1,5 +1,8 @@
 node_modules
 .env
+.env*
+*.env
+backend/.env
 dist
 .DS_Store
 

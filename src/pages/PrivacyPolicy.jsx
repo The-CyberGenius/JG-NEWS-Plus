@@ -19,7 +19,7 @@ export default function PrivacyPolicy() {
     return (
         <>
             <Helmet>
-                <title>{isHi ? 'गोपनीयता नीति | JG News Plus' : 'Privacy Policy | JG News Plus'}</title>
+                <title>{isHi ? 'गोपनीयता नीति | JG News' : 'Privacy Policy | JG News'}</title>
             </Helmet>
             <div className="container section-gap" style={{ maxWidth: '780px' }}>
                 <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '24px', fontSize: '0.85rem', color: 'var(--gray-600)' }}>
@@ -37,8 +37,8 @@ export default function PrivacyPolicy() {
 
                 <Section title={isHi ? '1. परिचय' : '1. Introduction'}>
                     {isHi
-                        ? 'JG News Plus आपकी गोपनीयता को गंभीरता से लेता है। यह नीति बताती है कि हम कौन सी जानकारी एकत्र करते हैं, उसका उपयोग कैसे करते हैं, और आपके अधिकार क्या हैं।'
-                        : 'JG News Plus takes your privacy seriously. This policy explains what information we collect, how we use it, and your rights regarding your data.'}
+                        ? 'JG News आपकी गोपनीयता को गंभीरता से लेता है। यह नीति बताती है कि हम कौन सी जानकारी एकत्र करते हैं, उसका उपयोग कैसे करते हैं, और आपके अधिकार क्या हैं।'
+                        : 'JG News takes your privacy seriously. This policy explains what information we collect, how we use it, and your rights regarding your data.'}
                 </Section>
 
                 <Section title={isHi ? '2. एकत्र की जाने वाली जानकारी' : '2. Information We Collect'}>

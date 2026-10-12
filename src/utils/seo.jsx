@@ -6,7 +6,7 @@ const DEFAULT_IMAGE = `${SITE_URL}/logo.png`;
 
 export function SEO({
     title,
-    description = 'JG News Plus Rajasthan - 24x7 Latest News in Hindi. निडर • निष्पक्ष • निर्भीक',
+    description = 'JG News Rajasthan - 24x7 Latest News in Hindi. निडर • निष्पक्ष • निर्भीक',
     image = DEFAULT_IMAGE,
     url,
     type = 'website',
@@ -16,7 +16,7 @@ export function SEO({
     keywords,
     structuredData,
 }) {
-    const fullTitle = title ? `${title} | JG News Plus` : 'JG News Plus Rajasthan | 24x7 News';
+    const fullTitle = title ? `${title} | JG News` : 'JG News Rajasthan | 24x7 News';
     const canonical = url ? `${SITE_URL}${url}` : SITE_URL;
 
     return (
@@ -32,7 +32,7 @@ export function SEO({
             <meta property="og:image" content={image} />
             <meta property="og:url" content={canonical} />
             <meta property="og:type" content={type} />
-            <meta property="og:site_name" content="JG News Plus" />
+            <meta property="og:site_name" content="JG News" />
             <meta property="og:locale" content="hi_IN" />
 
             {/* Twitter Card */}
@@ -71,10 +71,10 @@ export function articleStructuredData(article) {
         image: [article.image].filter(Boolean),
         datePublished: article.date,
         dateModified: article.updatedAt || article.date,
-        author: [{ '@type': 'Person', name: article.author || 'JG News Plus' }],
+        author: [{ '@type': 'Person', name: article.author || 'JG News' }],
         publisher: {
             '@type': 'Organization',
-            name: 'JG News Plus',
+            name: 'JG News',
             logo: {
                 '@type': 'ImageObject',
                 url: `${SITE_URL}/logo.png`,
@@ -94,7 +94,7 @@ export function organizationStructuredData() {
     return {
         '@context': 'https://schema.org',
         '@type': 'NewsMediaOrganization',
-        name: 'JG News Plus',
+        name: 'JG News',
         url: SITE_URL,
         logo: `${SITE_URL}/logo.png`,
         sameAs: [
@@ -103,6 +103,6 @@ export function organizationStructuredData() {
             'https://x.com/jgnewslive',
             'https://www.youtube.com/@MANOJ-1974-JG',
         ],
-        description: 'JG News Plus Rajasthan - 24x7 Latest News in Hindi',
+        description: 'JG News Rajasthan - 24x7 Latest News in Hindi',
     };
 }

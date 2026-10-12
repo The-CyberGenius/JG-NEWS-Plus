@@ -20,8 +20,8 @@ export default function Footer() {
 
     const WA_NUMBER = '917240116211';
     const WA_MSG = encodeURIComponent(lang === 'hi'
-        ? 'नमस्ते JG News Plus,\nमैं आपसे संपर्क करना चाहता/चाहती हूं।\nनाम:\nविषय:\nसंदेश:'
-        : 'Hello JG News Plus,\nI would like to get in touch.\nName:\nSubject:\nMessage:');
+        ? 'नमस्ते JG News,\nमैं आपसे संपर्क करना चाहता/चाहती हूं।\nनाम:\nविषय:\nसंदेश:'
+        : 'Hello JG News,\nI would like to get in touch.\nName:\nSubject:\nMessage:');
 
     return (
         <footer style={{ background: 'var(--navy)', color: 'rgba(255,255,255,0.8)', marginTop: '48px' }}>
@@ -49,7 +49,7 @@ export default function Footer() {
                     {/* Brand */}
                     <div className="jg-span-2">
                         <div style={{ fontWeight: 900, fontSize: '1.4rem', color: 'white', marginBottom: '4px' }}>
-                            JG <span style={{ color: 'var(--teal)' }}>NEWS</span> <span style={{ color: 'var(--saffron)' }}>Plus</span>
+                            JG <span style={{ color: 'var(--teal)' }}>NEWS</span>
                         </div>
                         <div style={{ fontSize: '0.8rem', color: 'var(--teal)', marginBottom: '12px', fontWeight: 600 }}>
                             {t.tagline}
@@ -223,7 +223,7 @@ export default function Footer() {
             {/* Bottom Bar */}
             <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', padding: '16px', textAlign: 'center', fontSize: '0.78rem', color: 'rgba(255,255,255,0.5)' }}>
                 <div className="container" style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '8px' }}>
-                    <span>© {new Date().getFullYear()} JG News Plus Rajasthan. {lang === 'hi' ? 'सर्वाधिकार सुरक्षित।' : 'All rights reserved.'}</span>
+                    <span>© {new Date().getFullYear()} JG News Rajasthan. {lang === 'hi' ? 'सर्वाधिकार सुरक्षित।' : 'All rights reserved.'}</span>
                     <div style={{ display: 'flex', gap: '16px' }}>
                         <Link to="/privacy"
                             style={{ color: 'rgba(255,255,255,0.5)', transition: 'color 0.2s' }}

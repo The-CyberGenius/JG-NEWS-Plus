@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 const newspaperSchema = new mongoose.Schema({
-    title: { type: String, required: true },       // e.g. "JG News Plus - दैनिक संस्करण"
+    title: { type: String, required: true },       // e.g. "JG News - दैनिक संस्करण"
     edition: { type: String, required: true },     // e.g. "Edition 042 | April 2025"
     pdfUrl: { type: String, required: true },      // Google Drive / Cloudinary URL
     thumbnail: { type: String, default: '' },      // Preview image URL

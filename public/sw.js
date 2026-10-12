@@ -1,4 +1,4 @@
-// JG News Plus — Service Worker
+// JG News — Service Worker
 // Strategy:
 //  - HTML: network-first with offline fallback
 //  - Static assets (JS/CSS/fonts): stale-while-revalidate

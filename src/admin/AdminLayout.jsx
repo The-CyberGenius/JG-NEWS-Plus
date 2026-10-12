@@ -76,7 +76,7 @@ export default function AdminLayout({ children }) {
 
                 <div style={{ marginTop: 'auto', padding: '16px', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
                     <div style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', textAlign: 'center' }}>
-                        JG News Plus v1.0<br />निडर • निष्पक्ष • निर्भीक
+                        JG News v1.0<br />निडर • निष्पक्ष • निर्भीक
                     </div>
                 </div>
             </div>

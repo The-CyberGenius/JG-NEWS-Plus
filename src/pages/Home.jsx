@@ -362,7 +362,7 @@ export default function Home() {
         <div>
             <SEO
                 title="Rajasthan की ताज़ा खबरें"
-                description="JG News Plus पर पढ़ें राजस्थान की हर बड़ी खबर — राजनीति, अपराध, खेल, मौसम, ब्रेकिंग न्यूज़ और बहुत कुछ। निडर • निष्पक्ष • निर्भीक।"
+                description="JG News पर पढ़ें राजस्थान की हर बड़ी खबर — राजनीति, अपराध, खेल, मौसम, ब्रेकिंग न्यूज़ और बहुत कुछ। निडर • निष्पक्ष • निर्भीक।"
                 url="/"
                 keywords="Rajasthan News, Hindi News, राजस्थान समाचार, Jaipur News, जयपुर समाचार, Breaking News, JG News"
             />
@@ -636,7 +636,7 @@ export default function Home() {
                                     <span className="live-dot" />LIVE ON AIR
                                 </span>
                                 <h2 style={{ fontSize: '1.8rem', fontWeight: 900, margin: '12px 0 8px', lineHeight: 1.2 }}>
-                                    JG NEWS Plus<br />
+                                    JG NEWS<br />
                                     <span style={{ color: 'var(--teal)' }}>LIVE देखें</span>
                                 </h2>
                                 <p style={{ opacity: 0.8, fontSize: '0.9rem', marginBottom: '20px' }}>
@@ -646,10 +646,10 @@ export default function Home() {
                                     ▶ अभी देखें
                                 </Link>
                             </div>
-                            <div className="video-embed">
+                            <div className="video-embed" style={{ borderRadius: '12px', overflow: 'hidden', border: '1px solid rgba(229, 9, 20, 0.35)', boxShadow: '0 8px 32px rgba(0, 0, 0, 0.45)' }}>
                                 <iframe
                                     src={settings.liveUrl}
-                                    title="JG News Plus Live"
+                                    title="JG News Live"
                                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                     allowFullScreen
                                 />
@@ -726,7 +726,7 @@ export default function Home() {
                                 📰 E-NEWSPAPER
                             </div>
                             <h2 style={{ fontSize: '1.8rem', fontWeight: 900, margin: '0 0 10px', lineHeight: 1.2 }}>
-                                JG News Plus<br />
+                                JG News<br />
                                 <span style={{ color: 'var(--teal)' }}>ई-अखबार पढ़ें</span>
                             </h2>
                             <p style={{ opacity: 0.8, fontSize: '0.9rem', marginBottom: '20px', lineHeight: 1.7 }}>

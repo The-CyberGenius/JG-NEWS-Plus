@@ -128,7 +128,7 @@ export default function CategoryPage() {
         <div className="container section-gap">
             <SEO
                 title={`${category} समाचार`}
-                description={`${category} की ताज़ा खबरें — JG News Plus पर पढ़ें ${category} से जुड़े सभी समाचार, अपडेट और विश्लेषण।`}
+                description={`${category} की ताज़ा खबरें — JG News पर पढ़ें ${category} से जुड़े सभी समाचार, अपडेट और विश्लेषण।`}
                 url={`/category/${category}`}
                 keywords={`${category}, ${category} News, ${category} समाचार, Rajasthan News`}
             />

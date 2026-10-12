@@ -103,7 +103,7 @@ const SEED_CATEGORIES = [
 
 const SEED_SETTINGS = {
     liveUrl: 'https://www.youtube.com/embed/5qap5aO4i9A',
-    siteTitle: 'JG News Plus',
+    siteTitle: 'JG News',
     breakingLabel: 'ब्रेकिंग न्यूज़',
 };
 

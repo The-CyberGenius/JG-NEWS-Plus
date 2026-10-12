@@ -1,7 +1,7 @@
 {
-  "name": "JG News Plus",
+  "name": "JG News",
   "short_name": "JG News",
-  "description": "JG News Plus Rajasthan - 24x7 Latest News in Hindi",
+  "description": "JG News Rajasthan - 24x7 Latest News in Hindi",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
