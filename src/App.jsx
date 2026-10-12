@@ -38,6 +38,8 @@ const NewsSyncManager = lazy(() => import('./admin/NewsSyncManager'));
 const MessageManager = lazy(() => import('./admin/MessageManager'));
 const AnalyticsPage = lazy(() => import('./admin/AnalyticsPage'));
 const SubscriberManager = lazy(() => import('./admin/SubscriberManager'));
+const SessionManager = lazy(() => import('./admin/SessionManager'));
+const NewsAnalyticsManager = lazy(() => import('./admin/NewsAnalyticsManager'));
 
 function PublicLayout({ children }) {
     return (
@@ -98,6 +100,8 @@ export default function App() {
                                             <Route path="messages" element={<MessageManager />} />
                                             <Route path="analytics" element={<AnalyticsPage />} />
                                             <Route path="subscribers" element={<SubscriberManager />} />
+                                            <Route path="sessions" element={<SessionManager />} />
+                                            <Route path="news-analytics" element={<NewsAnalyticsManager />} />
                                         </Routes>
                                     </AdminLayout>
                                 </AdminGuard>

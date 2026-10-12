@@ -248,6 +248,12 @@ export const adminLogin = async (password) => {
 };
 
 export const adminLogout = () => {
+    // Notify server to mark session inactive (fire-and-forget)
+    try {
+        api.post('/admin/logout').catch(() => {});
+    } catch {
+        // ignore
+    }
     localStorage.removeItem(KEYS.ADMIN);
     localStorage.removeItem(KEYS.TOKEN);
     localStorage.removeItem(KEYS.ROLE);
@@ -275,6 +281,32 @@ export const isAdminLoggedIn = () => {
 
 export const getAdminRole = () =>
     localStorage.getItem(KEYS.ROLE) || 'admin';
+
+// ─── Super Super Admin Controls ──────────────────────────────────────────────
+export const getLoginSessions = async () => {
+    const response = await api.get('/admin/sessions');
+    return response.data;
+};
+
+export const forceLogoutSession = async (sessionId) => {
+    const response = await api.post(`/admin/sessions/${sessionId}/logout`);
+    return response.data;
+};
+
+export const forceLogoutAllOthers = async () => {
+    const response = await api.post('/admin/sessions/logout-all-others');
+    return response.data;
+};
+
+export const getArticlesForAnalytics = async (params = {}) => {
+    const response = await api.get('/admin/articles-analytics', { params });
+    return response.data;
+};
+
+export const updateArticleAnalytics = async (articleId, { views, shares }) => {
+    const response = await api.put(`/admin/articles/${articleId}/analytics`, { views, shares });
+    return response.data;
+};
 
 // ─── E-Newspaper ──────────────────────────────────────────────────────────────
 export const getNewspapers = async () => {
