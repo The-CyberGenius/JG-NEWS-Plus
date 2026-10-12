@@ -4,6 +4,7 @@ node_modules
 !.env.example
 *.env
 backend/.env
+env-for-vercel.txt
 dist
 .DS_Store
 

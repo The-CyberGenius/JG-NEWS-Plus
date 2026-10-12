@@ -4,7 +4,7 @@ import { useNews } from '../context/NewsContext';
 import { timeAgo } from '../utils/helpers';
 import { NewsCardSkeleton, CategorySectionSkeleton, ListSkeleton } from '../components/Skeletons';
 import { SEO } from '../utils/seo';
-import { optimizeImage, srcSet } from '../utils/imageUrl';
+import { optimizeImage, srcSet, DEFAULT_NEWS_FALLBACK } from '../utils/imageUrl';
 import { api } from '../store/newsStore';
 import { articleHref } from '../utils/articleHref';
 
@@ -29,41 +29,26 @@ const INITIAL_WEATHER = [
 
 function NewsCard({ article }) {
     const [imgFailed, setImgFailed] = useState(false);
-    const validImageUrl = (() => {
-        const u = (article.image || '').trim();
-        if (!u) return false;
-        // Require a real http(s) URL
-        if (!/^https?:\/\//i.test(u)) return false;
-        return true;
-    })();
-    const hasImage = validImageUrl && !imgFailed;
+    const cardImg = (!imgFailed && article.image && article.image.trim()) ? article.image.trim() : DEFAULT_NEWS_FALLBACK;
 
     return (
-        <Link to={articleHref(article)} className={`news-card${hasImage ? '' : ' news-card--no-image'}`} style={{ textDecoration: 'none' }}>
-            {hasImage ? (
-                <div className="news-card__img">
-                    <img
-                        src={optimizeImage(article.image, { width: 600 })}
-                        srcSet={srcSet(article.image, [400, 600, 800])}
-                        sizes="(max-width: 768px) 100vw, 33vw"
-                        alt={article.title}
-                        loading="lazy"
-                        decoding="async"
-                        onError={() => setImgFailed(true)}
-                    />
-                    {article.isBreaking && <span className="badge badge-red">ब्रेकिंग</span>}
-                    {article.isFeatured && !article.isBreaking && <span className="badge badge-teal">मुख्य</span>}
-                </div>
-            ) : (
-                <div className="news-card__placeholder">
-                    <span className="news-card__placeholder-cat">{article.category}</span>
-                    <h3 className="news-card__placeholder-title">{article.title}</h3>
-                    {article.isBreaking && <span className="badge badge-red news-card__placeholder-badge">ब्रेकिंग</span>}
-                </div>
-            )}
+        <Link to={articleHref(article)} className="news-card" style={{ textDecoration: 'none' }}>
+            <div className="news-card__img">
+                <img
+                    src={optimizeImage(cardImg, { width: 600 })}
+                    srcSet={srcSet(cardImg, [400, 600, 800])}
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                    alt={article.title}
+                    loading="lazy"
+                    decoding="async"
+                    onError={() => setImgFailed(true)}
+                />
+                {article.isBreaking && <span className="badge badge-red">ब्रेकिंग</span>}
+                {article.isFeatured && !article.isBreaking && <span className="badge badge-teal">मुख्य</span>}
+            </div>
             <div className="news-card__body">
-                {hasImage && <div className="news-card__category">{article.category}</div>}
-                {hasImage && <div className="news-card__title">{article.title}</div>}
+                <div className="news-card__category">{article.category}</div>
+                <div className="news-card__title">{article.title}</div>
                 <div className="news-card__meta">
                     <span className="news-card__location">📍 {article.localArea ? `${article.localArea}, ` : ''}{article.district}</span>
                     <span>•</span>
@@ -397,8 +382,8 @@ export default function Home() {
                                     >
                                         <img
                                             className="hero-slide__img"
-                                            src={optimizeImage(a.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=900&q=80', { width: 1200 })}
-                                            srcSet={srcSet(a.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=900&q=80', [600, 900, 1200, 1600])}
+                                            src={optimizeImage(a.image || DEFAULT_NEWS_FALLBACK, { width: 1200 })}
+                                            srcSet={srcSet(a.image || DEFAULT_NEWS_FALLBACK, [600, 900, 1200, 1600])}
                                             sizes="(max-width: 1024px) 100vw, 66vw"
                                             alt={a.title}
                                             loading={i === 0 ? 'eager' : 'lazy'}

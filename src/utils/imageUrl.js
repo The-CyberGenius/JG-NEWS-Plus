@@ -2,7 +2,8 @@
 // Adds f_auto (best format: WebP/AVIF) and q_auto (smart compression) transformations
 // Optionally sets width for srcset.
 
-const FALLBACK = 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600&q=80';
+export const DEFAULT_NEWS_FALLBACK = 'https://res.cloudinary.com/dsczo1zim/image/upload/v1791826657/jgnews_defaults/default_news_logo.png';
+const FALLBACK = DEFAULT_NEWS_FALLBACK;
 
 /**
  * Optimize an image URL.

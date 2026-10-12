@@ -5,7 +5,7 @@ import { timeAgo } from '../utils/helpers';
 import { NewsCardSkeleton } from '../components/Skeletons';
 import { SEO } from '../utils/seo';
 import { getArticles, fetchMetaDistricts } from '../store/newsStore';
-import { optimizeImage, srcSet } from '../utils/imageUrl';
+import { optimizeImage, srcSet, DEFAULT_NEWS_FALLBACK } from '../utils/imageUrl';
 import { useLang } from '../context/LangContext';
 
 const PAGE_SIZE = 12;
@@ -14,34 +14,25 @@ const ALL_RAJASTHAN = 'राजस्थान';
 function NewsCard({ article }) {
     const [imgFailed, setImgFailed] = useState(false);
     const { t } = useLang();
-    const validImageUrl = !!(article.image && /^https?:\/\//i.test(article.image.trim()));
-    const hasImage = validImageUrl && !imgFailed;
+    const cardImg = (!imgFailed && article.image && article.image.trim()) ? article.image.trim() : DEFAULT_NEWS_FALLBACK;
 
     return (
-        <Link to={articleHref(article)} className={`news-card${hasImage ? '' : ' news-card--no-image'}`} style={{ textDecoration: 'none' }}>
-            {hasImage ? (
-                <div className="news-card__img">
-                    <img
-                        src={optimizeImage(article.image, { width: 600 })}
-                        srcSet={srcSet(article.image, [400, 600, 800])}
-                        sizes="(max-width: 768px) 100vw, 33vw"
-                        alt={article.title}
-                        loading="lazy"
-                        decoding="async"
-                        onError={() => setImgFailed(true)}
-                    />
-                    {article.isBreaking && <span className="badge badge-red">{t.breaking}</span>}
-                </div>
-            ) : (
-                <div className="news-card__placeholder">
-                    <span className="news-card__placeholder-cat">{article.category}</span>
-                    <h3 className="news-card__placeholder-title">{article.title}</h3>
-                    {article.isBreaking && <span className="badge badge-red news-card__placeholder-badge">{t.breaking}</span>}
-                </div>
-            )}
+        <Link to={articleHref(article)} className="news-card" style={{ textDecoration: 'none' }}>
+            <div className="news-card__img">
+                <img
+                    src={optimizeImage(cardImg, { width: 600 })}
+                    srcSet={srcSet(cardImg, [400, 600, 800])}
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                    alt={article.title}
+                    loading="lazy"
+                    decoding="async"
+                    onError={() => setImgFailed(true)}
+                />
+                {article.isBreaking && <span className="badge badge-red">{t.breaking}</span>}
+            </div>
             <div className="news-card__body">
-                {hasImage && <div className="news-card__category">{article.category}</div>}
-                {hasImage && <div className="news-card__title">{article.title}</div>}
+                <div className="news-card__category">{article.category}</div>
+                <div className="news-card__title">{article.title}</div>
                 <div className="news-card__meta">
                     <span>📍 {article.localArea ? `${article.localArea}, ` : ''}{article.district}</span>
                     <span>•</span>

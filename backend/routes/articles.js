@@ -6,6 +6,8 @@ import { detectCategory } from '../utils/categoryDetector.js';
 
 const router = express.Router();
 
+const DEFAULT_NEWS_IMAGE = 'https://res.cloudinary.com/dsczo1zim/image/upload/v1791826657/jgnews_defaults/default_news_logo.png';
+
 // Helper: ensure article has a slug, generate if missing
 const ensureSlug = async (title, currentSlug, currentId) => {
     if (currentSlug) return currentSlug;
@@ -135,6 +137,16 @@ router.get('/:idOrSlug', async (req, res) => {
 router.post('/', requireAdmin, async (req, res) => {
     try {
         const data = { ...req.body };
+        // Default classification, location, and author
+        if (!data.category || !data.category.trim()) data.category = 'राजस्थान';
+        if (!data.district || !data.district.trim()) data.district = 'चूरू';
+        if (!data.localArea || !data.localArea.trim()) data.localArea = 'रतनगढ़';
+        if (!data.author || !data.author.trim()) data.author = 'मनोज पारीक';
+        if (!data.image || !data.image.trim()) data.image = DEFAULT_NEWS_IMAGE;
+        if (!data.excerpt && data.content) {
+            data.excerpt = data.content.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 160);
+        }
+
         // Always sanitize date — empty/invalid/<2000 becomes Date.now
         data.date = sanitizeDate(data.date);
         // Auto-generate slug from title if not provided
@@ -158,6 +170,9 @@ router.put('/:id', requireAdmin, async (req, res) => {
         const data = { ...req.body };
         // Sanitize date only if caller explicitly sent one (don't overwrite existing good date)
         if ('date' in data) data.date = sanitizeDate(data.date);
+        if ('image' in data && (!data.image || !data.image.trim())) {
+            data.image = DEFAULT_NEWS_IMAGE;
+        }
         // Regenerate slug if title changed and no explicit slug provided
         if (data.title && !data.slug) {
             const current = await Article.findById(req.params.id).lean();

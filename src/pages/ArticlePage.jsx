@@ -5,7 +5,7 @@ import { useLang } from '../context/LangContext';
 import { timeAgo, formatDate, getEmbedUrl } from '../utils/helpers';
 import { api } from '../store/newsStore';
 import { SEO, articleStructuredData } from '../utils/seo';
-import { optimizeImage } from '../utils/imageUrl';
+import { optimizeImage, DEFAULT_NEWS_FALLBACK } from '../utils/imageUrl';
 import { articleHref } from '../utils/articleHref';
 
 export default function ArticlePage() {
@@ -116,7 +116,7 @@ export default function ArticlePage() {
         );
     }
 
-    const rawImg = article.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=1200&q=80';
+    const rawImg = article.image || DEFAULT_NEWS_FALLBACK;
     const heroImg = optimizeImage(rawImg, { width: 1200 });
 
     return (
@@ -124,7 +124,7 @@ export default function ArticlePage() {
             <SEO
                 title={article.title}
                 description={article.excerpt || article.title}
-                image={optimizeImage(article.image, { width: 1200 })}
+                image={optimizeImage(rawImg, { width: 1200 })}
                 url={articleHref(article)}
                 type="article"
                 publishedAt={article.date}

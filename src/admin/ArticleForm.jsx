@@ -9,16 +9,18 @@ const RAJASTHAN_DISTRICTS = [
     'अजमेर', 'अलवर', 'अनूपगढ़', 'बालोतरा', 'बांसवाड़ा', 'बारां', 'बाड़मेर', 'ब्यावर', 'भरतपुर', 'भीलवाड़ा', 'बीकानेर', 'बूंदी', 'चित्तौड़गढ़', 'चूरू', 'दौसा', 'डीग', 'धौलपुर', 'डीडवाना-कुचामन', 'दूदू', 'डूंगरपुर', 'गंगानगर', 'गंगापुर सिटी', 'हनुमानगढ़', 'जयपुर', 'जयपुर ग्रामीण', 'जैसलमेर', 'जालौर', 'झालावाड़', 'झुंझुनूं', 'जोधपुर', 'जोधपुर ग्रामीण', 'करौली', 'केकड़ी', 'खैरथल-तिजारा', 'कोटा', 'कोटपुतली-बहरोड़', 'नागौर', 'नीम का थाना', 'पाली', 'फलोदी', 'प्रतापगढ़', 'राजसमंद', 'सलुंबर', 'सांचौर', 'सवाई माधोपुर', 'शाहpura', 'सीकर', 'सिरोही', 'टोंक', 'उदयपुर', 'अन्य'
 ];
 
+const DEFAULT_NEWS_IMAGE = 'https://res.cloudinary.com/dsczo1zim/image/upload/v1791826657/jgnews_defaults/default_news_logo.png';
+
 const EMPTY_FORM = {
     title: '',
     excerpt: '',
     content: '',
-    category: '',
-    district: '',
-    localArea: '',
+    category: 'राजस्थान',
+    district: 'चूरू',
+    localArea: 'रतनगढ़',
     image: '',
     videoUrl: '',
-    author: '',
+    author: 'मनोज पारीक',
     tags: '',
     isBreaking: false,
     isFeatured: false,
@@ -158,17 +160,24 @@ export default function ArticleForm() {
         if (!form.content.trim()) return setToast('❌ खबर विस्तार (Content) ज़रुरी है');
 
         setSaving(true);
-        let finalImageUrl = form.image;
+        let finalImageUrl = (form.image || '').trim();
 
         try {
             if (imageFile) {
                 setToast('⏳ मुख्य फोटो अपलोड हो रही है...');
                 const uploadResult = await uploadImage(imageFile);
                 finalImageUrl = uploadResult.url;
+            } else if (!finalImageUrl) {
+                // If user did not upload or provide any image, use official default logo
+                finalImageUrl = DEFAULT_NEWS_IMAGE;
             }
 
             const data = {
                 ...form,
+                category: form.category || 'राजस्थान',
+                district: form.district || 'चूरू',
+                localArea: form.localArea || 'रतनगढ़',
+                author: form.author || 'मनोज पारीक',
                 image: finalImageUrl,
                 tags: form.tags.split(',').map(t => t.trim()).filter(Boolean),
                 // If a date was set, use it; otherwise let backend use default (now)
@@ -311,7 +320,19 @@ export default function ArticleForm() {
                                                 >✕</button>
                                             </>
                                         ) : (
-                                            <div style={{ fontSize: '0.85rem', color: 'var(--gray-500)', fontWeight: 700 }}>फोटो चुनें</div>
+                                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', padding: '10px' }}>
+                                                <img
+                                                    src={DEFAULT_NEWS_IMAGE}
+                                                    alt="Default JG News Logo"
+                                                    style={{ width: '130px', maxHeight: '100px', objectFit: 'contain', borderRadius: '10px', filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.12))' }}
+                                                />
+                                                <div style={{ fontSize: '0.82rem', color: 'var(--navy)', fontWeight: 800 }}>
+                                                    डिफ़ॉल्ट लोगो सेट है
+                                                </div>
+                                                <div style={{ fontSize: '0.72rem', color: 'var(--gray-500)', fontWeight: 600 }}>
+                                                    (फोटो न डालने पर यही उपयोग होगा — बदलने के लिए यहाँ क्लिक करें)
+                                                </div>
+                                            </div>
                                         )}
                                         <input type="file" accept="image/*" onChange={handleImgFile} style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer', zIndex: imgPreview ? 1 : 2 }} />
                                     </div>

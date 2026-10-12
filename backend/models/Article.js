@@ -3,17 +3,17 @@ import mongoose from 'mongoose';
 const articleSchema = new mongoose.Schema({
     title: { type: String, required: true },
     slug: { type: String, index: true, unique: true, sparse: true }, // SEO-friendly URL
-    excerpt: { type: String, required: true },
+    excerpt: { type: String, default: '' },
     content: { type: String, required: true },
-    category: { type: String, required: true },
-    district: { type: String, required: true },
-    localArea: { type: String, default: '' },
-    image: { type: String, required: true },
+    category: { type: String, required: true, default: 'राजस्थान' },
+    district: { type: String, required: true, default: 'चूरू' },
+    localArea: { type: String, default: 'रतनगढ़' },
+    image: { type: String, default: 'https://res.cloudinary.com/dsczo1zim/image/upload/v1791826657/jgnews_defaults/default_news_logo.png' },
     videoUrl: { type: String, default: '' },
     isBreaking: { type: Boolean, default: false },
     isFeatured: { type: Boolean, default: false },
     isHidden: { type: Boolean, default: false }, // hidden articles don't appear on public site
-    author: { type: String, required: true },
+    author: { type: String, required: true, default: 'मनोज पारीक' },
     tags: [{ type: String }],
     date: { type: Date, default: Date.now },
     views: { type: Number, default: 0 },
