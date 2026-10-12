@@ -3,8 +3,8 @@ import express from 'express';
 
 const router = express.Router();
 
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'jgnews@shiva';
-const SUBADMIN_PASSWORD = process.env.SUBADMIN_PASSWORD || 'jgnews_subadmin';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'jgnews@manoj';
+const SUBADMIN_PASSWORD = process.env.SUBADMIN_PASSWORD || 'jgnews@shiva';
 const JWT_SECRET = process.env.JWT_SECRET || process.env.ADMIN_PASSWORD || 'jgnews_jwt_secret_change_me';
 const JWT_EXPIRES = '12h';
 
