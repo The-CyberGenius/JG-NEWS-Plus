@@ -29,15 +29,21 @@ api.interceptors.request.use((config) => {
     return config;
 });
 
-// If any admin request returns 401, clear session and bounce to /admin login
+// If any admin request returns 401, handle session safely
 api.interceptors.response.use(
     (res) => res,
     (err) => {
         if (err?.response?.status === 401) {
-            localStorage.removeItem(KEYS.TOKEN);
-            localStorage.removeItem(KEYS.ADMIN);
-            if (typeof window !== 'undefined' && window.location.pathname.startsWith('/admin')) {
-                window.location.href = '/admin';
+            const isEditing = typeof window !== 'undefined' &&
+                (window.location.pathname.includes('/admin/news/add') || window.location.pathname.includes('/admin/news/edit'));
+
+            // Do NOT force page redirect if editing news to avoid wiping out written content!
+            if (!isEditing) {
+                localStorage.removeItem(KEYS.TOKEN);
+                localStorage.removeItem(KEYS.ADMIN);
+                if (typeof window !== 'undefined' && window.location.pathname.startsWith('/admin')) {
+                    window.location.href = '/admin';
+                }
             }
         }
         return Promise.reject(err);
@@ -247,8 +253,25 @@ export const adminLogout = () => {
     localStorage.removeItem(KEYS.ROLE);
 };
 
-export const isAdminLoggedIn = () =>
-    localStorage.getItem(KEYS.ADMIN) === 'true';
+export const isAdminLoggedIn = () => {
+    const isSession = localStorage.getItem(KEYS.ADMIN) === 'true';
+    const token = localStorage.getItem(KEYS.TOKEN);
+    if (!isSession || !token) return false;
+
+    try {
+        const parts = token.split('.');
+        if (parts.length !== 3) return false;
+        const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
+        // If token has an exp claim and is expired, clear and return false
+        if (payload.exp && payload.exp * 1000 < Date.now()) {
+            adminLogout();
+            return false;
+        }
+        return true;
+    } catch {
+        return false;
+    }
+};
 
 export const getAdminRole = () =>
     localStorage.getItem(KEYS.ROLE) || 'admin';

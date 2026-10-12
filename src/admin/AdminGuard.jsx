@@ -1,19 +1,23 @@
 import React, { useEffect, useRef } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useNews } from '../context/NewsContext';
+import { isAdminLoggedIn } from '../store/newsStore';
 
 export default function AdminGuard({ children }) {
-    const { adminAuth, refresh } = useNews();
+    const { adminAuth, refresh, logout } = useNews();
     const refreshedRef = useRef(false);
 
-    // When admin enters admin panel, load FULL article list (not just first 30)
+    const isTokenFresh = adminAuth && isAdminLoggedIn();
+
     useEffect(() => {
-        if (adminAuth && !refreshedRef.current) {
+        if (!isAdminLoggedIn() && adminAuth) {
+            logout();
+        } else if (isTokenFresh && !refreshedRef.current) {
             refreshedRef.current = true;
             refresh();
         }
-    }, [adminAuth, refresh]);
+    }, [adminAuth, isTokenFresh, logout, refresh]);
 
-    if (!adminAuth) return <Navigate to="/admin" replace />;
+    if (!isTokenFresh) return <Navigate to="/admin" replace />;
     return children;
 }

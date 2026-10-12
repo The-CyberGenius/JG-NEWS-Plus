@@ -10,6 +10,7 @@ const RAJASTHAN_DISTRICTS = [
 ];
 
 const DEFAULT_NEWS_IMAGE = 'https://res.cloudinary.com/dsczo1zim/image/upload/v1791826657/jgnews_defaults/default_news_logo.png';
+const DRAFT_KEY = 'jgnews_news_draft';
 
 const EMPTY_FORM = {
     title: '',
@@ -41,7 +42,7 @@ const nowLocalInput = () => toLocalInput(new Date());
 export default function ArticleForm() {
     const { id } = useParams();
     const location = useLocation();
-    const { articles, categories, addArticle, updateArticle } = useNews();
+    const { articles, categories, addArticle, updateArticle, login } = useNews();
     const navigate = useNavigate();
     const isEdit = Boolean(id);
     const quillRef = useRef(null);
@@ -53,6 +54,11 @@ export default function ArticleForm() {
     const [toast, setToast] = useState('');
     const [imgPreview, setImgPreview] = useState('');
     const [imageFile, setImageFile] = useState(null);
+    const [draftRestored, setDraftRestored] = useState(false);
+    const [showReAuthModal, setShowReAuthModal] = useState(false);
+    const [reAuthPassword, setReAuthPassword] = useState('');
+    const [reAuthError, setReAuthError] = useState('');
+    const [reAuthSubmitting, setReAuthSubmitting] = useState(false);
 
     // --- Optimized Image Handler for Editor ---
     const imageHandler = () => {
@@ -133,9 +139,46 @@ export default function ArticleForm() {
                 isFeatured: aiPrefill.isFeatured || false,
                 date: nowLocalInput(),
             });
-            setImgPreview(aiPrefill.image || '');
+        } else if (!isEdit && !aiPrefill) {
+            // Restore draft if available
+            try {
+                const saved = localStorage.getItem(DRAFT_KEY);
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    if (parsed && (parsed.title || parsed.content)) {
+                        setForm(parsed);
+                        if (parsed.image) setImgPreview(parsed.image);
+                        setDraftRestored(true);
+                    }
+                }
+            } catch (e) {
+                console.error('Failed to restore draft', e);
+            }
         }
     }, [id, isEdit, articles, aiPrefill]);
+
+    // Auto-save draft on changes (only in add mode)
+    useEffect(() => {
+        if (!isEdit && !fromAiSync && (form.title?.trim() || form.content?.trim())) {
+            const timer = setTimeout(() => {
+                try {
+                    localStorage.setItem(DRAFT_KEY, JSON.stringify(form));
+                } catch {}
+            }, 500);
+            return () => clearTimeout(timer);
+        }
+    }, [form, isEdit, fromAiSync]);
+
+    const clearDraft = () => {
+        try {
+            localStorage.removeItem(DRAFT_KEY);
+        } catch {}
+        setForm({ ...EMPTY_FORM, date: nowLocalInput() });
+        setImgPreview('');
+        setImageFile(null);
+        setDraftRestored(false);
+        setToast('🗑️ ड्राफ्ट साफ़ कर दिया गया');
+    };
 
     const set = (key, val) => setForm(f => ({ ...f, [key]: val }));
 
@@ -152,13 +195,7 @@ export default function ArticleForm() {
         setImgPreview(URL.createObjectURL(file));
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        
-        if (!form.title.trim()) return setToast('❌ शीर्षक (Title) ज़रुरी है');
-        if (!form.category) return setToast('❌ श्रेणी (Category) चुनें');
-        if (!form.content.trim()) return setToast('❌ खबर विस्तार (Content) ज़रुरी है');
-
+    const executeSubmit = async () => {
         setSaving(true);
         let finalImageUrl = (form.image || '').trim();
 
@@ -189,6 +226,9 @@ export default function ArticleForm() {
                 setToast('✅ खबर अपडेट हो गई!');
             } else {
                 await addArticle(data);
+                try {
+                    localStorage.removeItem(DRAFT_KEY);
+                } catch {}
                 setToast('✅ खबर सफलतापूर्वक जोड़ी गई!');
             }
             setTimeout(() => {
@@ -197,9 +237,47 @@ export default function ArticleForm() {
             }, 1500);
         } catch (error) {
             console.error('Failed to save article:', error);
-            setToast('❌ विफल: ' + (error.response?.data?.message || error.message));
+            if (error.response?.status === 401) {
+                setShowReAuthModal(true);
+                setReAuthError('सत्र समाप्त हो गया है। कृपया पासवर्ड डालें — आपका लिखा हुआ आर्टिकल सुरक्षित है!');
+            } else {
+                setToast('❌ विफल: ' + (error.response?.data?.message || error.message));
+            }
         } finally {
             setSaving(false);
+        }
+    };
+
+    const handleSubmit = async (e) => {
+        if (e && e.preventDefault) e.preventDefault();
+        
+        if (!form.title.trim()) return setToast('❌ शीर्षक (Title) ज़रुरी है');
+        if (!form.category) return setToast('❌ श्रेणी (Category) चुनें');
+        if (!form.content.trim()) return setToast('❌ खबर विस्तार (Content) ज़रुरी है');
+
+        await executeSubmit();
+    };
+
+    const handleReAuthSubmit = async (e) => {
+        e.preventDefault();
+        if (!reAuthPassword.trim()) return;
+        setReAuthSubmitting(true);
+        setReAuthError('');
+
+        try {
+            const ok = await login(reAuthPassword.trim());
+            if (ok) {
+                setShowReAuthModal(false);
+                setReAuthPassword('');
+                setToast('✅ लॉगिन सफल! खबर तुरंत पोस्ट की जा रही है...');
+                await executeSubmit();
+            } else {
+                setReAuthError('गलत पासवर्ड! कृपया पुनः प्रयास करें।');
+            }
+        } catch (err) {
+            setReAuthError('लॉगिन विफल: ' + (err.response?.data?.message || err.message));
+        } finally {
+            setReAuthSubmitting(false);
         }
     };
 
@@ -229,6 +307,31 @@ export default function ArticleForm() {
                     </p>
                 </div>
             </div>
+
+            {draftRestored && !isEdit && (
+                <div style={{
+                    background: '#ecfdf5', border: '1px solid #a7f3d0', color: '#065f46',
+                    padding: '12px 18px', borderRadius: '14px', marginBottom: '24px',
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '15px',
+                    boxShadow: '0 2px 10px rgba(0,0,0,0.03)'
+                }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.9rem', fontWeight: 700 }}>
+                        <span style={{ fontSize: '1.2rem' }}>💾</span>
+                        <span>आपका पिछला सुरक्षित ड्राफ्ट ऑटो-रीस्टोर कर लिया गया है।</span>
+                    </div>
+                    <button
+                        type="button"
+                        onClick={clearDraft}
+                        style={{
+                            background: 'white', border: '1px solid #6ee7b7', color: '#065f46',
+                            padding: '6px 12px', borderRadius: '8px', cursor: 'pointer',
+                            fontWeight: 700, fontSize: '0.8rem'
+                        }}
+                    >
+                        ड्राफ्ट साफ़ करें (Reset)
+                    </button>
+                </div>
+            )}
 
             <form onSubmit={handleSubmit}>
                 <div className="article-form-grid">
@@ -467,6 +570,63 @@ export default function ArticleForm() {
                     </div>
                 </div>
             </form>
+
+            {/* Seamless In-Page Re-Auth Modal (Prevents text loss if session dropped) */}
+            {showReAuthModal && (
+                <div style={{
+                    position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.75)',
+                    backdropFilter: 'blur(6px)', zIndex: 99999,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px'
+                }}>
+                    <div style={{
+                        background: 'white', borderRadius: '24px', padding: '36px', maxWidth: '420px', width: '100%',
+                        boxShadow: '0 25px 70px rgba(0,0,0,0.35)', textAlign: 'center'
+                    }}>
+                        <div style={{ fontSize: '2.6rem', marginBottom: '12px' }}>🔐</div>
+                        <h3 style={{ margin: '0 0 8px', color: 'var(--navy)', fontWeight: 900, fontSize: '1.35rem' }}>
+                            लॉगिन सत्र समाप्त हुआ
+                        </h3>
+                        <p style={{ color: 'var(--gray-600)', fontSize: '0.88rem', marginBottom: '20px', lineHeight: 1.5 }}>
+                            चिंता न करें! <strong>आपका लिखा हुआ आर्टिकल 100% सुरक्षित है।</strong> बस पासवर्ड डालकर तुरंत पोस्ट करें:
+                        </p>
+                        {reAuthError && (
+                            <div style={{ background: '#fee2e2', color: '#dc2626', padding: '10px 14px', borderRadius: '12px', fontSize: '0.82rem', marginBottom: '16px', fontWeight: 700 }}>
+                                {reAuthError}
+                            </div>
+                        )}
+                        <form onSubmit={handleReAuthSubmit}>
+                            <input
+                                type="password"
+                                className="form-control"
+                                placeholder="एडमिन या सबएडमिन पासवर्ड..."
+                                value={reAuthPassword}
+                                onChange={e => setReAuthPassword(e.target.value)}
+                                autoFocus
+                                required
+                                style={{ padding: '14px 16px', fontSize: '1rem', borderRadius: '14px', marginBottom: '16px', border: '2px solid var(--gray-200)' }}
+                            />
+                            <div style={{ display: 'flex', gap: '10px' }}>
+                                <button
+                                    type="button"
+                                    onClick={() => setShowReAuthModal(false)}
+                                    className="btn"
+                                    style={{ flex: 1, background: 'var(--gray-100)', color: 'var(--gray-700)', padding: '12px', borderRadius: '12px', fontWeight: 700 }}
+                                >
+                                    रद्द करें
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="btn btn-primary"
+                                    disabled={reAuthSubmitting}
+                                    style={{ flex: 2, padding: '12px', borderRadius: '12px', fontWeight: 800 }}
+                                >
+                                    {reAuthSubmitting ? 'जाँच हो रही है...' : 'लॉगिन और पोस्ट करें 🚀'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
 
             <style>{`
                 .article-form-grid {
