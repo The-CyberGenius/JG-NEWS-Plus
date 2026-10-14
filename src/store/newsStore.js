@@ -207,6 +207,17 @@ export const updateSettings = async (updates) => {
     }
 };
 
+// Fetch latest videos from JG News YouTube channel
+export const getLatestYouTubeVideos = async (limit = 5) => {
+    try {
+        const response = await api.get('/settings/youtube-videos', { params: { limit } });
+        return response.data || [];
+    } catch (error) {
+        console.error("Error fetching latest youtube videos", error);
+        return [];
+    }
+};
+
 // Fetch distinct locations (with counts) for the location filter pills
 export const fetchMetaDistricts = async () => {
     try {
